@@ -1,7 +1,12 @@
-export default function Categories(): React.ReactElement {
+import Categories from "@/Features/Categories/page";
+
+export default function OrderManagement(): React.ReactElement {
     return (
         <div>
-            <h1>Categories page</h1>
+            
+            <Categories />
+
+
         </div>
     );
 }

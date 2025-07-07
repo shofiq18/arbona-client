@@ -11,10 +11,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
-import { FilterFormValues, Order } from "@/types";
+import { AddOrderFormValues, FilterFormValues, Order } from "@/types";
 import { useState } from "react";
 import { ReusableModal } from "@/components/ReusableModal";
 import { OrderFilterForm } from "@/components/OrderFilterForm";
+import { AddOrderForm } from "@/components/AddOrderForm";
 
 export default function OrderManagement(): React.ReactElement {
   const {
@@ -30,6 +31,18 @@ export default function OrderManagement(): React.ReactElement {
     isError: boolean;
     error: object;
   };
+
+  const [addOrderOpen, setAddOrderOpen] = useState(false);
+
+  function handleAddOrderSubmit(values: AddOrderFormValues) {
+    // Implement your add order logic here (API call, state update, etc.)
+    console.log("Add Order:", values);
+    setAddOrderOpen(false);
+  }
+
+  function handleAddOrderCancel() {
+    setAddOrderOpen(false);
+  }
 
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -140,7 +153,17 @@ export default function OrderManagement(): React.ReactElement {
               onClear={handleFilterClear}
             />
           </ReusableModal>
-          <Button className="bg-[#EF4343]">+ Add Order</Button>
+          <ReusableModal
+            open={addOrderOpen}
+            onOpenChange={setAddOrderOpen}
+            trigger={<Button className="bg-[#EF4343]">+ Add Order</Button>}
+            title="Add New Order"
+          >
+            <AddOrderForm
+              onSubmit={handleAddOrderSubmit}
+              onCancel={handleAddOrderCancel}
+            />
+          </ReusableModal>
           <Button className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>

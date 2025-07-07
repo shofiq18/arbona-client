@@ -72,3 +72,24 @@ export interface OrderFilterFormProps {
   onSubmit: (values: FilterFormValues) => void;
   onClear?: () => void;
 }
+
+export interface AddOrderFormValues {
+  date: string;
+  invoiceNumber: string;
+  PONumber: string;
+  storeName: string;
+  paymentDueDate: string;
+  orderAmount: string;
+  orderStatus: string;
+  paymentAmountReceived: string;
+  discountGiven: string;
+  openBalance: string;
+  profitAmount: string;
+  profitPercentage: string;
+  paymentStatus: string;
+}
+
+export interface AddOrderFormProps {
+  onSubmit: (values: AddOrderFormValues) => void;
+  onCancel?: () => void;
+}

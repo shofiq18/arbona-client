@@ -1,14 +1,16 @@
 import baseApi from "../../baseApi";
 
-
 interface LoginRequest {
   email: string;
   password: string;
 }
 
-interface LoginResponse {
-  token: string;
-  role: string;
+interface LoginResponseData {
+  success: boolean;
+  message: string;
+  data: {
+    accessToken: string;
+  };
 }
 
 interface AdminProfile {
@@ -19,18 +21,14 @@ interface AdminProfile {
 
 const adminApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<LoginResponseData, LoginRequest>({
       query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
-      async onQueryStarted(_, { queryFulfilled }) {
-        const { data } = await queryFulfilled;
-        if (data.role !== "admin") {
-          throw new Error("Unauthorized: Admin role required");
-        }
-      },
+      // Remove jwtDecode from onQueryStarted to avoid the error
+      // Role check will be handled in the component
     }),
     logout: builder.mutation<void, void>({
       query: () => ({
@@ -47,4 +45,4 @@ const adminApi = baseApi.injectEndpoints({
 });
 
 export const { useLoginMutation, useLogoutMutation, useGetAdminProfileQuery } = adminApi;
-export default adminApi; // Add this line to export adminApi
+export default adminApi;

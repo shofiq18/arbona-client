@@ -10,12 +10,12 @@ interface Customer {
 const customersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCustomers: builder.query<Customer[], void>({
-      query: () => "/customers",
+      query: () => "/customer",
       providesTags: ["Customers"],
     }),
     addCustomer: builder.mutation<Customer, Partial<Customer>>({
       query: (customer) => ({
-        url: "/customers",
+        url: "/customer",
         method: "POST",
         body: customer,
       }),
@@ -23,15 +23,15 @@ const customersApi = baseApi.injectEndpoints({
     }),
     updateCustomer: builder.mutation<Customer, Partial<Customer> & { id: number }>({
       query: ({ id, ...patch }) => ({
-        url: `/customers/${id}`,
-        method: "PUT",
+        url: `/customer/${id}`,
+        method: "PATCH",
         body: patch,
       }),
       invalidatesTags: ["Customers"],
     }),
     deleteCustomer: builder.mutation<{ success: boolean }, number>({
       query: (id) => ({
-        url: `/customers/${id}`,
+        url: `/customer/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Customers"],

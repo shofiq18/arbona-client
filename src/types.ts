@@ -1,4 +1,4 @@
-export type Order = {
+export interface Order {
   _id: string;
   date: string; // e.g., "2025-07-05"
   invoiceNumber: string;
@@ -47,4 +47,28 @@ export type Order = {
   createdAt: string;
   updatedAt: string;
   __v: number;
-};
+}
+
+export interface ReusableModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  trigger: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}
+
+export interface FilterFormValues {
+  fromDate: string;
+  toDate: string;
+  fromDueDate: string;
+  toDueDate: string;
+  storeName: string;
+  productStatus: string;
+  orderStatus: string;
+  verificationStatus: string;
+}
+
+export interface OrderFilterFormProps {
+  onSubmit: (values: FilterFormValues) => void;
+  onClear?: () => void;
+}

@@ -11,7 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
-import { Order } from "@/types";
+import { FilterFormValues, Order } from "@/types";
+import { useState } from "react";
+import { ReusableModal } from "@/components/ReusableModal";
+import { OrderFilterForm } from "@/components/OrderFilterForm";
 
 export default function OrderManagement(): React.ReactElement {
   const {
@@ -27,6 +30,20 @@ export default function OrderManagement(): React.ReactElement {
     isError: boolean;
     error: object;
   };
+
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  // ...existing code for fetching orders...
+
+  function handleFilterSubmit(values: FilterFormValues) {
+    // Implement filter logic here (update query params, refetch, etc.)
+    console.log(values);
+    setFilterOpen(false);
+  }
+
+  function handleFilterClear() {
+    // Implement clear logic here
+  }
 
   const cardData = [
     {
@@ -105,17 +122,24 @@ export default function OrderManagement(): React.ReactElement {
 
       {/* Section 2: Search & Filter option */}
       <div className="flex items-center justify-between w-full space-x-4 mt-6 mb-10">
-        {/* Search Input */}
         <Input
           type="text"
           placeholder="Search product..."
           className="max-w-xs"
         />
-
-        {/* Action Buttons */}
         <div className="flex items-center space-x-2">
           <Button className="bg-[#21C45D]">Hide Boards</Button>
-          <Button className="bg-[#FF9012]">Filter</Button>
+          <ReusableModal
+            open={filterOpen}
+            onOpenChange={setFilterOpen}
+            trigger={<Button className="bg-[#FF9012]">Filter</Button>}
+            title="Product Filters"
+          >
+            <OrderFilterForm
+              onSubmit={handleFilterSubmit}
+              onClear={handleFilterClear}
+            />
+          </ReusableModal>
           <Button className="bg-[#EF4343]">+ Add Order</Button>
           <Button className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
@@ -248,80 +272,3 @@ export default function OrderManagement(): React.ReactElement {
     </div>
   );
 }
-
-// {
-//     "_id": "6869ae5bc51a16d6e5b3df93",
-//     "date": "2025-07-05",
-//     "invoiceNumber": "INV-003-2025",
-//     "PONumber": "PO-12345",
-//     "storeId": "6868134c700b677ce9c8d09e",
-//     "paymentDueDate": "2025-07-20",
-//     "orderAmount": 225,
-//     "orderStatus": "verified",
-//     "isDeleted": false,
-//     "paymentAmountReceived": 500,
-//     "discountGiven": 25,
-//     "openBalance": -300,
-//     "profitAmount": 100,
-//     "profitPercentage": 80,
-//     "paymentStatus": "notPaid",
-//     "products": [
-//         {
-//             "productId": {
-//                 "packageDimensions": {
-//                     "length": 30,
-//                     "width": 20,
-//                     "height": 15,
-//                     "unit": "CM"
-//                 },
-//                 "_id": "68670fce4de386639cd11483",
-//                 "name": "Kitchen Towel Roll - Super Absorbent",
-//                 "packetQuantity": 12,
-//                 "packingUnit": "PACKET",
-//                 "weight": 2.5,
-//                 "weightUnit": "KILOGRAM",
-//                 "categoryId": "68670d014de386639cd11476",
-//                 "reorderPointOfQuantity": 20,
-//                 "salesPrice": 10,
-//                 "purchasePrice": 5,
-//                 "barcodeString": "111000000001",
-//                 "itemNumber": "KT-JMB-12",
-//                 "quantity": 120,
-//                 "warehouseLocation": "R1-S2-A3",
-//                 "createdAt": "2025-07-03T23:18:38.715Z",
-//                 "updatedAt": "2025-07-03T23:32:05.244Z",
-//                 "__v": 0
-//             },
-//             "quantity": 5,
-//             "discount": 10,
-//             "_id": "6869ae5bc51a16d6e5b3df94"
-//         },
-//         {
-//             "productId": {
-//                 "_id": "68670ff34de386639cd11487",
-//                 "name": "Multifold Paper Towels - White",
-//                 "packetQuantity": 24,
-//                 "packingUnit": "BOX",
-//                 "weight": 4,
-//                 "weightUnit": "KILOGRAM",
-//                 "categoryId": "68670d014de386639cd11476",
-//                 "reorderPointOfQuantity": 30,
-//                 "salesPrice": 20,
-//                 "purchasePrice": 10,
-//                 "barcodeString": "111000000002",
-//                 "itemNumber": "MPT-WHT-24",
-//                 "quantity": 300,
-//                 "warehouseLocation": "R2-S1-B1",
-//                 "createdAt": "2025-07-03T23:19:15.491Z",
-//                 "updatedAt": "2025-07-03T23:19:15.491Z",
-//                 "__v": 0
-//             },
-//             "quantity": 10,
-//             "discount": 15,
-//             "_id": "6869ae5bc51a16d6e5b3df95"
-//         }
-//     ],
-//     "createdAt": "2025-07-05T22:59:39.176Z",
-//     "updatedAt": "2025-07-05T22:59:39.176Z",
-//     "__v": 0
-// }

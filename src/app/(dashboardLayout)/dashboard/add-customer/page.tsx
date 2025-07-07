@@ -1,11 +1,11 @@
-
-import CustomerTable from "@/Features/Customers/CustomerTable";
+import AddCustomers from "@/Features/Customers/AddCustomers";
 
 export default function Customers(): React.ReactElement {
     return (
         <div>
            
-            <CustomerTable />
+           <AddCustomers />
+            
 
         </div>
     );

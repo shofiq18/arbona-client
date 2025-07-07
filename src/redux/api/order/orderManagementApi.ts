@@ -1,6 +1,5 @@
 import baseApi from "../baseApi";
 
-
 interface Order {
   id: number;
   productId: number;
@@ -11,7 +10,7 @@ interface Order {
 const orderManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
-      query: () => "/orders",
+      query: () => "/order",
       providesTags: ["Orders"],
     }),
     addOrder: builder.mutation<Order, Partial<Order>>({
@@ -40,5 +39,10 @@ const orderManagementApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetOrdersQuery, useAddOrderMutation, useUpdateOrderMutation, useDeleteOrderMutation } = orderManagementApi;
+export const {
+  useGetOrdersQuery,
+  useAddOrderMutation,
+  useUpdateOrderMutation,
+  useDeleteOrderMutation,
+} = orderManagementApi;
 export default orderManagementApi;

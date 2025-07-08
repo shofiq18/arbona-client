@@ -53,7 +53,10 @@ const Categories: React.FC = () => {
     useDeleteCategoryMutation();
 
   // ✅ Extract array safely
-  const categoriesData: Category[] = data ?? [];
+  
+const categoriesData: Category[] = data?.data ?? [];
+
+
 
   const filteredCategories = categoriesData.filter(
     (category) =>
@@ -187,7 +190,7 @@ const Categories: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Add Category</DialogTitle>
               <DialogDescription>
-                Add a new category here. Click save when your&apos;e done.
+                Add a new category here. Click save when you are done.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
@@ -318,8 +321,7 @@ const Categories: React.FC = () => {
                       <DialogHeader>
                         <DialogTitle>Update Category</DialogTitle>
                         <DialogDescription>
-                          Update the category details here. Click save when
-                          you&apos;re done.
+                          Update the category details here. Click save when you are done.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4">

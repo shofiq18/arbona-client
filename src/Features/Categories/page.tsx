@@ -41,15 +41,19 @@ const Categories: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: "", description: "" });
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
 
   const { data, isLoading, isError, refetch } = useGetCategoriesQuery();
   const [addCategory, { isLoading: isCreating }] = useAddCategoryMutation();
-  const [updateCategory, { isLoading: isUpdating }] = useUpdateCategoryMutation();
-  const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
+  const [updateCategory, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
+  const [deleteCategory, { isLoading: isDeleting }] =
+    useDeleteCategoryMutation();
 
   // ✅ Extract array safely
-  const categoriesData: Category[] = data?.data ?? [];
+  const categoriesData: Category[] = data ?? [];
 
   const filteredCategories = categoriesData.filter(
     (category) =>
@@ -59,7 +63,10 @@ const Categories: React.FC = () => {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentCategories = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
+  const currentCategories = filteredCategories.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
 
   useEffect(() => {
@@ -110,7 +117,10 @@ const Categories: React.FC = () => {
   const handleSaveUpdate = async () => {
     if (selectedCategory && newCategory.name && newCategory.description) {
       try {
-        await updateCategory({ _id: selectedCategory._id, ...newCategory }).unwrap();
+        await updateCategory({
+          _id: selectedCategory._id,
+          ...newCategory,
+        }).unwrap();
         toast.success("Category updated successfully!");
         setNewCategory({ name: "", description: "" });
         setIsUpdateModalOpen(false);
@@ -177,7 +187,7 @@ const Categories: React.FC = () => {
             <DialogHeader>
               <DialogTitle>Add Category</DialogTitle>
               <DialogDescription>
-                Add a new category here. Click save when you're done.
+                Add a new category here. Click save when your&apos;e done.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
@@ -197,7 +207,10 @@ const Categories: React.FC = () => {
                   id="description-1"
                   value={newCategory.description}
                   onChange={(e) =>
-                    setNewCategory({ ...newCategory, description: e.target.value })
+                    setNewCategory({
+                      ...newCategory,
+                      description: e.target.value,
+                    })
                   }
                 />
               </div>
@@ -231,9 +244,15 @@ const Categories: React.FC = () => {
                 <td className="p-2">{category.name}</td>
                 <td className="p-2">{category.description}</td>
                 <td className="p-2 flex space-x-2">
-                  <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+                  <Dialog
+                    open={isViewModalOpen}
+                    onOpenChange={setIsViewModalOpen}
+                  >
                     <DialogTrigger asChild>
-                      <button onClick={() => handleView(category)} className="text-gray-600 hover:text-gray-800">
+                      <button
+                        onClick={() => handleView(category)}
+                        className="text-gray-600 hover:text-gray-800"
+                      >
                         <Image
                           src="/dashboardIcons/eye.png"
                           width={20}
@@ -253,11 +272,19 @@ const Categories: React.FC = () => {
                       <div className="grid gap-4">
                         <div className="grid gap-3">
                           <Label htmlFor="view-name">Name</Label>
-                          <Input id="view-name" value={selectedCategory?.name || ""} readOnly />
+                          <Input
+                            id="view-name"
+                            value={selectedCategory?.name || ""}
+                            readOnly
+                          />
                         </div>
                         <div className="grid gap-3">
                           <Label htmlFor="view-description">Description</Label>
-                          <Input id="view-description" value={selectedCategory?.description || ""} readOnly />
+                          <Input
+                            id="view-description"
+                            value={selectedCategory?.description || ""}
+                            readOnly
+                          />
                         </div>
                       </div>
                       <DialogFooter>
@@ -269,10 +296,20 @@ const Categories: React.FC = () => {
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                  <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
+                  <Dialog
+                    open={isUpdateModalOpen}
+                    onOpenChange={setIsUpdateModalOpen}
+                  >
                     <DialogTrigger asChild>
-                      <button onClick={() => handleUpdate(category)} className="text-gray-600 hover:text-gray-800">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                      <button
+                        onClick={() => handleUpdate(category)}
+                        className="text-gray-600 hover:text-gray-800"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
                           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                         </svg>
                       </button>
@@ -281,7 +318,8 @@ const Categories: React.FC = () => {
                       <DialogHeader>
                         <DialogTitle>Update Category</DialogTitle>
                         <DialogDescription>
-                          Update the category details here. Click save when you're done.
+                          Update the category details here. Click save when
+                          you&apos;re done.
                         </DialogDescription>
                       </DialogHeader>
                       <div className="grid gap-4">
@@ -291,7 +329,10 @@ const Categories: React.FC = () => {
                             id="name-2"
                             value={newCategory.name}
                             onChange={(e) =>
-                              setNewCategory({ ...newCategory, name: e.target.value })
+                              setNewCategory({
+                                ...newCategory,
+                                name: e.target.value,
+                              })
                             }
                           />
                         </div>
@@ -301,7 +342,10 @@ const Categories: React.FC = () => {
                             id="description-2"
                             value={newCategory.description}
                             onChange={(e) =>
-                              setNewCategory({ ...newCategory, description: e.target.value })
+                              setNewCategory({
+                                ...newCategory,
+                                description: e.target.value,
+                              })
                             }
                           />
                         </div>
@@ -312,15 +356,24 @@ const Categories: React.FC = () => {
                             Cancel
                           </Button>
                         </DialogClose>
-                        <Button onClick={handleSaveUpdate} disabled={isUpdating}>
+                        <Button
+                          onClick={handleSaveUpdate}
+                          disabled={isUpdating}
+                        >
                           {isUpdating ? "Updating..." : "Save changes"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
                   </Dialog>
-                  <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+                  <Dialog
+                    open={isDeleteConfirmOpen}
+                    onOpenChange={setIsDeleteConfirmOpen}
+                  >
                     <DialogTrigger asChild>
-                      <button onClick={() => handleDelete(category)} className="text-gray-600 hover:text-gray-800">
+                      <button
+                        onClick={() => handleDelete(category)}
+                        className="text-gray-600 hover:text-gray-800"
+                      >
                         <Image
                           src="/dashboardIcons/delete.png"
                           width={20}
@@ -334,7 +387,9 @@ const Categories: React.FC = () => {
                       <DialogHeader>
                         <DialogTitle>Confirm Delete</DialogTitle>
                         <DialogDescription>
-                          Are you sure you want to delete {selectedCategory?.name}? This action cannot be undone.
+                          Are you sure you want to delete{" "}
+                          {selectedCategory?.name}? This action cannot be
+                          undone.
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>
@@ -343,7 +398,11 @@ const Categories: React.FC = () => {
                             Cancel
                           </Button>
                         </DialogClose>
-                        <Button onClick={confirmDelete} disabled={isDeleting} variant="destructive">
+                        <Button
+                          onClick={confirmDelete}
+                          disabled={isDeleting}
+                          variant="destructive"
+                        >
                           {isDeleting ? "Deleting..." : "Delete"}
                         </Button>
                       </DialogFooter>
@@ -364,7 +423,8 @@ const Categories: React.FC = () => {
 
       <div className="mt-4 flex justify-between items-center">
         <p className="text-gray-600">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredCategories.length)} of{" "}
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, filteredCategories.length)} of{" "}
           {filteredCategories.length} categories
         </p>
         <div className="flex space-x-2">
@@ -390,7 +450,9 @@ const Categories: React.FC = () => {
             variant="outline"
             size="sm"
             disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
           >
             Next
           </Button>

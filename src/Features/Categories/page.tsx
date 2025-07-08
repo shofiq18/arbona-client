@@ -50,6 +50,7 @@ const Categories: React.FC = () => {
 
   // ✅ Extract array safely
   const categoriesData: Category[] = data?.data ?? [];
+  console.log(categoriesData);
 
   const filteredCategories = categoriesData.filter(
     (category) =>

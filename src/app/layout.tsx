@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/redux/api/provider";
- // Adjust the path based on your structure
-
+// Adjust the path based on your structure
+import { Toaster } from 'react-hot-toast'
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,6 +33,10 @@ export default function RootLayout({
         <ReduxProvider>
           <div className="">{children}</div>
         </ReduxProvider>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+        />
       </body>
     </html>
   );

@@ -49,8 +49,8 @@ const Categories: React.FC = () => {
   const [deleteCategory, { isLoading: isDeleting }] = useDeleteCategoryMutation();
 
   // ✅ Extract array safely
-  
-const categoriesData: Category[] = data?.data ?? [];
+
+  const categoriesData: Category[] = data?.data ?? [];
 
 
 
@@ -84,7 +84,7 @@ const categoriesData: Category[] = data?.data ?? [];
       } catch (error) {
         toast.error(
           "Failed to add category: " +
-            (error instanceof Error ? error.message : "Unknown error")
+          (error instanceof Error ? error.message : "Unknown error")
         );
       }
     }
@@ -121,7 +121,7 @@ const categoriesData: Category[] = data?.data ?? [];
       } catch (error) {
         toast.error(
           "Failed to update category: " +
-            (error instanceof Error ? error.message : "Unknown error")
+          (error instanceof Error ? error.message : "Unknown error")
         );
       }
     }
@@ -143,7 +143,7 @@ const categoriesData: Category[] = data?.data ?? [];
       } catch (error) {
         toast.error(
           "Failed to delete category: " +
-            (error instanceof Error ? error.message : "Unknown error")
+          (error instanceof Error ? error.message : "Unknown error")
         );
       }
     }
@@ -158,7 +158,7 @@ const categoriesData: Category[] = data?.data ?? [];
   if (isError) return <p>Error loading categories. Please try again later.</p>;
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
+    <div className="p-4 ">
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"

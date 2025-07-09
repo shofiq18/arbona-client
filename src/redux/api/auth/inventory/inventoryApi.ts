@@ -1,37 +1,97 @@
+
+
+
 import baseApi from "../../baseApi";
 
+// Full Inventory Type (as received from backend)
+export interface payload {
+  _id: string;
+  name: string;
+  description?: string;
+  itemNumber: string;
+  barcodeString: string;
+  categoryId?: { _id: string; name: string }; // Full object from DB
+  packetSize: string;
+  weight: number;
+  weightUnit: string;
+  profitPercentage: number;
+  packageDimensions: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+  quantity: number;
+  reorderPointOfQuantity: number;
+  warehouseLocation: string;
+  purchasePrice: number;
+  salesPrice: number;
+  competitorPrice: number;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
 
-interface Inventory {
-  id: number;
-  productId: number;
-  stock: number;
+// ✅ New payload type for update mutation
+export type UpdateInventoryPayload = {
+  _id: string;
+  name: string;
+  description?: string;
+  packetSize: string;
+  weight: number;
+  weightUnit: string;
+  categoryId: string; // ✅ only string ID
+  reorderPointOfQuantity: number;
+  quantity: number;
+  warehouseLocation: string;
+  purchasePrice: number;
+  salesPrice: number;
+  competitorPrice: number;
+  barcodeString: string;
+  packageDimensions: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+};
+
+interface InventoryResponse {
+  success: boolean;
+  message: string;
+  data: payload[];
 }
 
 const inventoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getInventory: builder.query<Inventory[], void>({
-      query: () => "/inventory",
+    getInventory: builder.query<InventoryResponse, void>({
+      query: () => "/product",
       providesTags: ["Inventory"],
     }),
-    addInventory: builder.mutation<Inventory, Partial<Inventory>>({
+
+    addInventory: builder.mutation<payload, Partial<payload>>({
       query: (inventory) => ({
-        url: "/inventory",
+        url: "/product",
         method: "POST",
         body: inventory,
       }),
       invalidatesTags: ["Inventory"],
     }),
-    updateInventory: builder.mutation<Inventory, Partial<Inventory> & { id: number }>({
-      query: ({ id, ...patch }) => ({
-        url: `/inventory/${id}`,
-        method: "PUT",
+
+    // ✅ Updated mutation uses the new UpdateInventoryPayload
+    updateInventory: builder.mutation<payload, UpdateInventoryPayload>({
+      query: ({ _id, ...patch }) => ({
+        url: `/product/${_id}`,
+        method: "PATCH",
         body: patch,
       }),
       invalidatesTags: ["Inventory"],
     }),
-    deleteInventory: builder.mutation<{ success: boolean }, number>({
-      query: (id) => ({
-        url: `/inventory/${id}`,
+
+    deleteInventory: builder.mutation<{ success: boolean }, string>({
+      query: (_id) => ({
+        url: `/product/${_id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Inventory"],
@@ -39,5 +99,11 @@ const inventoryApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetInventoryQuery, useAddInventoryMutation, useUpdateInventoryMutation, useDeleteInventoryMutation } = inventoryApi;
+export const {
+  useGetInventoryQuery,
+  useAddInventoryMutation,
+  useUpdateInventoryMutation,
+  useDeleteInventoryMutation,
+} = inventoryApi;
+
 export default inventoryApi;

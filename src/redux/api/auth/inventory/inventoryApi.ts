@@ -3,6 +3,9 @@
 
 import baseApi from "../../baseApi";
 
+
+
+
 // Full Inventory Type (as received from backend)
 export interface payload {
   _id: string;
@@ -32,6 +35,12 @@ export interface payload {
   updatedAt: string;
   __v?: number;
 }
+
+export type PacketSizeResponse = {
+  success: boolean;
+  message: string;
+  data: string[];
+};
 
 // ✅ New payload type for update mutation
 export type UpdateInventoryPayload = {
@@ -96,6 +105,13 @@ const inventoryApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Inventory"],
     }),
+
+    // get all pack size 
+    getPackSize: builder.query<PacketSizeResponse, void>({
+      query: () => "/product/packet-sizes",
+      providesTags: ["Inventory"],
+    }),
+
   }),
 });
 
@@ -104,6 +120,8 @@ export const {
   useAddInventoryMutation,
   useUpdateInventoryMutation,
   useDeleteInventoryMutation,
+  useGetPackSizeQuery
 } = inventoryApi;
 
 export default inventoryApi;
+

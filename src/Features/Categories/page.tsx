@@ -22,6 +22,8 @@ import {
   useUpdateCategoryMutation,
   useDeleteCategoryMutation,
 } from "@/redux/api/auth/categories/categoriesApi";
+import Loading from "@/redux/Shared/Loading";
+import ErrorState from "@/redux/Shared/ErrorState";
 
 interface Category {
   _id: string;
@@ -164,8 +166,8 @@ const Categories: React.FC = () => {
     setSelectedCategory(null);
   };
 
-  if (isLoading) return <p>Loading categories...</p>;
-  if (isError) return <p>Error loading categories. Please try again later.</p>;
+  if (isLoading) return <Loading title="Loading categories" message="all categories data fetched "/>;
+  if (isError) return <ErrorState title="fetch error"message=" categories data fetch error" />;
 
   return (
     <div className="p-4 ">

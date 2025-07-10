@@ -66,6 +66,30 @@ export type UpdateInventoryPayload = {
   };
 };
 
+export interface CreateInventoryPayload {
+  name: string;
+  itemNumber: string;
+  quantity: number;
+  reorderPointOfQuantity: number;
+  weight: number;
+  weightUnit: string;
+  purchasePrice: number;
+  salesPrice: number;
+  competitorPrice: number;
+  barcodeString: string;
+  warehouseLocation: string;
+  packetSize: string;
+  categoryId: string; // ✅ just string here
+  packageDimensions: {
+    length: number;
+    width: number;
+    height: number;
+    unit: string;
+  };
+  isDeleted: boolean;
+}
+
+
 interface InventoryResponse {
   success: boolean;
   message: string;
@@ -79,7 +103,7 @@ const inventoryApi = baseApi.injectEndpoints({
       providesTags: ["Inventory"],
     }),
 
-    addInventory: builder.mutation<payload, Partial<payload>>({
+    addInventory: builder.mutation<payload, CreateInventoryPayload>({
       query: (inventory) => ({
         url: "/product",
         method: "POST",

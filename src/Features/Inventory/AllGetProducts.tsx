@@ -35,18 +35,22 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import Loading from "@/redux/Shared/Loading";
+import ErrorState from "@/redux/Shared/ErrorState";
 
 
 
 
 export default function AllGetProducts() {
   const [search, setSearch] = useState("");
-  const { data } = useGetInventoryQuery();
+  const router = useRouter();
+  const { data, isLoading, isError } = useGetInventoryQuery();
   const [deleteInventory] = useDeleteInventoryMutation();
   const [updateInventory] = useUpdateInventoryMutation();
   const products: payload[] = data?.data ?? [];
 
-  console.log("getdata", products);
+  console.log("get data", products);
 
   // Filter products based on search
   const filteredProducts = products.filter((product) =>
@@ -66,6 +70,10 @@ export default function AllGetProducts() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+
+
+
 
   // Permission check (replace with your auth logic)
   const hasDeletePermission = true; // Placeholder
@@ -132,6 +140,14 @@ export default function AllGetProducts() {
     }
   };
 
+   if(isLoading){
+    return <Loading  title="All Product Loading... " message="all product fetch successfully "/>
+   }
+
+   if (isError){
+    return <ErrorState title="loading error" message="fetching error"/>
+   }
+
 
 
 
@@ -153,8 +169,8 @@ export default function AllGetProducts() {
             Filter
           </Button>
           <Button
-            className="bg-red-600 hover:bg-red-700 text-white gap-2"
-            onClick={() => console.log("Add Customer clicked")}
+            className="bg-red-600 cursor-pointer hover:bg-red-700 text-white gap-2"
+            onClick={() => router.push("/dashboard/add-product")}
           >
             <PlusCircle className="h-4 w-4" /> Add Product
           </Button>

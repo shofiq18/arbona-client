@@ -6,6 +6,7 @@
 import { useGetCategoriesQuery } from '@/redux/api/auth/categories/categoriesApi';
 import { useAddInventoryMutation, useGetPackSizeQuery } from '@/redux/api/auth/inventory/inventoryApi';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 const AddProductPage = () => {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ const AddProductPage = () => {
   const { data: packSize } = useGetPackSizeQuery(); // Removed unused refetch
   const packSizes: string[] = packSize?.data ?? [];
 
-  const weightUnits = ['KILOGRAM', 'POUND', 'OUNCE', 'LITRE', 'PIECE', 'GRAM', 'MILLIGRAM', 'MILLILITRE'];
+  const weightUnits = ['KILOGRAM', 'POUND', 'OUNCE', 'LITRE', 'PIECE', 'GRAM', 'MILLIGRAM', 'MILLILITER'];
   const packageUnits = ['CM', 'INCH'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -85,7 +86,7 @@ const AddProductPage = () => {
     try {
       await addInventory(payload).unwrap();
       console.log("Post data:", payload);
-      alert('Product added successfully!');
+      toast.success('Product added successfully!');
       setFormData({
         name: '',
         itemNumber: '',
@@ -104,18 +105,11 @@ const AddProductPage = () => {
       });
     } catch (err) {
       console.error("Failed to add product:", err);
-      alert('Failed to add product');
+      toast.error('Failed to add product');
     }
   };
 
-  const handleManualAdd = (field: string, value: string) => {
-    if (field === 'packetSize' && !packSizes.includes(value)) {
-      console.log(`Adding new pack size: ${value}`);
-    } else if (field === 'categoryId' && !categoriesData.some(cat => cat._id === value)) {
-      console.log(`Adding new category: ${value}`);
-    }
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+
 
   return (
     <div className="p-4">
@@ -127,18 +121,32 @@ const AddProductPage = () => {
           <label className="block text-sm font-medium text-gray-700">Product Name *</label>
           <input name="name" value={formData.name} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700">Pack Size *</label>
           <select name="packetSize" value={formData.packetSize} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required>
             <option value="">Select Pack Size</option>
             {packSizes.map(size => <option key={size} value={size}>{size}</option>)}
           </select>
+        </div> */}
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Pack Size *</label>
           <input
-            placeholder="Add new pack size"
-            onBlur={(e) => handleManualAdd('packetSize', e.target.value)}
+            list="packSizeOptions"
+            name="packetSize"
+            value={formData.packetSize}
+            onChange={handleChange}
             className="mt-1 p-2 w-full border rounded"
+            placeholder="Type or select pack size"
+            required
           />
+          <datalist id="packSizeOptions">
+            {packSizes.map(size => (
+              <option key={size} value={size} />
+            ))}
+          </datalist>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Weight Unit *</label>
           <select name="weightUnit" value={formData.weightUnit} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required>
@@ -155,11 +163,7 @@ const AddProductPage = () => {
             <option value="">Select Category</option>
             {categoriesData.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
           </select>
-          <input
-            placeholder="Add new category"
-            onBlur={(e) => handleManualAdd('categoryId', e.target.value)}
-            className="mt-1 p-2 w-full border rounded"
-          />
+
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Reorder Quantity *</label>
@@ -222,7 +226,7 @@ const AddProductPage = () => {
             categoryId: '',
             packageDimensions: { length: 0, width: 0, height: 0, unit: 'CM' }
           })}>Clear</button>
-          <button type="button" className="bg-gray-500 text-white p-2 rounded" onClick={() => {}}>Cancel</button>
+          <button type="button" className="bg-gray-500 text-white p-2 rounded" onClick={() => { }}>Cancel</button>
         </div>
       </form>
     </div>

@@ -15,7 +15,8 @@ import { AddOrderFormValues, FilterFormValues, Order } from "@/types";
 import { useState } from "react";
 import { ReusableModal } from "@/components/ReusableModal";
 import { OrderFilterForm } from "@/components/OrderFilterForm";
-import { AddOrderForm } from "@/components/AddOrderForm";
+import OrderPage from "@/components/AddOrderForm";
+import AddOrderPage from "@/components/AddOrderForm";
 
 export default function OrderManagement(): React.ReactElement {
   const {
@@ -159,10 +160,7 @@ export default function OrderManagement(): React.ReactElement {
             trigger={<Button className="bg-[#EF4343]">+ Add Order</Button>}
             title="Add New Order"
           >
-            <AddOrderForm
-              onSubmit={handleAddOrderSubmit}
-              onCancel={handleAddOrderCancel}
-            />
+            <AddOrderPage />
           </ReusableModal>
           <Button className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />

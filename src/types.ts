@@ -93,3 +93,44 @@ export interface AddOrderFormProps {
   onSubmit: (values: AddOrderFormValues) => void;
   onCancel?: () => void;
 }
+
+// customer table data type 
+
+export interface Customer {
+  _id: string;
+  storeName: string;
+  storePhone: string;
+  storePersonEmail: string;
+  storePersonName: string;
+  storePersonPhone: string;
+  billingAddress: string;
+  billingState: string;
+  billingZipcode: string;
+  billingCity: string;
+  shippingAddress: string;
+  shippingState: string;
+  shippingZipcode: string;
+  shippingCity: string;
+  salesTaxId: string;
+  acceptedDeliveryDays: string[];
+  bankACHAccountInfo: string;
+  creditApplication: string;
+  ownerLegalFrontImage: string;
+  ownerLegalBackImage: string;
+  voidedCheckImage: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  // Optional fields from fakeData, assuming they might exist
+  openBalance?: string;
+  numOfOrders?: number;
+  orderAmount?: string;
+  liftgate?: string;
+}
+
+// TypeScript type for API response
+export interface GetCustomersResponse {
+  success: boolean;
+  message: string;
+  data: Customer[];
+}

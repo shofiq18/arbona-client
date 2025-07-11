@@ -267,7 +267,7 @@ const Categories: React.FC = () => {
                         />
                       </button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="sm:max-w-[425px] ">
                       <DialogHeader>
                         <DialogTitle>View Details</DialogTitle>
                         <DialogDescription>

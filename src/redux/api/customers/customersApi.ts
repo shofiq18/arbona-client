@@ -1,15 +1,12 @@
+import { Customer, GetCustomersResponse } from "@/types";
 import baseApi from "../baseApi";
 
 
-interface Customer {
-  id: number;
-  name: string;
-  email: string;
-}
+
 
 const customersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCustomers: builder.query<Customer[], void>({
+    getCustomers: builder.query<GetCustomersResponse, void>({
       query: () => "/customer",
       providesTags: ["Customers"],
     }),

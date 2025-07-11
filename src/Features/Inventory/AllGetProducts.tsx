@@ -249,13 +249,14 @@ export default function AllGetProducts() {
                         </svg>
                       </button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-4xl!">
                       <DialogHeader>
                         <DialogTitle>Product Details</DialogTitle>
                       </DialogHeader>
                       {selectedProduct && (
-                        <div className="space-y-4">
-                          <p><strong>ID:</strong> {selectedProduct._id}</p>
+                        <div className="space-y-4  md:grid grid-cols-2 ">
+                          <div>
+                            <p><strong>ID:</strong> {selectedProduct._id}</p>
                           <p><strong>Name:</strong> {selectedProduct.name}</p>
                           <p><strong>Category:</strong> {selectedProduct.categoryId?.name || "N/A"}</p>
                           <p><strong>Description:</strong> {selectedProduct.description || "N/A"}</p>
@@ -266,7 +267,9 @@ export default function AllGetProducts() {
                           <p><strong>Quantity:</strong> {selectedProduct.quantity?.toLocaleString() ?? "N/A"}</p>
                           <p><strong>Reorder Point:</strong> {selectedProduct.reorderPointOfQuantity}</p>
                           <p><strong>Warehouse Location:</strong> {selectedProduct.warehouseLocation || "N/A"}</p>
-                          <p><strong>Purchase Price:</strong> ${selectedProduct.purchasePrice?.toFixed(2) ?? "N/A"}</p>
+                          </div>
+                          <div>
+                              <p><strong>Purchase Price:</strong> ${selectedProduct.purchasePrice?.toFixed(2) ?? "N/A"}</p>
                           <p><strong>Sales Price:</strong> ${selectedProduct.salesPrice?.toFixed(2) ?? "N/A"}</p>
                           <p><strong>Profit:</strong> ${(selectedProduct.salesPrice && selectedProduct.purchasePrice
                             ? (selectedProduct.salesPrice - selectedProduct.purchasePrice).toFixed(2)
@@ -278,7 +281,9 @@ export default function AllGetProducts() {
                           <p><strong>Package Dimensions:</strong> {selectedProduct.packageDimensions?.length} x {selectedProduct.packageDimensions?.width} x {selectedProduct.packageDimensions?.height} {selectedProduct.packageDimensions?.unit}</p>
                           <p><strong>Created At:</strong> {new Date(selectedProduct.createdAt).toLocaleString()}</p>
                           <p><strong>Updated At:</strong> {new Date(selectedProduct.updatedAt).toLocaleString()}</p>
-                          <p><strong>Is Deleted:</strong> {selectedProduct.isDeleted ? "Yes" : "No"}</p>
+                          </div>
+                          
+                          
                           <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>Close</Button>
                         </div>
                       )}
@@ -306,7 +311,7 @@ export default function AllGetProducts() {
                         </svg>
                       </button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-4xl!">
                       <DialogHeader>
                         <DialogTitle>Update Product</DialogTitle>
                       </DialogHeader>

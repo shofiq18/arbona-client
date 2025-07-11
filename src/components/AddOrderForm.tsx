@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -13,19 +13,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  X,
-  Search,
+  Calculator,
   Calendar,
-  ShoppingCart,
-  Plus,
+  MapPin,
   Minus,
   Package,
-  Calculator,
+  Plus,
+  Search,
+  ShoppingCart,
   User,
-  MapPin,
 } from "lucide-react";
+import { useState } from "react";
 
 interface Product {
   id: string;
@@ -311,7 +310,7 @@ const AddOrderPage = () => {
                 placeholder="Search by name or code..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 w-full"
               />
             </div>
           </div>

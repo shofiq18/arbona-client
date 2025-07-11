@@ -1,7 +1,6 @@
 // components/ReusableModal.tsx
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,

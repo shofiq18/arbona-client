@@ -1,9 +1,10 @@
-import ContainerTable from "@/Features/Container/ContainerTable";
+import AddContainerPage from "@/Features/Container/AddContainer";
+
 
 export default function Container(): React.ReactElement {
     return (
         <div>
-            <ContainerTable/>
+            <AddContainerPage/> 
         </div>
     );
 }

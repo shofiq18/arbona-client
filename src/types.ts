@@ -134,3 +134,61 @@ export interface GetCustomersResponse {
   message: string;
   data: Customer[];
 }
+
+// add container type 
+export interface ContainerProduct {
+  _id: string;
+  category: string;
+  itemNumber: string;
+  quantity: number;
+  perCaseCost: number;
+  purchasePrice: number;
+  salesPrice: number;
+}
+
+export interface Container {
+  _id: string;
+  containerNumber: string;
+  containerName: string;
+  isDeleted: boolean;
+  containerStatus: 'onTheWay' | 'delivered' | 'pending' | string;
+  deliveryDate: string;
+  shippingCost: number;
+  containerProducts: ContainerProduct[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface ContainerApiResponse {
+  success: boolean;
+  message: string;
+  data: Container[];
+}
+
+export interface InventoryProduct {
+  _id: string;
+  name: string;
+  category: string;
+  packetSize: string;
+  perCaseCost: number;
+  purchasePrice: number;
+  salesPrice: number;
+}
+
+export interface InventoryApiResponse {
+  success: boolean;
+  message: string;
+  data: InventoryProduct[];
+}
+
+export interface Category {
+  _id: string;
+  name: string;
+}
+
+export interface CategoryApiResponse {
+  success: boolean;
+  message: string;
+  data: Category[];
+}

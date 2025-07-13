@@ -175,7 +175,7 @@ export default function AddCustomer(): React.ReactElement {
 
       await addCustomer(payload).unwrap();
       toast.success("Customer Added successfully")
-      router.push("/dashboard");
+      router.push("/dashboard/customers");
     } catch (err) {
       console.error("Failed to add customer:", err);
     }

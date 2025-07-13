@@ -121,13 +121,7 @@ const AddProductPage = () => {
           <label className="block text-sm font-medium text-gray-700">Product Name *</label>
           <input name="name" value={formData.name} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
         </div>
-        {/* <div>
-          <label className="block text-sm font-medium text-gray-700">Pack Size *</label>
-          <select name="packetSize" value={formData.packetSize} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required>
-            <option value="">Select Pack Size</option>
-            {packSizes.map(size => <option key={size} value={size}>{size}</option>)}
-          </select>
-        </div> */}
+        
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Pack Size *</label>

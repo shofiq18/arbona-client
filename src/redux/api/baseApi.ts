@@ -27,6 +27,7 @@ export const baseApi = createApi({
     "Categories",
     "Inventory",
     "Containers",
+    "Products"
   ],
 });
 

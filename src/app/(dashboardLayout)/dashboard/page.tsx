@@ -53,7 +53,7 @@ export default function AppSidebar() {
                   {/* Dashboard */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/dashboard"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "hover:bg-[#F7F7F81A] text-white   focus:bg-[#F7F7F81A] "
                       }`}
                   >
@@ -71,7 +71,7 @@ export default function AppSidebar() {
                   {/* Order management */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/order-management"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
@@ -90,7 +90,7 @@ export default function AppSidebar() {
                   {/* Customer */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/customers"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
@@ -108,7 +108,7 @@ export default function AppSidebar() {
                   {/* Categories */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/categories"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
@@ -126,7 +126,7 @@ export default function AppSidebar() {
                   {/* Inventory */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/inventory"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
@@ -144,7 +144,7 @@ export default function AppSidebar() {
                   {/* Container */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/container"
-                      ? "bg-[#4EA674] text-gray-300 text-lg"
+                      ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
@@ -174,14 +174,7 @@ export default function AppSidebar() {
         <div className="pt-4">
           <Separator className="bg-[#242432] mb-4" />
           <SidebarMenu>
-            {/* Professional and Settings */}
-
-            <div className="flex justify-between items-center text-white mb-2">
-
-
-
-
-            </div>
+            
 
             {/* user logout */}
             <p className="text-white ml-4" >Admin</p>

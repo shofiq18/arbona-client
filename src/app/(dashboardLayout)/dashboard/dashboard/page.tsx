@@ -165,15 +165,12 @@ export default function Dashboard(): React.ReactElement {
 
             {/* Section 2: Best Selling Products & Weekly Report */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
                 <div>
                     <BestSellingProducts />
                 </div>
                 <div>
                     <WeeklyReport />
                 </div>
-
-               
             </div>
 
             {/* Section 3: Customer Segmentation */}

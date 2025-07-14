@@ -183,7 +183,7 @@ const Categories: React.FC = () => {
           <DialogTrigger asChild>
             <Button
               onClick={handleAddCategory}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              className="px-4 py-2 bg-red-600 text-white cursor-pointer hover:bg-red-700"
             >
               + Add Category
             </Button>

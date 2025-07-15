@@ -176,7 +176,7 @@ export default function OrderManagement(): React.ReactElement {
             <TableHead>Order Status</TableHead>
             <TableHead>Payment Receive</TableHead>
             <TableHead>Discount</TableHead>
-            <TableHead>Open Blance</TableHead>
+            <TableHead>Open Balance</TableHead>
             <TableHead>Profit</TableHead>
             <TableHead>Profit %</TableHead>
             <TableHead>Payment Status</TableHead>

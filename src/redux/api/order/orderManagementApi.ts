@@ -15,7 +15,7 @@ const orderManagementApi = baseApi.injectEndpoints({
     }),
     addOrder: builder.mutation<Order, Partial<Order>>({
       query: (order) => ({
-        url: "/orders",
+        url: "/order",
         method: "POST",
         body: order,
       }),

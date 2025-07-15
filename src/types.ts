@@ -94,7 +94,7 @@ export interface AddOrderFormProps {
   onCancel?: () => void;
 }
 
-// customer table data type 
+// customer table data type
 
 export interface Customer {
   _id: string;
@@ -135,7 +135,7 @@ export interface GetCustomersResponse {
   data: Customer[];
 }
 
-// add container type 
+// add container type
 export interface ContainerProduct {
   _id: string;
   category: string;
@@ -151,7 +151,7 @@ export interface Container {
   containerNumber: string;
   containerName: string;
   isDeleted: boolean;
-  containerStatus: 'onTheWay' | 'delivered' | 'pending' | string;
+  containerStatus: "onTheWay" | "delivered" | "pending" | string;
   deliveryDate: string;
   shippingCost: number;
   containerProducts: ContainerProduct[];
@@ -191,4 +191,46 @@ export interface CategoryApiResponse {
   success: boolean;
   message: string;
   data: Category[];
+}
+
+// Dimensions for package size
+export interface PackageDimensions {
+  length: number;
+  width: number;
+  height: number;
+  unit: string;
+}
+
+// Nested category information
+export interface CategoryId {
+  _id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+// Main product type for products by category
+export interface Product {
+  packageDimensions: PackageDimensions;
+  _id: string;
+  name: string;
+  isDeleted: boolean;
+  competitorPrice: number;
+  packetSize: string;
+  weight: number;
+  weightUnit: string;
+  categoryId: CategoryId;
+  reorderPointOfQuantity: number;
+  salesPrice: number;
+  purchasePrice: number;
+  barcodeString: string;
+  itemNumber: string;
+  quantity: number;
+  warehouseLocation: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  incomingQuantity: number;
 }

@@ -5,10 +5,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpDown, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
+import { ArrowUpDown, PlusCircle, Eye, Edit, Trash2, CloudCog } from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
 import { useRouter } from "next/navigation";
 import { useGetCustomersQuery } from "@/redux/api/customers/customersApi";
+import Loading from "@/redux/Shared/Loading";
  // Adjust path as needed
 
 
@@ -22,13 +23,18 @@ export default function CustomerTable() {
   // Extract customers array from response.data, default to empty array
   const customers = response?.data || [];
 
+  console.log("data fff", customers)
+
   // Filter customers based on search (storePersonName)
   const filteredData = customers.filter((customer) =>
     customer.storePersonName.toLowerCase().includes(search.toLowerCase())
   );
 
   if (isLoading) {
-    return <div className="p-4">Loading customers...</div>;
+    
+    return(
+      <Loading title="Loading Customer data...." message="All Customer dada fetched successfully"/> 
+    );
   }
 
   if (error) {
@@ -79,7 +85,7 @@ export default function CustomerTable() {
                 "Open Balance",
                 "No of Order",
                 "Order Amount",
-                "Liftgate",
+                "Customer Source", 
                 "Action",
               ].map((heading, i) => (
                 <th key={i} className="p-2 whitespace-nowrap font-medium">
@@ -100,17 +106,10 @@ export default function CustomerTable() {
                 <td className="p-2 whitespace-nowrap">{row.storePersonPhone}</td>
                 <td className="p-2 whitespace-nowrap">{row.storePersonEmail}</td>
                 <td className="p-2 whitespace-nowrap">{row.openBalance || "N/A"}</td>
-                <td className="p-2 whitespace-nowrap">{row.numOfOrders || "N/A"}</td>
-                <td className="p-2 whitespace-nowrap">{row.orderAmount || "N/A"}</td>
-                <td className="p-2 whitespace-nowrap">
-                  <span
-                    className={`text-white px-2 py-0.5 rounded text-xs ${
-                      row.liftgate === "Yes" ? "bg-green-500" : "bg-red-500"
-                    }`}
-                  >
-                    {row.liftgate || "No"}
-                  </span>
-                </td>
+                <td className="p-2 whitespace-nowrap">{row.totalOrders || "N/A"}</td>
+                <td className="p-2 whitespace-nowrap">{row.totalOrderAmount || "N/A"}</td>
+                <td className="p-2 whitespace-nowrap">{row.customerStutas || "N/A"}</td>
+                
                 <td className="p-2 whitespace-nowrap flex gap-2">
                   <Eye
                     className="w-4 h-4 text-gray-500 cursor-pointer hover:text-blue-700"

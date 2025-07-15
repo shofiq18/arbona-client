@@ -1,4 +1,7 @@
 
+
+
+
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -6,13 +9,55 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-
 import { useRouter } from "next/navigation";
 import { useAddCustomerMutation } from "@/redux/api/customers/customersApi";
 import toast from "react-hot-toast";
 
+interface FormData {
+  storeName: string;
+  storePersonName: string;
+  storePhone: string;
+  storePersonPhone: string;
+  storeAuthorizedPersonName: string;
+  storeAuthorizedPersonNumber: string;
+  storePersonEmail: string;
+  billingAddress: string;
+  billingCity: string;
+  billingState: string;
+  billingZipcode: string;
+  shippingAddress: string;
+  shippingCity: string;
+  shippingState: string;
+  shippingZipcode: string;
+  salesTaxId: string;
+  termDays: string;
+  acceptDeliveryDays: string[];
+  shippingStatus: string;
+  note: string;
+  sameAsBillingAddress: boolean;
+  bankAchInfo: string;
+  creditApplication: string;
+  ownerLegalFrontImage: string;
+  ownerLegalBackImage: string;
+  voidedCheckImage: string;
+  miscellaneous: string;
+  [key: string]: string | string[] | boolean; // Index signature
+}
+
+interface FilePreviews {
+  creditApplication: string;
+  ownerLegalFrontImage: string;
+  ownerLegalBackImage: string;
+  voidedCheckImage: string;
+  miscellaneous: string;
+}
+
+interface FieldErrors {
+  [key: string]: string;
+}
+
 export default function AddCustomer(): React.ReactElement {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     storeName: "",
     storePersonName: "",
     storePhone: "",
@@ -41,7 +86,7 @@ export default function AddCustomer(): React.ReactElement {
     voidedCheckImage: "",
     miscellaneous: "",
   });
-  const [filePreviews, setFilePreviews] = useState({
+  const [filePreviews, setFilePreviews] = useState<FilePreviews>({
     creditApplication: "",
     ownerLegalFrontImage: "",
     ownerLegalBackImage: "",
@@ -49,10 +94,38 @@ export default function AddCustomer(): React.ReactElement {
     miscellaneous: "",
   });
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [addCustomer, { isLoading, error }] = useAddCustomerMutation();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Required fields
+  const requiredFields = [
+    "storeName",
+    "storePersonName",
+    "storePhone",
+    "storePersonPhone",
+    "storeAuthorizedPersonName",
+    "storeAuthorizedPersonNumber",
+    "storePersonEmail",
+    "billingAddress",
+    "billingCity",
+    "billingState",
+    "billingZipcode",
+    "shippingAddress",
+    "shippingCity",
+    "shippingState",
+    "shippingZipcode",
+    "termDays",
+    "acceptDeliveryDays",
+    "shippingStatus",
+    "bankAchInfo",
+    "creditApplication",
+    "ownerLegalFrontImage",
+    "ownerLegalBackImage",
+    "voidedCheckImage",
+  ];
 
   // Handle input changes
   const handleInputChange = (
@@ -63,6 +136,12 @@ export default function AddCustomer(): React.ReactElement {
       ...prev,
       [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
+    // Clear error for this field when user starts typing
+    setFieldErrors((prev) => {
+      const newErrors = { ...prev };
+      delete newErrors[name];
+      return newErrors;
+    });
   };
 
   // Handle same as billing address checkbox
@@ -78,6 +157,17 @@ export default function AddCustomer(): React.ReactElement {
         shippingZipcode: prev.billingZipcode,
       }),
     }));
+    // Clear shipping-related errors if checked
+    if (isChecked) {
+      setFieldErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.shippingAddress;
+        delete newErrors.shippingCity;
+        delete newErrors.shippingState;
+        delete newErrors.shippingZipcode;
+        return newErrors;
+      });
+    }
   };
 
   // Handle acceptDeliveryDays checkbox changes
@@ -90,6 +180,14 @@ export default function AddCustomer(): React.ReactElement {
         ? [...prev.acceptDeliveryDays, day]
         : prev.acceptDeliveryDays.filter((d) => d !== day),
     }));
+    // Clear error for acceptDeliveryDays if at least one day is selected
+    if (isChecked || formData.acceptDeliveryDays.length > 0) {
+      setFieldErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors.acceptDeliveryDays;
+        return newErrors;
+      });
+    }
   };
 
   // Toggle dropdown visibility
@@ -132,6 +230,12 @@ export default function AddCustomer(): React.ReactElement {
           ...prev,
           [field]: file.type.startsWith("image/") ? result.data.url : file.name,
         }));
+        // Clear error for this field after successful upload
+        setFieldErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[field];
+          return newErrors;
+        });
       } else {
         setUploadError(result.error?.message || "Failed to upload image");
       }
@@ -143,6 +247,22 @@ export default function AddCustomer(): React.ReactElement {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate required fields
+    const newErrors: FieldErrors = {};
+    requiredFields.forEach((field) => {
+      if (!formData[field]) {
+        newErrors[field] = "This field is required.";
+      } else if (field === "acceptDeliveryDays" && formData[field].length === 0) {
+        newErrors[field] = "At least one delivery day is required.";
+      } else if (field === "termDays" && (parseInt(formData[field]) <= 0 || !formData[field])) {
+        newErrors[field] = "Valid term days are required.";
+      }
+    });
+    if (Object.keys(newErrors).length > 0) {
+      setFieldErrors(newErrors);
+      return;
+    }
+
     try {
       const payload = {
         storeName: formData.storeName,
@@ -174,10 +294,20 @@ export default function AddCustomer(): React.ReactElement {
       };
 
       await addCustomer(payload).unwrap();
-      toast.success("Customer Added successfully")
+      console.log("added customer", payload);
+      toast.success("Customer Added successfully");
       router.push("/dashboard/customers");
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to add customer:", err);
+      if (err?.data?.errorSources) {
+        const errors = err.data.errorSources.reduce((acc: FieldErrors, source: any) => {
+          acc[source.path] = source.message;
+          return acc;
+        }, {});
+        setFieldErrors(errors);
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     }
   };
 
@@ -202,6 +332,7 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storeName && <p className="text-red-500 text-sm">{fieldErrors.storeName}</p>}
           </div>
 
           <div className="space-y-2">
@@ -214,6 +345,7 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storePersonName && <p className="text-red-500 text-sm">{fieldErrors.storePersonName}</p>}
           </div>
         </div>
 
@@ -230,6 +362,7 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storePhone && <p className="text-red-500 text-sm">{fieldErrors.storePhone}</p>}
           </div>
 
           <div className="space-y-2">
@@ -243,6 +376,7 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storePersonPhone && <p className="text-red-500 text-sm">{fieldErrors.storePersonPhone}</p>}
           </div>
         </div>
 
@@ -260,6 +394,9 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storeAuthorizedPersonName && (
+              <p className="text-red-500 text-sm">{fieldErrors.storeAuthorizedPersonName}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -275,6 +412,9 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.storeAuthorizedPersonNumber && (
+              <p className="text-red-500 text-sm">{fieldErrors.storeAuthorizedPersonNumber}</p>
+            )}
           </div>
         </div>
 
@@ -290,6 +430,7 @@ export default function AddCustomer(): React.ReactElement {
             required
             className="w-full"
           />
+          {fieldErrors.storePersonEmail && <p className="text-red-500 text-sm">{fieldErrors.storePersonEmail}</p>}
         </div>
 
         {/* Billing Address */}
@@ -305,6 +446,7 @@ export default function AddCustomer(): React.ReactElement {
               rows={3}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             />
+            {fieldErrors.billingAddress && <p className="text-red-500 text-sm">{fieldErrors.billingAddress}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -318,6 +460,7 @@ export default function AddCustomer(): React.ReactElement {
                 required
                 className="w-full"
               />
+              {fieldErrors.billingCity && <p className="text-red-500 text-sm">{fieldErrors.billingCity}</p>}
             </div>
 
             <div className="space-y-2">
@@ -343,6 +486,7 @@ export default function AddCustomer(): React.ReactElement {
                 <option value="GA">Georgia</option>
                 {/* Add more states as needed */}
               </select>
+              {fieldErrors.billingState && <p className="text-red-500 text-sm">{fieldErrors.billingState}</p>}
             </div>
 
             <div className="space-y-2">
@@ -355,6 +499,7 @@ export default function AddCustomer(): React.ReactElement {
                 required
                 className="w-full"
               />
+              {fieldErrors.billingZipcode && <p className="text-red-500 text-sm">{fieldErrors.billingZipcode}</p>}
             </div>
           </div>
         </div>
@@ -391,6 +536,7 @@ export default function AddCustomer(): React.ReactElement {
               disabled={formData.sameAsBillingAddress}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             />
+            {fieldErrors.shippingAddress && <p className="text-red-500 text-sm">{fieldErrors.shippingAddress}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -405,6 +551,7 @@ export default function AddCustomer(): React.ReactElement {
                 disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
+              {fieldErrors.shippingCity && <p className="text-red-500 text-sm">{fieldErrors.shippingCity}</p>}
             </div>
 
             <div className="space-y-2">
@@ -431,6 +578,7 @@ export default function AddCustomer(): React.ReactElement {
                 <option value="GA">Georgia</option>
                 {/* Add more states as needed */}
               </select>
+              {fieldErrors.shippingState && <p className="text-red-500 text-sm">{fieldErrors.shippingState}</p>}
             </div>
 
             <div className="space-y-2">
@@ -444,6 +592,7 @@ export default function AddCustomer(): React.ReactElement {
                 disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
+              {fieldErrors.shippingZipcode && <p className="text-red-500 text-sm">{fieldErrors.shippingZipcode}</p>}
             </div>
           </div>
         </div>
@@ -459,6 +608,7 @@ export default function AddCustomer(): React.ReactElement {
               onChange={handleInputChange}
               className="w-full"
             />
+            {fieldErrors.salesTaxId && <p className="text-red-500 text-sm">{fieldErrors.salesTaxId}</p>}
           </div>
 
           <div className="space-y-2">
@@ -472,6 +622,7 @@ export default function AddCustomer(): React.ReactElement {
               required
               className="w-full"
             />
+            {fieldErrors.termDays && <p className="text-red-500 text-sm">{fieldErrors.termDays}</p>}
           </div>
         </div>
 
@@ -515,6 +666,9 @@ export default function AddCustomer(): React.ReactElement {
                 </div>
               )}
             </div>
+            {fieldErrors.acceptDeliveryDays && (
+              <p className="text-red-500 text-sm">{fieldErrors.acceptDeliveryDays}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -531,6 +685,7 @@ export default function AddCustomer(): React.ReactElement {
               <option value="GOLD">GOLD</option>
               <option value="PLATINUM">PLATINUM</option>
             </select>
+            {fieldErrors.shippingStatus && <p className="text-red-500 text-sm">{fieldErrors.shippingStatus}</p>}
           </div>
         </div>
 
@@ -545,6 +700,7 @@ export default function AddCustomer(): React.ReactElement {
             rows={3}
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
+          {fieldErrors.note && <p className="text-red-500 text-sm">{fieldErrors.note}</p>}
         </div>
 
         <Separator />
@@ -561,6 +717,7 @@ export default function AddCustomer(): React.ReactElement {
             required
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
+          {fieldErrors.bankAchInfo && <p className="text-red-500 text-sm">{fieldErrors.bankAchInfo}</p>}
         </div>
 
         {/* File Uploads */}
@@ -613,6 +770,9 @@ export default function AddCustomer(): React.ReactElement {
                   className="hidden"
                 />
               </label>
+              {fieldErrors.creditApplication && (
+                <p className="text-red-500 text-sm">{fieldErrors.creditApplication}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -662,6 +822,9 @@ export default function AddCustomer(): React.ReactElement {
                   className="hidden"
                 />
               </label>
+              {fieldErrors.ownerLegalFrontImage && (
+                <p className="text-red-500 text-sm">{fieldErrors.ownerLegalFrontImage}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -711,6 +874,9 @@ export default function AddCustomer(): React.ReactElement {
                   className="hidden"
                 />
               </label>
+              {fieldErrors.ownerLegalBackImage && (
+                <p className="text-red-500 text-sm">{fieldErrors.ownerLegalBackImage}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -760,6 +926,9 @@ export default function AddCustomer(): React.ReactElement {
                   className="hidden"
                 />
               </label>
+              {fieldErrors.voidedCheckImage && (
+                <p className="text-red-500 text-sm">{fieldErrors.voidedCheckImage}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -809,13 +978,13 @@ export default function AddCustomer(): React.ReactElement {
                   className="hidden"
                 />
               </label>
+              {fieldErrors.miscellaneous && <p className="text-red-500 text-sm">{fieldErrors.miscellaneous}</p>}
             </div>
           </div>
         </div>
 
-        {/* Error Display */}
+        {/* Upload Error */}
         {uploadError && <p className="text-red-500 text-sm">{uploadError}</p>}
-        {error && <p className="text-red-500 text-sm">Error: {JSON.stringify(error)}</p>}
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-4 pt-6">

@@ -23,6 +23,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import toast from "react-hot-toast";
+import Loading from "@/redux/Shared/Loading";
 
 
 export default function ContainerTable() {
@@ -57,7 +58,9 @@ export default function ContainerTable() {
     return filteredData.slice(start, start + itemsPerPage);
   }, [currentPage, filteredData]);
 
-  if (isLoading) return <div className="p-4">Loading containers...</div>;
+  if (isLoading) return (
+    <Loading title="Loading containers..." message="All Container Table data Fetching"/>
+  )
   if (error) return <div className="p-4 text-red-500">Error loading data.</div>;
 
   const handleDelete = async (id: string) => {

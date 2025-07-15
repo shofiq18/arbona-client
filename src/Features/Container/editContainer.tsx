@@ -6,6 +6,7 @@ import { Container, ContainerProduct } from '@/types';
 import { useUpdateContainerMutation, useGetContainerQuery } from '@/redux/api/auth/container/containerApi';
 import { useParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import Loading from '@/redux/Shared/Loading';
 
 const EditContainerPage = () => {
   const { id } = useParams();
@@ -37,7 +38,9 @@ const EditContainerPage = () => {
     }
   }, [containerData, id, isSuccess]);
 
-  if (isLoading) return <div className="p-6">Loading container data...</div>;
+  if (isLoading) return(
+    <Loading title='Loading Container Edit data ........'/>
+  );
   if (error) {
     const errorMessage = error && 'data' in error && typeof error.data === 'object' && error.data !== null
       ? (error.data as { message?: string }).message || 'Unknown error'

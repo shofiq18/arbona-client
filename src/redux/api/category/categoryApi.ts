@@ -8,12 +8,19 @@ export interface Category {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  data: object;
+}
+
+export interface GetCategoryResponse {
+  success: boolean;
+  message: string;
+  data: Category[];
 }
 
 // ---- Category API ----
 const categoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCategories: builder.query<Category[], void>({
+    getCategories: builder.query<GetCategoryResponse, void>({
       query: () => "/category",
       providesTags: ["Categories"],
     }),

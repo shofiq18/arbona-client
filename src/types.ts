@@ -126,7 +126,6 @@ export interface Customer {
   totalOrders?: number;
   totalOrderAmount?: string;
   isCustomerSourceProspect?: boolean;
-  
 }
 
 // TypeScript type for API response
@@ -234,4 +233,9 @@ export interface Product {
   updatedAt: string;
   __v: number;
   incomingQuantity: number;
+}
+export interface GetProductResponse {
+  success: boolean;
+  message: string;
+  data: Product[];
 }

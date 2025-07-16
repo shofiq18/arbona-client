@@ -1,13 +1,18 @@
-import { Customer, GetCustomersResponse } from "@/types";
+
+
+
+
+import { Customer } from "@/types";
 import baseApi from "../baseApi";
-
-
-
 
 const customersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCustomers: builder.query<GetCustomersResponse, void>({
+    getCustomers: builder.query<{ success: boolean; message: string; data: Customer[] }, void>({
       query: () => "/customer",
+      providesTags: ["Customers"],
+    }),
+    getCustomer: builder.query<{ success: boolean; message: string; data: Customer }, string>({
+      query: (id) => `/customer/${id}`,
       providesTags: ["Customers"],
     }),
     addCustomer: builder.mutation<Customer, Partial<Customer>>({
@@ -18,15 +23,15 @@ const customersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Customers"],
     }),
-    updateCustomer: builder.mutation<Customer, Partial<Customer> & { id: number }>({
-      query: ({ id, ...patch }) => ({
+    updateCustomer: builder.mutation<Customer, { id: string; data: Partial<Customer> }>({
+      query: ({ id, data }) => ({
         url: `/customer/${id}`,
         method: "PATCH",
-        body: patch,
+        body: data,
       }),
       invalidatesTags: ["Customers"],
     }),
-    deleteCustomer: builder.mutation<{ success: boolean }, number>({
+    deleteCustomer: builder.mutation<{ success: boolean }, string>({
       query: (id) => ({
         url: `/customer/${id}`,
         method: "DELETE",
@@ -36,5 +41,11 @@ const customersApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetCustomersQuery, useAddCustomerMutation, useUpdateCustomerMutation, useDeleteCustomerMutation } = customersApi;
+export const {
+  useGetCustomersQuery,
+  useGetCustomerQuery,
+  useAddCustomerMutation,
+  useUpdateCustomerMutation,
+  useDeleteCustomerMutation,
+} = customersApi;
 export default customersApi;

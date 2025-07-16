@@ -123,9 +123,10 @@ export interface Customer {
   updatedAt: string;
   // Optional fields from fakeData, assuming they might exist
   openBalance?: string;
-  numOfOrders?: number;
-  orderAmount?: string;
-  liftgate?: string;
+  totalOrders?: number;
+  totalOrderAmount?: string;
+  isCustomerSourceProspect?: boolean;
+  
 }
 
 // TypeScript type for API response

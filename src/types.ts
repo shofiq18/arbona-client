@@ -125,7 +125,7 @@ export interface Customer {
   openBalance?: string;
   totalOrders?: number;
   totalOrderAmount?: string;
-  customerStutas?: string;
+  isCustomerSourceProspect?: boolean;
   
 }
 

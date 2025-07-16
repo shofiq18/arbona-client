@@ -1,7 +1,5 @@
 
 
-
-
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -330,6 +328,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storeName}
               onChange={handleInputChange}
               required
+              placeholder="Enter store name"
               className="w-full"
             />
             {fieldErrors.storeName && <p className="text-red-500 text-sm">{fieldErrors.storeName}</p>}
@@ -343,6 +342,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storePersonName}
               onChange={handleInputChange}
               required
+              placeholder="Enter customer full name"
               className="w-full"
             />
             {fieldErrors.storePersonName && <p className="text-red-500 text-sm">{fieldErrors.storePersonName}</p>}
@@ -360,6 +360,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storePhone}
               onChange={handleInputChange}
               required
+              placeholder="Enter store phone number"
               className="w-full"
             />
             {fieldErrors.storePhone && <p className="text-red-500 text-sm">{fieldErrors.storePhone}</p>}
@@ -374,6 +375,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storePersonPhone}
               onChange={handleInputChange}
               required
+              placeholder="Enter cell phone number"
               className="w-full"
             />
             {fieldErrors.storePersonPhone && <p className="text-red-500 text-sm">{fieldErrors.storePersonPhone}</p>}
@@ -392,6 +394,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storeAuthorizedPersonName}
               onChange={handleInputChange}
               required
+              placeholder="Enter authorized person name"
               className="w-full"
             />
             {fieldErrors.storeAuthorizedPersonName && (
@@ -410,6 +413,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.storeAuthorizedPersonNumber}
               onChange={handleInputChange}
               required
+              placeholder="Enter authorized person number"
               className="w-full"
             />
             {fieldErrors.storeAuthorizedPersonNumber && (
@@ -428,6 +432,7 @@ export default function AddCustomer(): React.ReactElement {
             value={formData.storePersonEmail}
             onChange={handleInputChange}
             required
+            placeholder="Enter email address"
             className="w-full"
           />
           {fieldErrors.storePersonEmail && <p className="text-red-500 text-sm">{fieldErrors.storePersonEmail}</p>}
@@ -443,6 +448,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.billingAddress}
               onChange={handleInputChange}
               required
+              placeholder="Enter billing address"
               rows={3}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             />
@@ -458,6 +464,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.billingCity}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter billing city"
                 className="w-full"
               />
               {fieldErrors.billingCity && <p className="text-red-500 text-sm">{fieldErrors.billingCity}</p>}
@@ -471,6 +478,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.billingState}
                 onChange={handleInputChange}
                 required
+                
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Select State</option>
@@ -497,6 +505,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.billingZipcode}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter billing zipcode"
                 className="w-full"
               />
               {fieldErrors.billingZipcode && <p className="text-red-500 text-sm">{fieldErrors.billingZipcode}</p>}
@@ -532,6 +541,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.shippingAddress}
               onChange={handleInputChange}
               required
+              placeholder="Enter shipping address"
               rows={3}
               disabled={formData.sameAsBillingAddress}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -548,6 +558,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.shippingCity}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter shipping city"
                 disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
@@ -562,6 +573,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.shippingState}
                 onChange={handleInputChange}
                 required
+                
                 disabled={formData.sameAsBillingAddress}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -589,6 +601,7 @@ export default function AddCustomer(): React.ReactElement {
                 value={formData.shippingZipcode}
                 onChange={handleInputChange}
                 required
+                placeholder="Enter shipping zipcode"
                 disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
@@ -606,6 +619,7 @@ export default function AddCustomer(): React.ReactElement {
               name="salesTaxId"
               value={formData.salesTaxId}
               onChange={handleInputChange}
+              placeholder="Enter sales tax ID"
               className="w-full"
             />
             {fieldErrors.salesTaxId && <p className="text-red-500 text-sm">{fieldErrors.salesTaxId}</p>}
@@ -620,6 +634,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.termDays}
               onChange={handleInputChange}
               required
+              placeholder="Enter term days"
               className="w-full"
             />
             {fieldErrors.termDays && <p className="text-red-500 text-sm">{fieldErrors.termDays}</p>}
@@ -679,6 +694,7 @@ export default function AddCustomer(): React.ReactElement {
               value={formData.shippingStatus}
               onChange={handleInputChange}
               required
+              
               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             >
               <option value="SILVER">SILVER</option>
@@ -697,6 +713,7 @@ export default function AddCustomer(): React.ReactElement {
             name="note"
             value={formData.note}
             onChange={handleInputChange}
+            placeholder="Enter note"
             rows={3}
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
@@ -713,6 +730,7 @@ export default function AddCustomer(): React.ReactElement {
             name="bankAchInfo"
             value={formData.bankAchInfo}
             onChange={handleInputChange}
+            placeholder="Enter bank ACH account information"
             rows={5}
             required
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"

@@ -22,12 +22,14 @@ export const baseApi = createApi({
   tagTypes: [
     "Admin", 
     "Dashboard",
+    "SalesOverview", 
     "Orders",
     "Customers",
     "Categories",
     "Inventory",
     "Containers",
-    "Products"
+    "Products",
+    "ProductSegments"
   ],
 });
 

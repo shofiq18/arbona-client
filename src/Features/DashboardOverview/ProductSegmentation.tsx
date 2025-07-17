@@ -19,7 +19,7 @@ const ProductSegmentation: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
-      <h3 className="text-lg font-bold mb-4">Product Segmentation</h3>
+      <h3 className="text-lg font-bold m">Product Segmentation</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
         {segmentsToShow.map((segment, index) => (
           <div key={index} className="p-4 bg-gray-50 rounded-lg shadow">

@@ -44,6 +44,8 @@ export default function EditCustomerPage() {
     isDeleted: false,
     createdAt: "",
     updatedAt: "",
+     
+
   });
 
   useEffect(() => {

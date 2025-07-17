@@ -1,5 +1,7 @@
 
 
+
+
 "use client";
 
 import { useState } from "react";
@@ -53,6 +55,11 @@ export default function CustomerTable() {
       toast.error("Failed to delete customer");
       console.error("Delete error:", err);
     }
+  };
+
+  // Navigate to details page
+  const handleViewDetails = (id: string) => {
+    router.push(`/dashboard/customer-details/${id}`);
   };
 
   return (
@@ -114,7 +121,9 @@ export default function CustomerTable() {
           <tbody>
             {paginatedData.map((row) => (
               <tr key={row._id} className="border-t hover:bg-gray-50">
-                <td className="p-2 whitespace-nowrap text-gray-700">{row.storeName}</td>
+                <td className="p-2 whitespace-nowrap  cursor-pointer  text-blue-500 underline" onClick={() => handleViewDetails(row._id)}>
+                  {row.storeName}
+                </td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonName}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePhone}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonPhone}</td>

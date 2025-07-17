@@ -135,8 +135,26 @@ export interface AddOrderFormProps {
 
 // "@/types/index.ts" or similar
 
+interface CustomerOrder {
+  _id: string;
+  invoiceNumber: string;
+  PONumber: string;
+  date: string;
+  paymentDueDate: string;
+  orderAmount: number;
+  orderStatus: string;
+  paymentAmountReceived: number;
+  discountGiven: number;
+  openBalance: number;
+  profitAmount: number;
+  profitPercentage: number;
+  paymentStatus: string;
+}
+
+
 
 export interface Customer {
+  
   _id: string;
   storeName: string;
   storePhone: string;
@@ -162,10 +180,11 @@ export interface Customer {
   createdAt: string;
   updatedAt: string;
   // Optional fields from fakeData, assuming they might exist
-  openBalance?: string;
+  openBalance?: number;
   totalOrders?: number;
-  totalOrderAmount?: string;
+  totalOrderAmount?: number;
   isCustomerSourceProspect?: boolean;
+  customerOrders?: CustomerOrder[];
 }
 
 // TypeScript type for API response

@@ -263,7 +263,7 @@ const Categories: React.FC = () => {
                           width={20}
                           height={20}
                           alt="View"
-                          className="rounded-full"
+                          className="rounded-full cursor-pointer"
                         />
                       </button>
                     </DialogTrigger>
@@ -308,7 +308,7 @@ const Categories: React.FC = () => {
                     <DialogTrigger asChild>
                       <button
                         onClick={() => handleUpdate(category)}
-                        className="text-gray-600 hover:text-gray-800"
+                        className="text-gray-600 cursor-pointer hover:text-gray-800"
                       >
                         <svg
                           className="w-5 h-5"
@@ -383,7 +383,7 @@ const Categories: React.FC = () => {
                           width={20}
                           height={20}
                           alt="Delete"
-                          className="rounded-full"
+                          className="rounded-full cursor-pointer"
                         />
                       </button>
                     </DialogTrigger>
@@ -393,7 +393,7 @@ const Categories: React.FC = () => {
                         <DialogDescription>
                           Are you sure you want to delete{" "}
                           {selectedCategory?.name}? This action cannot be
-                          undone.
+                          undone. All the products in this category will also be deleted!
                         </DialogDescription>
                       </DialogHeader>
                       <DialogFooter>

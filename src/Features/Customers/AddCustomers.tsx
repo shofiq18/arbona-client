@@ -310,7 +310,7 @@ export default function AddCustomer(): React.ReactElement {
   };
 
   const handleCancel = () => {
-    router.push("/dashboard");
+    router.push("/dashboard/customers");
   };
 
   return (
@@ -1005,19 +1005,19 @@ export default function AddCustomer(): React.ReactElement {
         {uploadError && <p className="text-red-500 text-sm">{uploadError}</p>}
 
         {/* Action Buttons */}
-        <div className="flex justify-end space-x-4 pt-6">
+        <div className="flex justify-end   space-x-4 pt-6">
           <Button
             type="button"
             variant="outline"
             onClick={handleCancel}
-            className="px-6 py-2"
+            className="px-6 py-2 cursor-pointer text-white hover:text-white bg-gray-500 hover:bg-gray-600 "
             disabled={isLoading}
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white"
+            className="px-6 py-2 bg-red-600 hover:bg-red-700 cursor-pointer text-white"
             disabled={isLoading || formData.acceptDeliveryDays.length === 0}
           >
             {isLoading ? "Saving..." : "Save"}

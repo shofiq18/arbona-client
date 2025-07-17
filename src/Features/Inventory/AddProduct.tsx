@@ -7,10 +7,12 @@
 
 import { useGetCategoriesQuery } from '@/redux/api/auth/categories/categoriesApi';
 import { useAddInventoryMutation, useGetPackSizeQuery } from '@/redux/api/auth/inventory/inventoryApi';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 const AddProductPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     itemNumber: '',
@@ -227,8 +229,8 @@ const AddProductPage = () => {
         </div>
 
         <div className="col-span-3 flex justify-end gap-4">
-          <button type="submit" className="bg-red-500 text-white p-2 px-4 rounded" disabled={categoryData === undefined || packSize === undefined}>Save</button>
-          <button type="button" className="bg-pink-500 text-white p-2 px-4 rounded" onClick={() => setFormData({
+          <button type="submit" className="bg-red-500 text-white p-2 cursor-pointer px-4 rounded" disabled={categoryData === undefined || packSize === undefined}>Save</button>
+          <button type="button" className="bg-pink-500 cursor-pointer text-white p-2 px-4 rounded" onClick={() => setFormData({
             name: '',
             itemNumber: '',
             quantity: 0,
@@ -244,7 +246,12 @@ const AddProductPage = () => {
             categoryId: '',
             packageDimensions: { length: 0, width: 0, height: 0, unit: 'CM' }
           })}>Clear</button>
-         
+          <button></button>
+         <button type="button"
+          onClick={() => router.push("/dashboard/inventory")}
+           className="bg-gray-500 cursor-pointer text-white p-2 px-4 rounded">
+            Cancel
+          </button>
         </div>
       </form>
     </div>

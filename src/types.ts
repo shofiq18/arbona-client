@@ -161,38 +161,11 @@ export interface Customer {
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
-  
+  // Optional fields from fakeData, assuming they might exist
+  openBalance?: string;
   totalOrders?: number;
-  openBalance?: number;
-  totalOrderAmount?: number;
+  totalOrderAmount?: string;
   isCustomerSourceProspect?: boolean;
-  customerOrders?: {
-    _id: string;
-    date: string;
-    invoiceNumber: string;
-    PONumber: string;
-    storeId: string;
-    paymentDueDate: string;
-    orderAmount: number;
-    orderStatus: string;
-    isDeleted: boolean;
-    paymentAmountReceived: number;
-    discountGiven: number;
-    openBalance: number;
-    profitAmount: number;
-    profitPercentage: number;
-    paymentStatus: string;
-    products: {
-      productId: string;
-      quantity: number;
-      discount: number;
-      _id: string;
-    }[];
-    createdAt: string;
-    updatedAt: string;
-    
-  }[];
-  customerPayments?: any[]; // Adjust based on actual structure
 }
 
 // TypeScript type for API response
@@ -300,4 +273,9 @@ export interface Product {
   updatedAt: string;
   __v: number;
   incomingQuantity: number;
+}
+export interface GetProductResponse {
+  success: boolean;
+  message: string;
+  data: Product[];
 }

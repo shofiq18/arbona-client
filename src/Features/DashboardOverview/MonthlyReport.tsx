@@ -27,32 +27,26 @@ const MonthlyReport: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"Order" | "Customer">("Order");
   const { data, isLoading, isError } = useGetOrderCustomerChartQuery();
 
+  // ✅ Format chart data for full year (fill empty months with 0)
   const formatChartData = useMemo(() => {
-    if (!data?.data) return [];
+    if (!data?.data) return Array(12).fill(0); // default to 0 for each month
 
-    const rawData = activeTab === "Order" ? data.data.orders : data.data.customers;
+    const raw = activeTab === "Order" ? data.data.orders : data.data.customers;
 
-    // Sort by year/month and get last 6 months
-    const sorted = [...rawData].sort((a, b) => {
-      const dateA = new Date(a.year, a.month - 1);
-      const dateB = new Date(b.year, b.month - 1);
-      return dateA.getTime() - dateB.getTime();
+    const countsByMonth: Record<number, number> = {};
+    raw.forEach((item) => {
+      countsByMonth[item.month] = item.count;
     });
 
-    const last6 = sorted.slice(-6);
-
-    return last6.map((item) => ({
-      label: monthLabels[item.month - 1],
-      count: item.count,
-    }));
+    return monthLabels.map((_, i) => countsByMonth[i + 1] || 0);
   }, [data, activeTab]);
 
   const chartData: ChartData<"line"> = {
-    labels: formatChartData.map((item) => item.label),
+    labels: monthLabels,
     datasets: [
       {
-        label: activeTab,
-        data: formatChartData.map((item) => item.count),
+        label: `${activeTab} Count`,
+        data: formatChartData,
         borderColor: "#34D399",
         backgroundColor: "rgba(167, 243, 208, 0.5)",
         borderWidth: 2,
@@ -70,11 +64,8 @@ const MonthlyReport: React.FC = () => {
     plugins: {
       legend: { display: false },
       tooltip: {
-        enabled: true,
         callbacks: {
-          label: function (context: TooltipItem<"line">) {
-            return `${context.dataset.label}: ${context.parsed.y}`;
-          },
+          label: (context: TooltipItem<"line">) => `${context.dataset.label}: ${context.parsed.y}`,
         },
       },
     },
@@ -82,23 +73,20 @@ const MonthlyReport: React.FC = () => {
       x: { title: { display: false } },
       y: {
         beginAtZero: true,
-        title: { display: false },
         ticks: {
-          callback: function (value: string | number) {
-            return `${value}`;
-          },
+          callback: (value: string | number) => `${value}`,
         },
       },
     },
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <Loading/>;
   if (isError) return <div className="text-red-500">Failed to load chart data</div>;
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg mb-2 font-semibold">Monthly Report (Last 6 Months)</h2>
+        <h2 className="text-lg mb-4 font-semibold">Monthly Report (Full Year)</h2>
         <div className="flex p-1 bg-[#EAF8E7] rounded-2xl space-x-2">
           <button
             onClick={() => setActiveTab("Order")}
@@ -110,7 +98,7 @@ const MonthlyReport: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab("Customer")}
-            className={`px-4  text-sm font-bold rounded-lg ${
+            className={`px-4 py-2 text-sm font-bold rounded-lg ${
               activeTab === "Customer" ? "bg-gray-50 text-green-700" : "text-gray-600"
             }`}
           >

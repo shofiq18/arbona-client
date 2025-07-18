@@ -105,6 +105,26 @@ export default function AppSidebar() {
                       <span className="text-[16px]">Customers</span>
                     </Link>
                   </button>
+
+                  {/* Inventory */}
+                  <button
+                    className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/inventory"
+                      ? "bg-green-700 text-white text-lg"
+                      : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
+                      }`}
+                  >
+                    <Link href="/dashboard/inventory" className="flex items-center gap-2 w-full">
+                      <Image
+                        src="/dashboardIcons/fluent-mdl2_product-list.png"
+                        width={20}
+                        height={20}
+                        alt="Profile"
+                        className="rounded-full"
+                      />
+                      <span className="text-[16px]">Inventory</span>
+                    </Link>
+                  </button>
+                  
                   {/* Categories */}
                   <button
                     className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/categories"
@@ -123,22 +143,24 @@ export default function AppSidebar() {
                       <span className="text-[16px]">Categories</span>
                     </Link>
                   </button>
-                  {/* Inventory */}
+                  
+
+                  {/* Prospact */}
                   <button
-                    className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/inventory"
+                    className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${pathname === "/dashboard/prospact"
                       ? "bg-green-700 text-white text-lg"
                       : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                   >
-                    <Link href="/dashboard/inventory" className="flex items-center gap-2 w-full">
+                    <Link href="/dashboard/prospact" className="flex items-center gap-2 w-full">
                       <Image
-                        src="/dashboardIcons/fluent-mdl2_product-list.png"
+                        src="/dashboardIcons/Layer_1.png"
                         width={20}
                         height={20}
                         alt="Profile"
                         className="rounded-full"
                       />
-                      <span className="text-[16px]">Inventory</span>
+                      <span className="text-[16px] ">Prospact</span>
                     </Link>
                   </button>
                   {/* Container */}
@@ -159,6 +181,7 @@ export default function AppSidebar() {
                       <span className="text-[16px] ">Container</span>
                     </Link>
                   </button>
+                  
                 </div>
                 
                 

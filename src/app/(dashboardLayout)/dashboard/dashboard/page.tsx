@@ -1,7 +1,6 @@
 import BestSellingProducts from "@/Features/DashboardOverview/BestSellingProducts";
 import ProductSegmentation from "@/Features/DashboardOverview/ProductSegmentation";
 import SalesOverview from "@/Features/DashboardOverview/SalesOverview";
-import WeeklyReport from "@/Features/DashboardOverview/MonthlyReport";
 import MonthlyReport from "@/Features/DashboardOverview/MonthlyReport";
 
 

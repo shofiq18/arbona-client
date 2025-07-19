@@ -1,6 +1,5 @@
 
 
-
 "use client";
 
 import { useState } from "react";
@@ -35,8 +34,10 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loading from "@/redux/Shared/Loading";
 import ErrorState from "@/redux/Shared/ErrorState";
+import ProductFiltersModal from "./FilterModal";
 
 export default function AllGetProducts() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -45,14 +46,60 @@ export default function AllGetProducts() {
   const [deleteInventory] = useDeleteInventoryMutation();
   const [updateInventory] = useUpdateInventoryMutation();
   const products: payload[] = data?.data ?? [];
-
   console.log("get data", products);
+ const [activeFilters, setActiveFilters] = useState({
+    category: "",
+    product: "",
+    outOfStock: false,
+    lowStock: false,
+  });
+const handleApplyFilters = (newFilters:any) => {
 
+    setActiveFilters(newFilters);
+
+    setIsModalOpen(false); // Close the modal after applying filters
+
+    setCurrentPage(1); // Reset to the first page when filters change
+
+   
+
+  };
+  //shwo the modal name nad catagory 
+   const filteredProducts = products.filter((product) => {
+    const matchesSearch =
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase());
+
+    const matchesCategory = activeFilters.category
+      ? (product.categoryId?.name || "") === activeFilters.category
+      : true;
+
+    const matchesProduct = activeFilters.product
+      ? product.name === activeFilters.product
+      : true;
+
+    const matchesOutOfStock = activeFilters.outOfStock
+      ? (product.quantity ?? 0) === 0
+      : true;
+
+   const matchesLowStock = activeFilters.lowStock
+  ? (product.quantity ?? 0) < 50 && (product.quantity ?? 0) > 0 
+  : true;
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesProduct &&
+      matchesOutOfStock &&
+      matchesLowStock
+    );
+  });
   // Filter products based on search
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()) ||
-    (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
-  );
+  // const filteredProducts = products.filter((product) =>
+  //   product.name.toLowerCase().includes(search.toLowerCase()) ||
+  //   (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
+  // );
+
 
   // Calculate total pages
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
@@ -155,7 +202,7 @@ export default function AllGetProducts() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex gap-2">
-          <Button
+          <Button onClick={() => setIsModalOpen(true)}
             variant="outline"
             className="bg-orange-500 text-white hover:bg-orange-600"
           >
@@ -175,7 +222,14 @@ export default function AllGetProducts() {
           </Button>
         </div>
       </div>
+      {/* add dialog */}
+ <ProductFiltersModal open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        filterData={products} 
+        onApplyFilters={handleApplyFilters} 
+        currentFilters={activeFilters} 
 
+/ >
       {/* Product Table */}
       <Table className="w-full overflow-x-auto">
         <TableHeader>

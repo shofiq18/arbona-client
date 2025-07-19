@@ -1,6 +1,3 @@
-
-
-
 export interface Order {
   _id: string;
   date: string; // e.g., "2025-07-05"
@@ -129,9 +126,8 @@ export interface AddOrderFormProps {
 //   totalOrders?: number;
 //   totalOrderAmount?: string;
 //   isCustomerSourceProspect?: boolean;
-  
-// }
 
+// }
 
 // "@/types/index.ts" or similar
 
@@ -151,10 +147,7 @@ interface CustomerOrder {
   paymentStatus: string;
 }
 
-
-
 export interface Customer {
-  
   _id: string;
   storeName: string;
   storePhone: string;
@@ -297,4 +290,10 @@ export interface GetProductResponse {
   success: boolean;
   message: string;
   data: Product[];
+}
+
+export interface DecodedToken {
+  role: string;
+  name?: string;
+  email: string;
 }

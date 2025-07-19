@@ -3,6 +3,7 @@
 
 
 import { ProductSegment, useGetProductSegmentsQuery } from "@/redux/api/order/orderManagementApi";
+import Loading from "@/redux/Shared/Loading";
 import React from "react";
 
 
@@ -12,7 +13,9 @@ import React from "react";
 const ProductSegmentation: React.FC = () => {
   const { data, isLoading, isError } = useGetProductSegmentsQuery();
 
-  if (isLoading) return <div className="p-4 bg-white rounded-lg shadow-md">Loading segments...</div>;
+  if (isLoading) return <div className="p-4 bg-white rounded-lg shadow-md">
+    <Loading title="Product segmenttaiton Loading"/>
+  </div>;
   if (isError) return <div className="p-4 bg-white rounded-lg shadow-md text-red-500">Error loading segments</div>;
 
   const segmentsToShow: ProductSegment[]  = data?.data.slice(0, 4) || [];

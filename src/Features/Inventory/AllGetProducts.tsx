@@ -1,6 +1,7 @@
 
 
 
+
 "use client";
 
 import { useState } from "react";
@@ -196,7 +197,17 @@ export default function AllGetProducts() {
             <TableRow key={idx} className="text-sm">
               <TableCell>{product.categoryId?.name || ""}</TableCell>
               <TableCell className="text-blue-600 underline cursor-pointer">
-                {product.name}
+                <button
+              
+                  onClick={() => {
+                    setSelectedProduct(product);
+                    setIsUpdateOpen(true);
+                    
+                  }}
+                  className="cursor-pointer"
+                >
+                  {product.name}
+                </button>
               </TableCell>
               <TableCell>{product.quantity?.toLocaleString() ?? ""}</TableCell>
               <TableCell>

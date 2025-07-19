@@ -80,7 +80,7 @@ const MonthlyReport: React.FC = () => {
     },
   };
 
-  if (isLoading) return <Loading/>;
+  if (isLoading) return <Loading title="Montly cart Loading"/>;
   if (isError) return <div className="text-red-500">Failed to load chart data</div>;
 
   return (

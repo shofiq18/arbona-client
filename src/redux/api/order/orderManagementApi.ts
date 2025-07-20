@@ -18,13 +18,31 @@ interface ProductSegmentResponse {
   data: ProductSegment[];
 }
 
+// Updated payload interface to match your component needs
+interface UpdateOrderPayload {
+  id: string; // MongoDB _id as string
+  date?: string;
+  invoiceNumber?: string;
+  PONumber?: string;
+  storeId?: string;
+  paymentDueDate?: string;
+  paymentAmountReceived?: number;
+  paymentStatus?: string;
+  salesPerson?: string;
+  products?: Array<{
+    productId: string;
+    quantity: number;
+    discount: number;
+  }>;
+}
+
 const orderManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getOrders: builder.query<Order[], void>({
+    getOrders: builder.query<any[], void>({
       query: () => "/order",
       providesTags: ["Orders"],
     }),
-    addOrder: builder.mutation<Order, Partial<Order>>({
+    addOrder: builder.mutation<any, any>({
       query: (order) => ({
         url: "/order",
         method: "POST",
@@ -32,15 +50,15 @@ const orderManagementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
-    updateOrder: builder.mutation<Order, Partial<Order> & { id: number }>({
+    updateOrder: builder.mutation<any, UpdateOrderPayload>({
       query: ({ id, ...patch }) => ({
-        url: `/orders/${id}`,
-        method: "PUT",
+        url: `/order/${id}`, // Changed to singular to match your backend
+        method: "PATCH",
         body: patch,
       }),
       invalidatesTags: ["Orders"],
     }),
-    deleteOrder: builder.mutation<{ success: boolean }, number>({
+    deleteOrder: builder.mutation<{ success: boolean }, string>({
       query: (id) => ({
         url: `/order/${id}`,
         method: "DELETE",

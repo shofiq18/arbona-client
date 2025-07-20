@@ -30,8 +30,25 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
 
+// Updated interfaces to match your data structure
+interface UpdateOrderPayload {
+  id: string;
+  date?: string;
+  storeId?: string;
+  paymentDueDate?: string;
+  orderAmount?: number;
+  shippingCharge?: number;
+  paymentAmountReceived?: number;
+  paymentStatus?: string;
+  products?: Array<{
+    productId: string;
+    quantity: number;
+    discount: number;
+  }>;
+}
+
+// Rest of your existing interfaces remain the same...
 interface Product {
   _id: string;
   name: string;
@@ -73,25 +90,6 @@ interface Client {
 interface Category {
   _id: string;
   name: string;
-}
-
-interface OrderProduct {
-  productId: string;
-  quantity: number;
-  discount: number;
-}
-
-interface OrderPayload {
-  orderId: string;
-  date: string;
-  invoiceNumber: string;
-  PONumber: string;
-  storeId: string;
-  paymentDueDate: string;
-  paymentAmountReceived: number;
-  paymentStatus: string;
-  salesPerson?: string;
-  products: OrderProduct[];
 }
 
 interface Order {
@@ -165,10 +163,6 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const [orderDate, setOrderDate] = useState<string>(
     order?.date ? new Date(order.date).toISOString().split("T")[0] : ""
   );
-  const [invoiceNumber, setInvoiceNumber] = useState<string>(
-    order?.invoiceNumber ?? ""
-  );
-  const [PONumber, setPONumber] = useState<string>(order?.PONumber ?? "");
   const [paymentDueDate, setPaymentDueDate] = useState<string>(
     order?.paymentDueDate
       ? new Date(order.paymentDueDate).toISOString().split("T")[0]
@@ -180,7 +174,10 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const [paymentStatus, setPaymentStatus] = useState<string>(
     order?.paymentStatus ?? "notPaid"
   );
-  const [salesPerson, setSalesPerson] = useState<string>("");
+  // Added shippingCharge state
+  const [shippingCharge, setShippingCharge] = useState<number>(
+    Number(order?.storeId?.shippingCharge) ?? 0
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
@@ -206,15 +203,14 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   useEffect(() => {
     if (order?.products?.length && orderItems.length === 0) {
       const initialOrderItems = order.products.map((orderProduct) => {
-        // Create a basic product details structure
         const productDetails: ProductDetails = {
           id: orderProduct?.productId ?? "",
-          name: `Product ${orderProduct?.productId ?? "Unknown"}`, // Placeholder name
-          itemCode: `SKU-${orderProduct?.productId ?? "Unknown"}`, // Placeholder SKU
-          category: "Unknown", // Placeholder category
-          price: 0, // Will be updated when user modifies
-          availableQty: 0, // Placeholder qty
-          unit: "pcs", // Placeholder unit
+          name: `Product ${orderProduct?.productId ?? "Unknown"}`,
+          itemCode: `SKU-${orderProduct?.productId ?? "Unknown"}`,
+          category: "Unknown",
+          price: 0,
+          availableQty: 0,
+          unit: "pcs",
         };
 
         return {
@@ -223,7 +219,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
           bookedQty: 0,
           discount: orderProduct?.discount ?? 0,
           total:
-            0 * (orderProduct?.quantity ?? 0) - (orderProduct?.discount ?? 0), // Will be 0 initially
+            0 * (orderProduct?.quantity ?? 0) - (orderProduct?.discount ?? 0),
         };
       });
 
@@ -238,6 +234,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
     }
   }, [categories, selectedCategoryId]);
 
+  // All your existing functions remain the same...
   const addToOrder = (product: Product) => {
     const item: ProductDetails = {
       id: product?._id ?? "",
@@ -343,20 +340,21 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
 
   const { totalAmount, totalQuantity, totalWeight } = calculateTotals();
 
-  const constructOrderPayload = () => ({
-    orderId: order?._id ?? "",
+  // Updated to match your actual data structure
+  // Updated to match your exact data structure
+  const constructOrderPayload = (): UpdateOrderPayload => ({
+    id: order?._id ?? "",
     date: orderDate,
-    invoiceNumber,
-    PONumber,
     storeId: selectedClient,
     paymentDueDate,
-    paymentAmountReceived,
+    orderAmount: Math.round(totalAmount), // Ensure integer value
+    shippingCharge: Math.round(shippingCharge), // Ensure integer value
+    paymentAmountReceived: Math.round(paymentAmountReceived), // Ensure integer value
     paymentStatus,
-    salesPerson,
     products: orderItems.map((item) => ({
       productId: item?.product?.id ?? "",
-      quantity: item?.quantity ?? 0,
-      discount: item?.discount ?? 0,
+      quantity: Math.round(item?.quantity ?? 0), // Ensure integer value
+      discount: Math.round(item?.discount ?? 0), // Ensure integer value
     })),
   });
 
@@ -365,16 +363,26 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
       alert("Please select a client and add items");
       return;
     }
-    const payload = constructOrderPayload();
+
     try {
-      await updateOrder(payload as OrderPayload).unwrap();
+      const payload = constructOrderPayload();
+      console.log("Updating order with payload:", payload);
+
+      const result = await updateOrder(payload).unwrap();
+      console.log("Update successful:", result);
+
       alert("Order updated successfully!");
-      onUpdateSuccess?.();
+      if (onUpdateSuccess) {
+        onUpdateSuccess();
+      }
     } catch (err: any) {
-      alert(
-        "Order update failed: " +
-          (err?.data?.message || err?.error || "Unknown error")
-      );
+      console.error("Update order error:", err);
+      const errorMessage =
+        err?.data?.message ||
+        err?.message ||
+        err?.error ||
+        "Failed to update order";
+      alert(`Order update failed: ${errorMessage}`);
     }
   };
 
@@ -432,20 +440,6 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
               value={orderDate}
               onChange={(e) => setOrderDate(e.target.value)}
             />
-          </div>
-          <div className="space-y-2">
-            <Label>Invoice Number</Label>
-            <Input
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder="Invoice Number"
-            />
-            <Label>P.O. Number</Label>
-            <Input
-              value={PONumber}
-              onChange={(e) => setPONumber(e.target.value)}
-              placeholder="PO Number"
-            />
             <Label>Payment Due Date</Label>
             <Input
               type="date"
@@ -460,26 +454,30 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
               value={paymentAmountReceived}
               onChange={(e) => setPaymentAmountReceived(Number(e.target.value))}
             />
+            <Label>Shipping Charge</Label>
+            <Input
+              type="number"
+              value={shippingCharge}
+              onChange={(e) => setShippingCharge(Number(e.target.value))}
+            />
+          </div>
+          <div className="space-y-2">
             <Label>Payment Status</Label>
             <Select value={paymentStatus} onValueChange={setPaymentStatus}>
               <SelectTrigger>
-                <SelectValue placeholder="notPaid" />
+                <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="notPaid">Not Paid</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="partiallyPaid">Partially Paid</SelectItem>
                 <SelectItem value="partial">Partial</SelectItem>
               </SelectContent>
             </Select>
-            <Label>Sales Person</Label>
-            <Input
-              value={salesPerson}
-              onChange={(e) => setSalesPerson(e.target.value)}
-              placeholder="Sales Person ID"
-            />
           </div>
         </div>
 
+        {/* Rest of your component remains the same... */}
         {/* Add search bar */}
         <div className="mb-4">
           <div className="relative">
@@ -702,15 +700,6 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                     ))
                   )}
                 </ScrollArea>
-                {orderItems.length > 0 && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                    <p className="text-sm text-yellow-700">
-                      <strong>Note:</strong> Update product prices manually for
-                      accurate totals. Existing order items show as placeholder
-                      names until prices are set.
-                    </p>
-                  </div>
-                )}
               </CardContent>
               <div className="border-t px-4 py-2 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -718,14 +707,14 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                   <span className="font-semibold">{totalQuantity}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Total Weight:</span>
+                  <span>Shipping:</span>
                   <span className="font-semibold">
-                    {totalWeight.toFixed(2)} kg
+                    ₹{shippingCharge.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Total:</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>₹{(totalAmount + shippingCharge).toFixed(2)}</span>
                 </div>
               </div>
             </Card>
@@ -735,7 +724,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
         <div className="flex justify-between mt-4">
           <div className="text-sm text-muted-foreground">
             Original Order Amount: ₹{(order?.orderAmount ?? 0).toFixed(2)} |{" "}
-            Current Amount: ₹{totalAmount.toFixed(2)}
+            Current Amount: ₹{(totalAmount + shippingCharge).toFixed(2)}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCancel}>

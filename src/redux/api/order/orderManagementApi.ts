@@ -18,7 +18,6 @@ interface ProductSegmentResponse {
   data: ProductSegment[];
 }
 
-
 const orderManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
@@ -43,7 +42,7 @@ const orderManagementApi = baseApi.injectEndpoints({
     }),
     deleteOrder: builder.mutation<{ success: boolean }, number>({
       query: (id) => ({
-        url: `/orders/${id}`,
+        url: `/order/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: ["Orders"],
@@ -60,9 +59,6 @@ export const {
   useAddOrderMutation,
   useUpdateOrderMutation,
   useDeleteOrderMutation,
-  useGetProductSegmentsQuery
+  useGetProductSegmentsQuery,
 } = orderManagementApi;
 export default orderManagementApi;
-
-
-

@@ -12,7 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
+import UpdateOrderPage from "@/components/UpdateOrderForm";
+import {
+  useGetOrdersQuery,
+  useDeleteOrderMutation,
+} from "@/redux/api/order/orderManagementApi";
 import { FilterFormValues, Order } from "@/types";
 import Link from "next/link";
 import { useState } from "react";
@@ -33,25 +37,52 @@ export default function OrderManagement(): React.ReactElement {
     error: object;
   };
 
-  console.log("check", orders)
+  // States
   const [addOrderOpen, setAddOrderOpen] = useState(false);
-
-  // function handleAddOrderSubmit(values: AddOrderFormValues) {
-  //   // Implement your add order logic here (API call, state update, etc.)
-  //   console.log("Add Order:", values);
-  //   setAddOrderOpen(false);
-  // }
-
-  // function handleAddOrderCancel() {
-  //   setAddOrderOpen(false);
-  // }
-
+  const [updateOrderOpen, setUpdateOrderOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
 
-  // ...existing code for fetching orders...
+  // Delete mutation
+  const [deleteOrder, { isLoading: isDeleting }] = useDeleteOrderMutation();
 
+  // Delete handler functions
+  const handleDeleteClick = (order: Order) => {
+    setOrderToDelete(order);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      await deleteOrder(orderToDelete._id).unwrap();
+
+      // Success feedback
+      alert(
+        `Order #${orderToDelete.invoiceNumber} has been deleted successfully!`
+      );
+
+      // Close modal and reset state
+      setDeleteConfirmOpen(false);
+      setOrderToDelete(null);
+    } catch (err: any) {
+      // Error handling
+      const errorMessage =
+        err?.data?.message || err?.error || "Failed to delete order";
+      alert(`Error deleting order: ${errorMessage}`);
+      console.error("Delete order error:", err);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirmOpen(false);
+    setOrderToDelete(null);
+  };
+
+  // Other handler functions
   function handleFilterSubmit(values: FilterFormValues) {
-    // Implement filter logic here (update query params, refetch, etc.)
     console.log(values);
     setFilterOpen(false);
   }
@@ -92,10 +123,8 @@ export default function OrderManagement(): React.ReactElement {
 
   if (isError) {
     console.log(error);
-    return <div>Error: </div>;
+    return <div>Error loading orders</div>;
   }
-
-  console.log(orders);
 
   return (
     <div>
@@ -137,7 +166,7 @@ export default function OrderManagement(): React.ReactElement {
         ))}
       </div>
 
-      {/* Section 2: Search & Filter option */}
+      {/* Section 2: Search & Filter options */}
       <div className="flex items-center justify-between space-x-4 mt-6 mb-10">
         <Input
           type="text"
@@ -359,6 +388,7 @@ export default function OrderManagement(): React.ReactElement {
                 </TableCell>
                 <TableCell className="text-sm sticky right-0 bg-white">
                   <div className="flex items-center space-x-2">
+                    {/* View Button */}
                     <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
                       <svg
                         width="16"
@@ -375,23 +405,40 @@ export default function OrderManagement(): React.ReactElement {
                         />
                       </svg>
                     </button>
-                    <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 20 21"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          clipRule="evenodd"
-                          d="M17.3047 7.3201C18.281 6.34379 18.281 4.76087 17.3047 3.78456L16.7155 3.19531C15.7391 2.219 14.1562 2.219 13.1799 3.19531L3.69097 12.6843C3.34624 13.029 3.10982 13.467 3.01082 13.9444L2.34111 17.1737C2.21932 17.7609 2.73906 18.2807 3.32629 18.1589L6.55565 17.4892C7.03302 17.3902 7.47103 17.1538 7.81577 16.809L17.3047 7.3201Z"
-                          fill="#667085"
-                        />
-                      </svg>
-                    </button>
-                    <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
+
+                    {/* Update Button */}
+                    <ReusableModal
+                      open={updateOrderOpen}
+                      onOpenChange={setUpdateOrderOpen}
+                      trigger={
+                        <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 20 21"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M17.3047 7.3201C18.281 6.34379 18.281 4.76087 17.3047 3.78456L16.7155 3.19531C15.7391 2.219 14.1562 2.219 13.1799 3.19531L3.69097 12.6843C3.34624 13.029 3.10982 13.467 3.01082 13.9444L2.34111 17.1737C2.21932 17.7609 2.73906 18.2807 3.32629 18.1589L6.55565 17.4892C7.03302 17.3902 7.47103 17.1538 7.81577 16.809L17.3047 7.3201Z"
+                              fill="#667085"
+                            />
+                          </svg>
+                        </button>
+                      }
+                      title="Update Order"
+                    >
+                      <UpdateOrderPage key={idx} order={order} />
+                    </ReusableModal>
+
+                    {/* Delete Button */}
+                    <button
+                      className="cursor-pointer hover:bg-red-100 p-2 rounded-full transition-colors"
+                      onClick={() => handleDeleteClick(order)}
+                      disabled={isDeleting}
+                    >
                       <svg
                         width="14"
                         height="14"
@@ -401,13 +448,13 @@ export default function OrderManagement(): React.ReactElement {
                       >
                         <path
                           d="M6.33317 6.62502C6.79341 6.62502 7.1665 6.99812 7.1665 7.45835V12.4584C7.1665 12.9186 6.79341 13.2917 6.33317 13.2917C5.87293 13.2917 5.49984 12.9186 5.49984 12.4584V7.45835C5.49984 6.99812 5.87293 6.62502 6.33317 6.62502Z"
-                          fill="#667085"
+                          fill={isDeleting ? "#ccc" : "#ef4444"}
                         />
                         <path
                           fillRule="evenodd"
                           clipRule="evenodd"
                           d="M12.9998 3.50002V2.66669C12.9998 1.28598 11.8806 0.166687 10.4998 0.166687H5.49984C4.11913 0.166687 2.99984 1.28598 2.99984 2.66669V3.50002H1.74984C1.2896 3.50002 0.916504 3.87312 0.916504 4.33335C0.916504 4.79359 1.2896 5.16669 1.74984 5.16669H2.1665V14.3334C2.1665 15.7141 3.28579 16.8334 4.6665 16.8334H11.3332C12.7139 16.8334 13.8332 15.7141 13.8332 14.3334V5.16669H14.2498C14.7101 5.16669 15.0832 4.79359 15.0832 4.33335C15.0832 3.87312 14.7101 3.50002 14.2498 3.50002H12.9998Z"
-                          fill="#667085"
+                          fill={isDeleting ? "#ccc" : "#ef4444"}
                         />
                       </svg>
                     </button>
@@ -419,7 +466,75 @@ export default function OrderManagement(): React.ReactElement {
         </Table>
       </div>
 
-      {/* Pagination or Load More (Optional) */}
+      {/* Delete Confirmation Modal */}
+      <ReusableModal
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        title="Confirm Delete"
+      >
+        <div className="p-4">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+              <svg
+                className="w-6 h-6 text-red-600"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Delete Order
+            </h3>
+            <p className="text-gray-600">
+              Are you sure you want to delete order{" "}
+              <span className="font-semibold">
+                #{orderToDelete?.invoiceNumber}
+              </span>
+              ?
+              {orderToDelete?.storeId?.storeName && (
+                <>
+                  {" "}
+                  from{" "}
+                  <span className="font-semibold">
+                    {orderToDelete.storeId.storeName}
+                  </span>
+                </>
+              )}
+            </p>
+            <p className="text-sm text-red-600 mt-2">
+              This action cannot be undone.
+            </p>
+          </div>
+
+          <div className="flex gap-3 justify-center">
+            <Button
+              variant="outline"
+              onClick={handleDeleteCancel}
+              disabled={isDeleting}
+              className="min-w-[100px]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 min-w-[100px]"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
+          </div>
+        </div>
+      </ReusableModal>
+
+      {/* Pagination or Load More */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-500">
           Showing {orders?.length || 0} of {orders?.length || 0} orders

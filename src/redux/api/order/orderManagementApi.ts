@@ -52,6 +52,8 @@ const orderManagementApi = baseApi.injectEndpoints({
       query: () => "/order/getProductSegmentation",
       providesTags: ["ProductSegments"],
     }),
+
+    
   }),
 });
 
@@ -60,7 +62,8 @@ export const {
   useAddOrderMutation,
   useUpdateOrderMutation,
   useDeleteOrderMutation,
-  useGetProductSegmentsQuery
+  useGetProductSegmentsQuery,
+
 } = orderManagementApi;
 export default orderManagementApi;
 

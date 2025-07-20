@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
 import { FilterFormValues, Order } from "@/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ImFilePdf } from "react-icons/im";
 
 export default function OrderManagement(): React.ReactElement {
@@ -35,6 +35,35 @@ export default function OrderManagement(): React.ReactElement {
   console.log("check", orders)
   const [addOrderOpen, setAddOrderOpen] = useState(false);
 
+const handleDownload = async () => {
+   
+
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch( `${process.env.NEXT_PUBLIC_URL}/order/allOrdersPdf`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch PDF');
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: 'application/pdf' });
+
+      // Create a temporary link to trigger the download
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'order_details.pdf'; // Default file name
+      link.click(); // Trigger the download
+
+      // Clean up the URL object
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+     console.log(err)
+    } 
+  };
   // function handleAddOrderSubmit(values: AddOrderFormValues) {
   //   // Implement your add order logic here (API call, state update, etc.)
   //   console.log("Add Order:", values);
@@ -162,7 +191,7 @@ export default function OrderManagement(): React.ReactElement {
           >
             <AddOrderPage />
           </ReusableModal>
-          <Button className="bg-[#D9D9D9]" size="icon">
+          <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>
         </div>
@@ -260,7 +289,7 @@ export default function OrderManagement(): React.ReactElement {
                       />
                     </svg>
                   </button>
-                  <button className="cursor-pointer">
+                  <button  className="cursor-pointer">
                     <svg
                       width="16"
                       height="17"

@@ -1,28 +1,34 @@
 
 "use client";
-
+import { useConvertProspectMutation, useDeleteProspectMutation, useGetProspectsQuery } from "@/redux/api/prospact/prospact.Api";
+import ErrorState from "@/redux/Shared/ErrorState";
+import Loading from "@/redux/Shared/Loading";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 export default function ProspectDetails() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
   const router = useRouter();
+const [converProspect]=useConvertProspectMutation()
+const [deleteProspect]=useDeleteProspectMutation()
 
   const prospects = [
-    { client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
-    { client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
-    { client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "3day" },
-    { client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
-    { client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "3day" },
-    { client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
-    { client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
-    { client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Weekly" },
-    { client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "3day" },
-    { client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
+    { _id:'1',client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
+    { _id:'2',client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
+    { _id:'3',client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "3day" },
+    { _id:'4',client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "Weekly" },
+    { _id:'5',client: "Dhaval", salesPerson: "Mujahid", followUp: "22-07-2025", frequency: "3day" },
+    { _id:'6',client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
+    { _id:'7',client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
+    { _id:'8',client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Weekly" },
+    { _id:'9',client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "3day" },
+    { _id:'10',client: "Amit", salesPerson: "Rahim", followUp: "23-07-2025", frequency: "Monthly" },
   ];
+
 
   // Filter prospects based on search term
   const filteredProspects = prospects.filter((prospect) =>
@@ -36,6 +42,30 @@ export default function ProspectDetails() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
+
+
+  const deleteProspacts=async(id:string)=>{
+    console.log(id)
+ try {
+      await deleteProspect(id).unwrap();
+      toast.success("Prospact deleted successfully");
+     
+    } catch (err) {
+      toast.error("Failed to delete prospact");
+      console.error("Delete error:", err);
+    }
+  }
+  const converProspacts=async(id:string)=>{
+    console.log(id)
+ try {
+      await converProspect(id).unwrap();
+      toast.success("Prospact Convert successfully");
+     
+    } catch (err) {
+      toast.error("Failed to convert prospact");
+      console.error("convert error:", err);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
@@ -88,11 +118,11 @@ export default function ProspectDetails() {
                   <td className="p-3 text-gray-800">N/A</td>
                   <td className="p-3 text-gray-800">No notes</td>
                   <td className="p-3">
-                    <button className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
+                    <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
                   </td>
                   <td className="p-3">
                     <button className="text-blue-500 mr-2 hover:text-blue-700">✎</button>
-                    <button className="text-red-500 hover:text-red-700">🗑</button>
+                    <button onClick={()=>deleteProspacts(prospect._id)} className="text-red-500 hover:text-red-700">🗑</button>
                   </td>
                 </tr>
               ))}

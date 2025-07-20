@@ -21,6 +21,7 @@ export interface Order {
     shippingState: string;
     shippingZipcode: string;
     shippingCity: string;
+    shippingCharge: string;
     creditApplication: string;
     ownerLegalFrontImage: string;
     ownerLegalBackImage: string;

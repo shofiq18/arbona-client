@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
 import { FilterFormValues, Order } from "@/types";
+import Link from "next/link";
 import { useState } from "react";
 import { ImFilePdf } from "react-icons/im";
 
@@ -181,11 +182,11 @@ export default function OrderManagement(): React.ReactElement {
               <TableHead className="min-w-[120px]">Payment Due</TableHead>
               <TableHead className="min-w-[120px]">Order Amount</TableHead>
               <TableHead className="min-w-[120px]">Order Status</TableHead>
-              <TableHead className="min-w-[140px]">Payment Receive</TableHead>
+              <TableHead className="min-w-[140px]">Payment Received</TableHead>
               <TableHead className="min-w-[100px]">Discount</TableHead>
               <TableHead className="min-w-[120px]">Open Balance</TableHead>
-              <TableHead className="min-w-[100px]">Profit</TableHead>
-              <TableHead className="min-w-[100px]">Profit %</TableHead>
+              <TableHead className="min-w-[100px]">Profit Margin</TableHead>
+              <TableHead className="min-w-[100px]">Profit Markup</TableHead>
               <TableHead className="min-w-[130px]">Payment Status</TableHead>
               <TableHead className="min-w-[140px]">Sales Person</TableHead>
               <TableHead className="min-w-[150px]">Store Phone</TableHead>
@@ -198,6 +199,7 @@ export default function OrderManagement(): React.ReactElement {
               <TableHead className="min-w-[200px]">Shipping Address</TableHead>
               <TableHead className="min-w-[120px]">Shipping City</TableHead>
               <TableHead className="min-w-[120px]">Shipping State</TableHead>
+              <TableHead className="min-w-[120px]">Shipping Charge</TableHead>
               <TableHead className="min-w-[120px]">Shipping Zip</TableHead>
               <TableHead className="min-w-[200px]">Bank Account Info</TableHead>
               <TableHead className="min-w-[180px]">Delivery Days</TableHead>
@@ -219,10 +221,22 @@ export default function OrderManagement(): React.ReactElement {
                     year: "numeric",
                   })}
                 </TableCell>
-                <TableCell className="text-sm text-blue-600 font-medium">
-                  {order.invoiceNumber}
+                <TableCell>
+                  <Link
+                    href="#"
+                    className="cursor-pointer text-blue-600 font-medium hover:underline"
+                  >
+                    {order.invoiceNumber}
+                  </Link>
                 </TableCell>
-                <TableCell className="text-sm">{order.PONumber}</TableCell>
+                <TableCell className="text-sm">
+                  <Link
+                    href="#"
+                    className="cursor-pointer text-blue-600 font-medium hover:underline"
+                  >
+                    {order.PONumber}
+                  </Link>
+                </TableCell>
                 <TableCell className="text-sm font-medium">
                   {order.storeId?.storeName || "N/A"}
                 </TableCell>
@@ -310,6 +324,9 @@ export default function OrderManagement(): React.ReactElement {
                 </TableCell>
                 <TableCell className="text-sm">
                   {order.storeId?.shippingState || "N/A"}
+                </TableCell>
+                <TableCell className="text-sm">
+                  {order.storeId?.shippingCharge || "N/A"}
                 </TableCell>
                 <TableCell className="text-sm">
                   {order.storeId?.shippingZipcode || "N/A"}

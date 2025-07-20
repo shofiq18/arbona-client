@@ -32,6 +32,7 @@ export default function OrderManagement(): React.ReactElement {
     error: object;
   };
 
+  console.log("check", orders)
   const [addOrderOpen, setAddOrderOpen] = useState(false);
 
   // function handleAddOrderSubmit(values: AddOrderFormValues) {

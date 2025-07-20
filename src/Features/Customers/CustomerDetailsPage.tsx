@@ -1,16 +1,17 @@
-
-
-
 "use client";
 
 import { useGetCustomerQuery } from "@/redux/api/customers/customersApi";
 import { useParams } from "next/navigation";
 import Loading from "@/redux/Shared/Loading"; // Adjust path as needed
+import { useSendEmailForNotPaidOrdersMutation } from "@/redux/api/customers/customersApi"; // Import the new hook
+import { toast } from "react-toastify"; // Optional: for feedback (install if not present)
 
 const CustomerDetailsPage: React.FC = () => {
   const params = useParams();
   const id = params.id as string;
   const { data, isLoading, isError } = useGetCustomerQuery(id);
+  const [sendEmailForNotPaidOrders, { isLoading: isSending, isError: sendError, isSuccess }] =
+    useSendEmailForNotPaidOrdersMutation();
 
   if (isLoading) {
     return <Loading title="Loading Customer Details..." message="Customer details fetched successfully" />;
@@ -21,6 +22,17 @@ const CustomerDetailsPage: React.FC = () => {
   }
 
   const customer = data.data;
+
+  // Function to handle email sending
+  const handleSendEmail = async () => {
+    try {
+      await sendEmailForNotPaidOrders(id).unwrap();
+      toast.success("Email sent successfully!"); // Optional feedback
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast.error("Failed to send email. Please try again."); // Optional feedback
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -124,6 +136,26 @@ const CustomerDetailsPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Emailing Section */}
+        <div>
+          {customer.openBalance ? (
+            <div className="flex items-center justify-between border p-3 rounded-2xl bg-white border-red-200 gap-5">
+              <p className="text-xl font-bold">
+                This customer has <span className="text-xl text-red-700 font-bold">{customer.openBalance}</span> open balance remaining
+              </p>
+              <button
+                onClick={handleSendEmail}
+                className="bg-green-600 px-3 py-1 text-lg font-bold text-white rounded-md hover:bg-green-700 transition duration-300"
+                disabled={isSending}
+              >
+                {isSending ? "Sending..." : "Send Email?"}
+              </button>
+            </div>
+          ) : null}
+          {sendError && <p className="text-red-500 mt-2">Failed to send email. Please try again.</p>}
+          {isSuccess && <p className="text-green-600 mt-2">Email sent successfully!</p>}
+        </div>
+
         {/* Orders Table */}
         <div className="bg-white p-4 rounded-lg shadow-md mt-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">Order History</h2>
@@ -143,6 +175,7 @@ const CustomerDetailsPage: React.FC = () => {
                     <th className="p-3 whitespace-nowrap">Balance</th>
                     <th className="p-3 whitespace-nowrap">Profit</th>
                     <th className="p-3 whitespace-nowrap">Profit %</th>
+                    <th className="p-3 whitespace-nowrap">Open Balance</th>
                     <th className="p-3 whitespace-nowrap">Payment Status</th>
                   </tr>
                 </thead>
@@ -160,6 +193,7 @@ const CustomerDetailsPage: React.FC = () => {
                       <td className="p-3 whitespace-nowrap text-gray-700">${order.openBalance.toFixed(2)}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">${order.profitAmount.toFixed(2)}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">{order.profitPercentage.toFixed(2)}%</td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">{order.openBalance}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">{order.paymentStatus}</td>
                     </tr>
                   ))}

@@ -1,7 +1,3 @@
-
-
-
-
 import { Customer } from "@/types";
 import baseApi from "../baseApi";
 
@@ -38,6 +34,13 @@ const customersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Customers"],
     }),
+    sendEmailForNotPaidOrders: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/customer/${id}/send-email-for-not-paid-orders`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Customers"],
+    }),
   }),
 });
 
@@ -47,5 +50,6 @@ export const {
   useAddCustomerMutation,
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
+  useSendEmailForNotPaidOrdersMutation, // New hook export
 } = customersApi;
 export default customersApi;

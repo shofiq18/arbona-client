@@ -19,7 +19,7 @@ const SalesOverview = () => {
     trends: { totalSales: 0, ordersLast7Days: 0 },
   });
 
-  console.log("total product api", inventoryData);
+  // console.log("total product api", inventoryData);
 
   useEffect(() => {
     if (salesData?.data && inventoryData) {

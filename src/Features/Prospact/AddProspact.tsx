@@ -54,7 +54,7 @@ interface FieldErrors {
   [key: string]: string;
 }
 
-export default function AddCustomer(): React.ReactElement {
+export default function AddProspact(): React.ReactElement {
   const [formData, setFormData] = useState<FormData>({
     storeName: "",
     storePersonName: "",
@@ -310,12 +310,12 @@ export default function AddCustomer(): React.ReactElement {
   };
 
   const handleCancel = () => {
-    router.push("/dashboard/customers");
+    router.push("/dashboard/prospact");
   };
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Add Customer</h1>
+      <h1 className="text-2xl font-bold mb-6">Add Prospact Details</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
@@ -741,216 +741,10 @@ export default function AddCustomer(): React.ReactElement {
         {/* File Uploads */}
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="creditApplication">Credit Application</Label>
-              <label
-                htmlFor="creditApplication"
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"
-              >
-                {filePreviews.creditApplication ? (
-                  filePreviews.creditApplication.startsWith("http") ? (
-                    <img
-                      src={filePreviews.creditApplication}
-                      alt="Credit Application Preview"
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 truncate max-w-full">
-                      {filePreviews.creditApplication}
-                    </span>
-                  )
-                ) : (
-                  <>
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                  </>
-                )}
-                <input
-                  type="file"
-                  id="creditApplication"
-                  name="creditApplication"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload(e, "creditApplication")}
-                  className="hidden"
-                />
-              </label>
-              {fieldErrors.creditApplication && (
-                <p className="text-red-500 text-sm">{fieldErrors.creditApplication}</p>
-              )}
-            </div>
+            
 
             <div className="space-y-2">
-              <Label htmlFor="ownerLegalIdFront">Owner Legal ID (Front)</Label>
-              <label
-                htmlFor="ownerLegalIdFront"
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"
-              >
-                {filePreviews.ownerLegalFrontImage ? (
-                  filePreviews.ownerLegalFrontImage.startsWith("http") ? (
-                    <img
-                      src={filePreviews.ownerLegalFrontImage}
-                      alt="Owner Legal ID Front Preview"
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 truncate max-w-full">
-                      {filePreviews.ownerLegalFrontImage}
-                    </span>
-                  )
-                ) : (
-                  <>
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                  </>
-                )}
-                <input
-                  type="file"
-                  id="ownerLegalIdFront"
-                  name="ownerLegalIdFront"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload(e, "ownerLegalFrontImage")}
-                  className="hidden"
-                />
-              </label>
-              {fieldErrors.ownerLegalFrontImage && (
-                <p className="text-red-500 text-sm">{fieldErrors.ownerLegalFrontImage}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="ownerLegalIdBack">Owner Legal ID (Back)</Label>
-              <label
-                htmlFor="ownerLegalIdBack"
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"
-              >
-                {filePreviews.ownerLegalBackImage ? (
-                  filePreviews.ownerLegalBackImage.startsWith("http") ? (
-                    <img
-                      src={filePreviews.ownerLegalBackImage}
-                      alt="Owner Legal ID Back Preview"
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 truncate max-w-full">
-                      {filePreviews.ownerLegalBackImage}
-                    </span>
-                  )
-                ) : (
-                  <>
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                  </>
-                )}
-                <input
-                  type="file"
-                  id="ownerLegalIdBack"
-                  name="ownerLegalIdBack"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload(e, "ownerLegalBackImage")}
-                  className="hidden"
-                />
-              </label>
-              {fieldErrors.ownerLegalBackImage && (
-                <p className="text-red-500 text-sm">{fieldErrors.ownerLegalBackImage}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="voidedCheck">Voided Check</Label>
-              <label
-                htmlFor="voidedCheck"
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"
-              >
-                {filePreviews.voidedCheckImage ? (
-                  filePreviews.voidedCheckImage.startsWith("http") ? (
-                    <img
-                      src={filePreviews.voidedCheckImage}
-                      alt="Voided Check Preview"
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 truncate max-w-full">
-                      {filePreviews.voidedCheckImage}
-                    </span>
-                  )
-                ) : (
-                  <>
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                  </>
-                )}
-                <input
-                  type="file"
-                  id="voidedCheck"
-                  name="voidedCheck"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload(e, "voidedCheckImage")}
-                  className="hidden"
-                />
-              </label>
-              {fieldErrors.voidedCheckImage && (
-                <p className="text-red-500 text-sm">{fieldErrors.voidedCheckImage}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="miscellaneous">Miscellaneous</Label>
+              <Label htmlFor="miscellaneous">Additional Doc</Label>
               <label
                 htmlFor="miscellaneous"
                 className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"

@@ -1,5 +1,7 @@
 
 
+
+
 "use client";
 
 import { useState } from "react";
@@ -55,6 +57,11 @@ export default function CustomerTable() {
     }
   };
 
+  // Navigate to details page
+  const handleViewDetails = (id: string) => {
+    router.push(`/dashboard/customer-details/${id}`);
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -65,14 +72,9 @@ export default function CustomerTable() {
           onChange={(e) => setSearch(e.target.value)}
         />
         <div className="flex gap-2">
+          
           <Button
-            variant="outline"
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-          >
-            Filter
-          </Button>
-          <Button
-            className="bg-red-600 text-white hover:bg-red-700 gap-2"
+            className="bg-red-600 text-white cursor-pointer hover:bg-red-700 gap-2"
             onClick={() => router.push("/dashboard/add-customer")}
           >
             <PlusCircle className="h-4 w-4" /> Add Customer
@@ -92,10 +94,10 @@ export default function CustomerTable() {
             <tr>
               {[
                 "Store Name",
-                "Customer Name",
+                "Auth Person Name",
                 "Store Phone Number",
-                "Cell Phone Number",
-                "Email",
+                "Person Phone Number",
+                "Store Email",
                 "Open Balance",
                 "No of Order",
                 "Order Amount",
@@ -114,7 +116,9 @@ export default function CustomerTable() {
           <tbody>
             {paginatedData.map((row) => (
               <tr key={row._id} className="border-t hover:bg-gray-50">
-                <td className="p-2 whitespace-nowrap text-gray-700">{row.storeName}</td>
+                <td className="p-2 whitespace-nowrap  cursor-pointer  text-blue-500 underline" onClick={() => handleViewDetails(row._id)}>
+                  {row.storeName}
+                </td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonName}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePhone}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonPhone}</td>
@@ -187,8 +191,8 @@ export default function CustomerTable() {
               <div>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Store Name:</span> <span className="text-gray-600">{selectedCustomer.storeName}</span></p>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Store Phone:</span> <span className="text-gray-600">{selectedCustomer.storePhone}</span></p>
-                <p className="mb-2"><span className="font-semibold text-gray-700">Customer Name:</span> <span className="text-gray-600">{selectedCustomer.storePersonName}</span></p>
-                <p className="mb-2"><span className="font-semibold text-gray-700">Cell Phone:</span> <span className="text-gray-600">{selectedCustomer.storePersonPhone}</span></p>
+                <p className="mb-2"><span className="font-semibold text-gray-700">Auth Person Name:</span> <span className="text-gray-600">{selectedCustomer.storePersonName}</span></p>
+                <p className="mb-2"><span className="font-semibold text-gray-700"> Person Phone Number:</span> <span className="text-gray-600">{selectedCustomer.storePersonPhone}</span></p>
               </div>
               <div>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Billing Address:</span> <span className="text-gray-600">{selectedCustomer.billingAddress || "N/A"}</span></p>

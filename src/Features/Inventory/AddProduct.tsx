@@ -1,14 +1,18 @@
 
 
 
+
+
 'use client';
 
 import { useGetCategoriesQuery } from '@/redux/api/auth/categories/categoriesApi';
 import { useAddInventoryMutation, useGetPackSizeQuery } from '@/redux/api/auth/inventory/inventoryApi';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 const AddProductPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
     itemNumber: '',
@@ -119,9 +123,8 @@ const AddProductPage = () => {
       <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Name *</label>
-          <input name="name" value={formData.name} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input name="name" value={formData.name} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter product name" />
         </div>
-        
 
         <div>
           <label className="block text-sm font-medium text-gray-700">Pack Size *</label>
@@ -147,64 +150,87 @@ const AddProductPage = () => {
             {weightUnits.map(unit => <option key={unit} value={unit}>{unit}</option>)}
           </select>
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Product Quantity *</label>
-          <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="quantity" value={formData.quantity} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter quantity" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Category *</label>
           <select name="categoryId" value={formData.categoryId} onChange={handleCategoryChange} className="mt-1 p-2 w-full border rounded" required>
             <option value="">Select Category</option>
             {categoriesData.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
           </select>
-
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Reorder Quantity *</label>
-          <input type="number" name="reorderPointOfQuantity" value={formData.reorderPointOfQuantity} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="reorderPointOfQuantity" value={formData.reorderPointOfQuantity} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter reorder quantity" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Sales Price *</label>
-          <input type="number" name="salesPrice" value={formData.salesPrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="salesPrice" value={formData.salesPrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter sales price" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Competitors Price *</label>
-          <input type="number" name="competitorPrice" value={formData.competitorPrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="competitorPrice" value={formData.competitorPrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter competitor price" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Item Number</label>
-          <input name="itemNumber" value={formData.itemNumber} onChange={handleChange} className="mt-1 p-2 w-full border rounded" />
+          <input name="itemNumber" value={formData.itemNumber} onChange={handleChange} className="mt-1 p-2 w-full border rounded" placeholder="Enter item number" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Weight *</label>
-          <input type="number" name="weight" value={formData.weight} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="weight" value={formData.weight} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter weight" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Purchase Price *</label>
-          <input type="number" name="purchasePrice" value={formData.purchasePrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required />
+          <input type="number" name="purchasePrice" value={formData.purchasePrice} onChange={handleChange} className="mt-1 p-2 w-full border rounded" required placeholder="Enter purchase price" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Barcode String</label>
-          <input name="barcodeString" value={formData.barcodeString} onChange={handleChange} className="mt-1 p-2 w-full border rounded" />
+          <input name="barcodeString" value={formData.barcodeString} onChange={handleChange} className="mt-1 p-2 w-full border rounded" placeholder="Enter barcode" />
         </div>
+
         <div>
           <label className="block text-sm font-medium text-gray-700">Warehouse Location</label>
-          <input name="warehouseLocation" value={formData.warehouseLocation} onChange={handleChange} className="mt-1 p-2 w-full border rounded" />
+          <input name="warehouseLocation" value={formData.warehouseLocation} onChange={handleChange} className="mt-1 p-2 w-full border rounded" placeholder="Enter location" />
         </div>
+
         <div>
-          <label className="block text-sm font-medium text-gray-700">Package Dimensions</label>
-          <div className="flex gap-2 mt-1">
-            <input type="number" name="packageDimensions.length" value={formData.packageDimensions.length} onChange={handleChange} className="p-2 w-1/4 border rounded" placeholder="L" />
-            <input type="number" name="packageDimensions.width" value={formData.packageDimensions.width} onChange={handleChange} className="p-2 w-1/4 border rounded" placeholder="W" />
-            <input type="number" name="packageDimensions.height" value={formData.packageDimensions.height} onChange={handleChange} className="p-2 w-1/4 border rounded" placeholder="H" />
-            <select name="packageDimensions.unit" value={formData.packageDimensions.unit} onChange={handleChange} className="p-2 w-1/4 border rounded">
-              {packageUnits.map(unit => <option key={unit} value={unit}>{unit}</option>)}
-            </select>
+          
+          <div className="flex gap-2 mt-1 items-center">
+            <div className="flex flex-col w-1/4">
+               <label className="block text-sm font-medium text-gray-700">Lenth</label>
+              <input type="number" name="packageDimensions.length" value={formData.packageDimensions.length} onChange={handleChange} className="p-2 border rounded" placeholder="L" />
+            </div>
+            <div className="flex flex-col w-1/4">
+              <label className="block text-sm font-medium text-gray-700">Width</label>
+              <input type="number" name="packageDimensions.width" value={formData.packageDimensions.width} onChange={handleChange} className="p-2 border rounded" placeholder="W" />
+            </div>
+            <div className="flex flex-col w-1/4">
+              <label className="block text-sm font-medium text-gray-700">Height</label>
+              <input type="number" name="packageDimensions.height" value={formData.packageDimensions.height} onChange={handleChange} className="p-2 border rounded" placeholder="H" />
+            </div>
+            <div className="flex flex-col w-1/4">
+              <label className="block text-sm font-medium text-gray-700">Unit</label>
+              <select name="packageDimensions.unit" value={formData.packageDimensions.unit} onChange={handleChange} className="p-2 border rounded">
+                {packageUnits.map(unit => <option key={unit} value={unit}>{unit}</option>)}
+              </select>
+            </div>
           </div>
         </div>
+
         <div className="col-span-3 flex justify-end gap-4">
-          <button type="submit" className="bg-red-500 text-white p-2 rounded" disabled={categoryData === undefined || packSize === undefined}>Save</button>
-          <button type="button" className="bg-pink-500 text-white p-2 rounded" onClick={() => setFormData({
+          <button type="submit" className="bg-red-500 text-white p-2 cursor-pointer px-4 rounded" disabled={categoryData === undefined || packSize === undefined}>Save</button>
+          <button type="button" className="bg-pink-500 cursor-pointer text-white p-2 px-4 rounded" onClick={() => setFormData({
             name: '',
             itemNumber: '',
             quantity: 0,
@@ -220,7 +246,12 @@ const AddProductPage = () => {
             categoryId: '',
             packageDimensions: { length: 0, width: 0, height: 0, unit: 'CM' }
           })}>Clear</button>
-          <button type="button" className="bg-gray-500 text-white p-2 rounded" onClick={() => { }}>Cancel</button>
+          <button></button>
+         <button type="button"
+          onClick={() => router.push("/dashboard/inventory")}
+           className="bg-gray-500 cursor-pointer text-white p-2 px-4 rounded">
+            Cancel
+          </button>
         </div>
       </form>
     </div>

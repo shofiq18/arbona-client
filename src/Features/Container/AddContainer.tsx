@@ -7,9 +7,12 @@ import { useAddContainerMutation } from '@/redux/api/auth/container/containerApi
 import { useGetInventoryQuery } from '@/redux/api/auth/inventory/inventoryApi';
 import { useGetCategoriesQuery } from '@/redux/api/auth/categories/categoriesApi';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+
 
 
 const AddContainerPage = () => {
+  const router = useRouter();
   const [container, setContainer] = useState<Container>({
     _id: '',
     containerNumber: '',
@@ -211,7 +214,7 @@ const AddContainerPage = () => {
               />
             </div>
             <div className="mt-6">
-              <button type="submit" className="bg-red-500 text-white p-2 py-2 px-6 rounded" disabled={isLoading}>
+              <button type="submit" className="bg-red-500 cursor-pointer text-white p-2 py-2 px-6 rounded" disabled={isLoading}>
                 Submit
               </button>
             </div>
@@ -312,11 +315,13 @@ const AddContainerPage = () => {
           <button
             type="button"
             onClick={handleAddProduct}
-            className="bg-red-500 text-white p-2 px-8 rounded"
+            className="bg-red-500 cursor-pointer text-white p-2 px-8 rounded"
           >
             Add
           </button>
-          <button type="button" className="bg-gray-500 text-white p-2 px-8 rounded">
+          <button type="button"
+          onClick={() => router.push("/dashboard/container")}
+           className="bg-gray-500 cursor-pointer text-white p-2 px-8 rounded">
             Cancel
           </button>
         </div>

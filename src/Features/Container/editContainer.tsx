@@ -226,11 +226,16 @@ const EditContainerPage = () => {
             </table>
             <button
               type="submit"
-              className="mt-4 bg-red-500 text-white p-2 py-1 px-4 rounded"
+              className="mt-4 bg-red-500 text-white p-2 py-1 px-4 cursor-pointer rounded"
               disabled={isUpdating}
             >
               Update
             </button>
+            <button type="button"
+          onClick={() => router.push("/dashboard/container")}
+           className="mt-4 bg-gray-500 text-white p-2 py-1 px-4 ml-4 cursor-pointer rounded">
+            Cancel
+          </button>
           </div>
         )}
       </form>

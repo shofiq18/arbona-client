@@ -1,3 +1,6 @@
+
+
+
 export interface Order {
   _id: string;
   date: string;
@@ -107,11 +110,69 @@ export interface AddOrderFormProps {
 
 // customer table data type
 
+// export interface Customer {
+//   _id: string;
+//   storeName: string;
+//   storePhone: string;
+//   storePersonEmail: string;
+//   storePersonName: string;
+//   storePersonPhone: string;
+//   billingAddress: string;
+//   billingState: string;
+//   billingZipcode: string;
+//   billingCity: string;
+//   shippingAddress: string;
+//   shippingState: string;
+//   shippingZipcode: string;
+//   shippingCity: string;
+//   salesTaxId: string;
+//   acceptedDeliveryDays: string[];
+//   bankACHAccountInfo: string;
+//   creditApplication: string;
+//   ownerLegalFrontImage: string;
+//   ownerLegalBackImage: string;
+//   voidedCheckImage: string;
+//   isDeleted: boolean;
+//   createdAt: string;
+//   updatedAt: string;
+//   // Optional fields from fakeData, assuming they might exist
+//   openBalance?: string;
+//   totalOrders?: number;
+//   totalOrderAmount?: string;
+//   isCustomerSourceProspect?: boolean;
+  
+// }
+
+
+// "@/types/index.ts" or similar
+
+interface CustomerOrder {
+  _id: string;
+  invoiceNumber: string;
+  PONumber: string;
+  date: string;
+  paymentDueDate: string;
+  orderAmount: number;
+  orderStatus: string;
+  paymentAmountReceived: number;
+  discountGiven: number;
+  openBalance: number;
+  profitAmount: number;
+  profitPercentage: number;
+  paymentStatus: string;
+}
+
+
+
 export interface Customer {
+  
   _id: string;
   storeName: string;
   storePhone: string;
   storePersonEmail: string;
+  salesTaxId: string;
+  acceptedDeliveryDays: string[];
+  bankACHAccountInfo: string;
   storePersonName: string;
   storePersonPhone: string;
   billingAddress: string;
@@ -122,21 +183,19 @@ export interface Customer {
   shippingState: string;
   shippingZipcode: string;
   shippingCity: string;
-  salesTaxId: string;
-  acceptedDeliveryDays: string[];
-  bankACHAccountInfo: string;
-  creditApplication: string;
-  ownerLegalFrontImage: string;
-  ownerLegalBackImage: string;
-  voidedCheckImage: string;
+  creditApplication?: string;
+  ownerLegalFrontImage?: string;
+  ownerLegalBackImage?: string;
+  voidedCheckImage?: string;
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   // Optional fields from fakeData, assuming they might exist
-  openBalance?: string;
+  openBalance?: number;
   totalOrders?: number;
-  totalOrderAmount?: string;
+  totalOrderAmount?: number;
   isCustomerSourceProspect?: boolean;
+  customerOrders?: CustomerOrder[];
 }
 
 // TypeScript type for API response

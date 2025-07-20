@@ -5,10 +5,9 @@
 import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpDown, PlusCircle, Eye, Edit, Trash2 } from "lucide-react";
-import { FaFilePdf } from "react-icons/fa6";
+import { ArrowUpDown, PlusCircle, Eye, Edit, Trash2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useGetContainersQuery } from "@/redux/api/auth/container/containerApi";
+import { useGetContainersQuery, useImportContainerExcelMutation } from "@/redux/api/auth/container/containerApi";
 import { Container } from "@/redux/api/auth/container/containerApi";
 import { useDeleteContainerMutation } from "@/redux/api/auth/container/containerApi";
 import {
@@ -22,9 +21,17 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 import Loading from "@/redux/Shared/Loading";
-
 
 export default function ContainerTable() {
   const [search, setSearch] = useState("");
@@ -35,6 +42,16 @@ export default function ContainerTable() {
   const [selectedContainer, setSelectedContainer] = useState<Container | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [containerToDelete, setContainerToDelete] = useState<string | null>(null);
+
+  // Import dialog states
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [containerName, setContainerName] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [containerStatus, setContainerStatus] = useState("arrived");
+  const [shippingCost, setShippingCost] = useState("");
+
+  const [importContainerExcel, { isLoading: isImporting }] = useImportContainerExcelMutation();
 
   const {
     data: response,
@@ -78,6 +95,73 @@ export default function ContainerTable() {
     }
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const isExcel = file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || 
+                     file.type === "application/vnd.ms-excel" ||
+                     file.name.endsWith('.xlsx') || 
+                     file.name.endsWith('.xls');
+      
+      if (isExcel) {
+        setSelectedFile(file);
+      } else {
+        toast.error("Please select a valid Excel (.xlsx or .xls) file");
+        event.target.value = "";
+      }
+    }
+  };
+
+  const resetImportForm = () => {
+    setSelectedFile(null);
+    setContainerName("");
+    setDeliveryDate("");
+    setContainerStatus("arrived");
+    setShippingCost("");
+    // Reset file input
+    const fileInput = document.getElementById('excel-file-input') as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
+  const handleImport = async () => {
+    if (!selectedFile) {
+      toast.error("Please select an Excel file");
+      return;
+    }
+
+    if (!containerName.trim()) {
+      toast.error("Please enter a container name");
+      return;
+    }
+
+    // Generate automatic container number
+    const timestamp = new Date().getTime();
+    const randomNum = Math.floor(Math.random() * 1000);
+    const autoContainerNumber = `CONT-${timestamp}-${randomNum}`;
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("containerName", containerName.trim());
+    formData.append("deliveryDate", deliveryDate || new Date().toISOString().split('T')[0]);
+    formData.append("containerStatus", containerStatus);
+    formData.append("shippingCost", shippingCost || "0");
+
+    try {
+      const result = await importContainerExcel(formData).unwrap();
+      toast.success("Container imported successfully!", {
+        duration: 3000,
+      });
+      setImportDialogOpen(false);
+      resetImportForm();
+    } catch (err: any) {
+      console.error("Import failed:", err);
+      const errorMessage = err?.data?.message || err?.message || "Failed to import container";
+      toast.error(errorMessage, {
+        duration: 4000,
+      });
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
@@ -97,9 +181,120 @@ export default function ContainerTable() {
           >
             <PlusCircle className="h-4 w-4" /> Add Container
           </Button>
-          <Button variant="outline" className="text-gray-500 border hover:bg-gray-500">
-            <FaFilePdf className="h-4 w-4" />
-          </Button>
+
+          {/* Import Excel Dialog */}
+          <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                className="text-gray-600 border hover:bg-gray-50 flex items-center gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                Import Excel
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Import Container from Excel</DialogTitle>
+                <DialogDescription>
+                  Upload an Excel file with container products data. Fill in the container details below.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                {/* File Upload */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Excel File *</label>
+                  <input
+                    id="excel-file-input"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleFileSelect}
+                    className="w-full p-2 border border-gray-300 rounded-md cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                  />
+                  {selectedFile && (
+                    <p className="text-sm text-green-600">
+                      Selected: {selectedFile.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Container Name */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Container Name *</label>
+                  <Input
+                    placeholder="e.g., Container India"
+                    value={containerName}
+                    onChange={(e) => setContainerName(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Delivery Date */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Delivery Date</label>
+                  <Input
+                    type="date"
+                    value={deliveryDate}
+                    onChange={(e) => setDeliveryDate(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Container Status */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Status</label>
+                  <select
+                    value={containerStatus}
+                    onChange={(e) => setContainerStatus(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md bg-white"
+                  >
+                    <option value="arrived">Arrived</option>
+                    <option value="onTheWay">On The Way</option>
+                  </select>
+                </div>
+
+                {/* Shipping Cost */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Shipping Cost</label>
+                  <Input
+                    type="number"
+                    placeholder="e.g., 200"
+                    value={shippingCost}
+                    onChange={(e) => setShippingCost(e.target.value)}
+                    className="w-full"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setImportDialogOpen(false);
+                    resetImportForm();
+                  }}
+                  disabled={isImporting}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleImport}
+                  disabled={!selectedFile || !containerName.trim() || isImporting}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isImporting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Importing...
+                    </>
+                  ) : (
+                    "Import Container"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -107,7 +302,7 @@ export default function ContainerTable() {
         <table className="w-full text-left border-collapse text-sm">
           <thead className="bg-gray-100 text-gray-700">
             <tr>
-              {["Container No", "Container Name", "Status", "Per Case Cost", "Total Shipping Cost", "Action"].map(
+              {["Container No", "Container Name", "Status", "Arrived Date", "Purchase Cost", " Shipping Cost", "Total Cost", "Action"].map(
                 (heading, i) => (
                   <th key={i} className="p-2 whitespace-nowrap font-medium">
                     <div className="flex items-center gap-1">
@@ -121,21 +316,22 @@ export default function ContainerTable() {
           </thead>
           <tbody>
             {paginatedData.map((row) => {
-              const avgPerCaseCost =
-                row.containerProducts.length > 0
-                  ? (
-                      row.containerProducts.reduce((sum, p) => sum + p.perCaseCost, 0) /
-                      row.containerProducts.length
-                    ).toFixed(2)
-                  : "N/A";
+              const purchaseCost = row.containerProducts.length > 0
+                ? row.containerProducts.reduce((sum, p) => sum + (p.purchasePrice * p.quantity), 0).toFixed(2)
+                : "0.00";
+              const totalCost = row.containerProducts.length > 0
+                ? (parseFloat(purchaseCost) + row.shippingCost).toFixed(2)
+                : row.shippingCost.toFixed(2);
 
               return (
                 <tr key={row._id} className="border-t hover:bg-gray-50">
                   <td className="p-2 whitespace-nowrap">{row.containerNumber}</td>
                   <td className="p-2 whitespace-nowrap">{row.containerName}</td>
                   <td className="p-2 whitespace-nowrap">{row.containerStatus}</td>
-                  <td className="p-2 whitespace-nowrap">${avgPerCaseCost}</td>
+                  <td className="p-2 whitespace-nowrap">{row.deliveryDate || "N/A"}</td>
+                  <td className="p-2 whitespace-nowrap">${purchaseCost}</td>
                   <td className="p-2 whitespace-nowrap">${row.shippingCost}</td>
+                  <td className="p-2 whitespace-nowrap">${totalCost}</td>
                   <td className="p-2 whitespace-nowrap flex gap-2">
                     <Eye
                       className="w-4 h-4 text-gray-500 cursor-pointer hover:text-blue-700"
@@ -148,8 +344,8 @@ export default function ContainerTable() {
                       className="w-4 h-4 text-gray-500 cursor-pointer hover:text-yellow-700"
                       onClick={() => router.push(`/dashboard/edit-container/${row._id}`)}
                     />
-                    <AlertDialog  open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}  >
-                      <AlertDialogTrigger  asChild>
+                    <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                      <AlertDialogTrigger asChild>
                         <Trash2
                           className="w-4 h-4 text-gray-500 cursor-pointer hover:text-red-700"
                           onClick={() => {

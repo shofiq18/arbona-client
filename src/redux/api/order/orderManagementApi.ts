@@ -7,6 +7,18 @@ interface Order {
   status: string;
 }
 
+export interface ProductSegment {
+  combination: string[];
+  frequency: number;
+}
+
+interface ProductSegmentResponse {
+  success: boolean;
+  message: string;
+  data: ProductSegment[];
+}
+
+
 const orderManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
@@ -36,6 +48,10 @@ const orderManagementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
+    getProductSegments: builder.query<ProductSegmentResponse, void>({
+      query: () => "/order/getProductSegmentation",
+      providesTags: ["ProductSegments"],
+    }),
   }),
 });
 
@@ -44,5 +60,9 @@ export const {
   useAddOrderMutation,
   useUpdateOrderMutation,
   useDeleteOrderMutation,
+  useGetProductSegmentsQuery
 } = orderManagementApi;
 export default orderManagementApi;
+
+
+

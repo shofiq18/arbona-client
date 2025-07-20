@@ -1,9 +1,45 @@
+
+
+
 import baseApi from "../baseApi";
 
 interface DashboardData {
   totalOrders: number;
   totalCustomers: number;
   totalRevenue: number;
+}
+
+interface OrderData {
+  _id: string;
+  date: string;
+  invoiceNumber: string;
+  PONumber: string;
+  storeId: string;
+  paymentDueDate: string;
+  orderAmount: number;
+  orderStatus: string;
+  isDeleted: boolean;
+  paymentAmountReceived: number;
+  discountGiven: number;
+  openBalance: number;
+  profitAmount: number;
+  profitPercentage: number;
+  paymentStatus: string;
+  products: {
+    productId: any;
+    quantity: number;
+    discount: number;
+    _id: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+interface SalesOverviewResponse {
+  success: boolean;
+  message: string;
+  data: OrderData[];
 }
 
 interface ProductData {
@@ -20,6 +56,25 @@ interface ProductResponse {
   success: boolean;
   message: string;
   data: ProductData[];
+
+ 
+}
+
+
+
+ interface ChartItem {
+  year: number;
+  month: number;
+  count: number;
+}
+
+interface ChartDataResponse {
+  success: boolean;
+  message: string;
+  data: {
+    orders: ChartItem[];
+    customers: ChartItem[];
+  };
 }
 
 const dashboardApi = baseApi.injectEndpoints({
@@ -36,8 +91,22 @@ const dashboardApi = baseApi.injectEndpoints({
       query: () => "/order/worst-selling",
       providesTags: ["Products"],
     }),
+    getSalesOverviewData: builder.query<SalesOverviewResponse, void>({
+      query: () => "/order",
+      providesTags: ["SalesOverview"],
+    }),
+    getOrderCustomerChart: builder.query<ChartDataResponse, void>({
+      query: () => "/order/getChart",
+      providesTags: ["Chart"],
+    }),
   }),
 });
 
-export const { useGetDashboardDataQuery, useGetBestSellingProductsQuery, useGetWorstSellingProductsQuery } = dashboardApi;
+export const {
+  useGetDashboardDataQuery,
+  useGetBestSellingProductsQuery,
+  useGetWorstSellingProductsQuery,
+  useGetSalesOverviewDataQuery,
+  useGetOrderCustomerChartQuery
+} = dashboardApi;
 export default dashboardApi;

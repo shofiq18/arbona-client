@@ -1,10 +1,10 @@
 
 
-
 import baseApi from "../../baseApi";
 
 // Product inside a container
 export interface ContainerProduct {
+  
   _id: string;
   category: string;
   itemNumber: string;
@@ -20,7 +20,7 @@ export interface Container {
   containerNumber: string;
   containerName: string;
   isDeleted: boolean;
-  containerStatus: 'onTheWay' | 'delivered' | 'pending' | string;
+  containerStatus: "onTheWay" | "delivered" | "pending" | string;
   deliveryDate: string;
   shippingCost: number;
   containerProducts: ContainerProduct[];
@@ -59,7 +59,7 @@ const containerApi = baseApi.injectEndpoints({
     }),
 
     // ✅ POST create container
-    addContainer: builder.mutation<Container, Partial<Omit<Container, '_id' | 'createdAt' | 'updatedAt' | '__v'>>>({
+    addContainer: builder.mutation<Container, Partial<Omit<Container, "_id" | "createdAt" | "updatedAt" | "__v">>>({
       query: (container) => ({
         url: "/container",
         method: "POST",
@@ -86,6 +86,19 @@ const containerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Containers"],
     }),
+
+    // Updated importContainerExcel with typed response
+    importContainerExcel: builder.mutation<ContainerApiResponse, FormData>({
+      query: (formData) => {
+        console.log("Sending import request with FormData:", Object.fromEntries(formData)); // Debug
+        return {
+          url: "/container/xl",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Containers"],
+    }),
   }),
 });
 
@@ -95,6 +108,7 @@ export const {
   useAddContainerMutation,
   useUpdateContainerMutation,
   useDeleteContainerMutation,
+  useImportContainerExcelMutation,
 } = containerApi;
 
 export default containerApi;

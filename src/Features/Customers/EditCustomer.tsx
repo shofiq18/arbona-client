@@ -44,6 +44,7 @@ export default function EditCustomerPage() {
     isDeleted: false,
     createdAt: "",
     updatedAt: "",
+
   });
 
   useEffect(() => {
@@ -130,7 +131,7 @@ export default function EditCustomerPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="storePersonName">Customer Name</Label>
+            <Label htmlFor="storePersonName">Auth Person Name</Label>
             <Input
               id="storePersonName"
               name="storePersonName"
@@ -162,7 +163,7 @@ export default function EditCustomerPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="storePersonEmail">Email</Label>
+            <Label htmlFor="storePersonEmail">Store Email</Label>
             <Input
               id="storePersonEmail"
               name="storePersonEmail"
@@ -418,11 +419,10 @@ export default function EditCustomerPage() {
         
         </div>
         <div className="flex justify-end gap-4">
-          <Button
-            variant="outline"
-            onClick={() => router.back()}
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-          >
+          
+          <Button type="button"
+          onClick={() => router.push("/dashboard/customers")}
+           className="bg-gray-500 text-white hover:bg-gray-600">
             Cancel
           </Button>
           <Button type="submit" className="bg-red-600 text-white hover:bg-red-700">

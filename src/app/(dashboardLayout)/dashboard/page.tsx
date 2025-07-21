@@ -200,7 +200,7 @@ export default function AppSidebar() {
                           alt="Profile"
                           className="rounded-full"
                         />
-                        <span className="text-[16px]">Prospact</span>
+                        <span className="text-[16px]">Prospect</span>
                       </Link>
                     </button>
                   )}

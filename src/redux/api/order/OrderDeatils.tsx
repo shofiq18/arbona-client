@@ -9,6 +9,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -72,6 +81,36 @@ const OrderDeatils = ({ id }: { id: string }) => {
       scanStatus: "Scanned",
     },
   ];
+  const handleDownloadInvice = async (id: string) => {
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+
+      // Create a temporary link to trigger the download
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "order_invoice_pdf"; // Default file name
+      link.click(); // Trigger the download
+
+      // Clean up the URL object
+      URL.revokeObjectURL(link.href);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div>
       {" "}
@@ -105,9 +144,22 @@ const OrderDeatils = ({ id }: { id: string }) => {
               <Button size="sm" variant="outline">
                 <Download className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="outline">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger>Open</DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadInvice(data.data._id)}
+                  >
+                    Invoice
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadInvice(data.data._id)}
+                  >
+                    delivery slip
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>

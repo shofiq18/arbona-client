@@ -99,7 +99,7 @@ const handleDownloadInvice = async (id: string) => {
       `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`,
       {
         headers: {
-          'Authorization': `Bearer ${token}`, // Add the Bearer token
+          'Authorization': `${token}`, // Add the Bearer token
           'Content-Type': 'application/json', // Good practice, though PDF download might not strictly need it
         },
       }
@@ -139,7 +139,7 @@ const handleDownloadDilverySlip = async (id: string) => {
       `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`,
       {
         headers: {
-          'Authorization': `Bearer ${token}`, // Add the Bearer token
+          'Authorization': `${token}`, // Add the Bearer token
           'Content-Type': 'application/json', // Good practice
         },
       }
@@ -177,7 +177,7 @@ const handleDownloadExcel = async () => {
       `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true`,
       {
         headers: {
-          'Authorization': `Bearer ${token}`, // Add the Bearer token
+          'Authorization': `${token}`, // Add the Bearer token
           'Content-Type': 'application/json', // Good practice
         },
       }

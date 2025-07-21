@@ -3,7 +3,7 @@ import AddOrderPage from "@/components/AddOrderForm";
 import { OrderFilterForm } from "@/components/OrderFilterForm";
 import { ReusableModal } from "@/components/ReusableModal";
 import { Button } from "@/components/ui/button";
-
+import Cookies from "js-cookie";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -99,10 +99,21 @@ export default function OrderManagement(): React.ReactElement {
   console.log("check", orders);
 
   const handleDownload = async () => {
+    const token = Cookies?.get("token");
+    console.log(token)
+    if (!token) {
+      console.error('Authentication token not found. Please log in.');
+      return; // Stop execution if no token
+    }
     try {
       // Fetch the PDF as a binary response (arrayBuffer)
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/order/allOrdersPdf`
+        `${process.env.NEXT_PUBLIC_URL}/order/allOrdersPdf`,{
+           headers: {
+          'Authorization': `${token}`, // Add the Bearer token
+          'Content-Type': 'application/json', // Good practice, though PDF download might not strictly need it
+        },
+        }
       );
 
       if (!response.ok) {
@@ -650,13 +661,21 @@ export default function OrderManagement(): React.ReactElement {
                       {order.invoiceNumber}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm">
-                    <Link
-                      href="#"
-                      className="cursor-pointer text-blue-600 font-medium hover:underline"
-                    >
-                      {order.PONumber}
-                    </Link>
+                  <TableCell  className="text-sm">
+                  <ReusableModal
+                        open={updateOrderOpen}
+                        onOpenChange={setUpdateOrderOpen}
+                        trigger={
+                          <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
+                              {order.PONumber}
+                          </button>
+                        }
+                        title="Update Order"
+                      >
+                        <UpdateOrderPage key={idx} order={order} />
+                      </ReusableModal>
+                   
+                  
                   </TableCell>
                   <TableCell className="text-sm font-medium">
                     {order.storeId?.storeName || "N/A"}

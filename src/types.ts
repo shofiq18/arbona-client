@@ -3,14 +3,40 @@
 
 export interface Order {
   _id: string;
-  date: string; // e.g., "2025-07-05"
+  date: string;
   invoiceNumber: string;
   PONumber: string;
-  storeId: string;
+  storeId: {
+    _id: string;
+    storeName: string;
+    storePhone: string;
+    storePersonEmail: string;
+    salesTaxId: string;
+    acceptedDeliveryDays: string[];
+    bankACHAccountInfo: string;
+    storePersonName: string;
+    storePersonPhone: string;
+    billingAddress: string;
+    billingState: string;
+    billingZipcode: string;
+    billingCity: string;
+    shippingAddress: string;
+    shippingState: string;
+    shippingZipcode: string;
+    shippingCity: string;
+    shippingCharge: string;
+    creditApplication: string;
+    ownerLegalFrontImage: string;
+    ownerLegalBackImage: string;
+    voidedCheckImage: string;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
   paymentDueDate: string;
   orderAmount: number;
   orderStatus: string;
-  isDeleted: boolean;
   paymentAmountReceived: number;
   discountGiven: number;
   openBalance: number;
@@ -18,63 +44,86 @@ export interface Order {
   profitPercentage: number;
   paymentStatus: string;
   products: Array<{
-    productId: {
-      packageDimensions?: {
-        length: number;
-        width: number;
-        height: number;
-        unit: string;
-      };
-      _id: string;
-      name: string;
-      packetQuantity: number;
-      packingUnit: string;
-      weight: number;
-      weightUnit: string;
-      categoryId: string;
-      reorderPointOfQuantity: number;
-      salesPrice: number;
-      purchasePrice: number;
-      barcodeString: string;
-      itemNumber: string;
-      quantity: number;
-      warehouseLocation: string;
-      createdAt: string;
-      updatedAt: string;
-      __v: number;
-    };
+    productId: string | null;
     quantity: number;
     discount: number;
     _id: string;
   }>;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
 
+// export interface FilterFormValues {
+//   hasOpenBalance: undefined;
+//   paymentDueStartDate: boolean;
+//   paymentDueEndDate: boolean;
+//   storeIds: boolean;
+//   minOrderAmount: number;
+//   maxOrderAmount: string;
+//   paymentStatus: any;
+//   orderStatus: any;
+//   endDate: any;
+//   startDate: any;
+//   // Define your filter form values here
+//   dateRange?: string;
+//   status?: string;
+//   storeId?: string;
+//   // Add other filter fields as needed
+// }
+
+// export interface ReusableModalProps {
+//   open: boolean;
+//   onOpenChange: (open: boolean) => void;
+//   trigger: React.ReactNode;
+//   title: string;
+//   children: React.ReactNode;
+// }
+
+// export interface FilterFormValues {
+//   fromDate: string;
+//   toDate: string;
+//   fromDueDate: string;
+//   toDueDate: string;
+//   storeName: string;
+//   productStatus: string;
+//   orderStatus: string;
+//   verificationStatus: string;
+// }
+
+// export interface OrderFilterFormProps {
+//   onSubmit: (values: FilterFormValues) => void;
+//   onClear?: () => void;
+// }
+
 export interface ReusableModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trigger: React.ReactNode;
+  trigger: React.ReactNode; // required
   title: string;
   children: React.ReactNode;
 }
 
+
 export interface FilterFormValues {
-  fromDate: string;
-  toDate: string;
-  fromDueDate: string;
-  toDueDate: string;
-  storeName: string;
-  productStatus: string;
-  orderStatus: string;
-  verificationStatus: string;
+  hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
+  paymentDueStartDate?: Date | string | number;
+  paymentDueEndDate?: Date | string | number;
+  storeIds?: string[]; // boolean was incorrect
+  minOrderAmount?: number;
+  maxOrderAmount?: number; // changed from string to number
+  paymentStatus?: string | null; // better than `any`
+  // orderStatus?: string | null;
+  endDate?: Date | string | number;
+  startDate?: Date | string | number;
+  dateRange?: string;
+  status?: string;
+  storeId?: string;
+  orderStatus?: string[]; 
+  
 }
 
-export interface OrderFilterFormProps {
-  onSubmit: (values: FilterFormValues) => void;
-  onClear?: () => void;
-}
 
 export interface AddOrderFormValues {
   date: string;

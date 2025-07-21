@@ -1,4 +1,7 @@
 
+
+
+
 // import baseApi from "../../baseApi";
 // import Cookies from "js-cookie";
 
@@ -95,12 +98,44 @@
 //   data: Prospect[];
 // }
 
+// // Interface for the AddProspect request payload
+//  export interface AddProspectRequest {
+   
+//   storeName: string;
+//   storePhone: string;
+//   storePersonEmail: string;
+//   storePersonName: string;
+//   storePersonPhone: string;
+//   salesTaxId?: string;
+//   shippingAddress: string;
+//   shippingState: string;
+//   shippingZipcode: string;
+//   shippingCity: string;
+//   miscellaneousDocImage?: string;
+//   leadSource: string;
+//   note?: string;
+//   status: string;
+//   competitorStatement?: string
+//   assignedSalesPerson?: string;
+
+// }
+
 // const prospectApi = baseApi.injectEndpoints({
 //   endpoints: (builder) => ({
 //     getProspects: builder.query<ProspectsResponse, void>({
 //       query: () => ({
-//         url: "/prospect", // Adjust to your backend endpoint
+//         url: "/prospect",
 //         method: "GET",
+//         headers: {
+//           Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
+//         },
+//       }),
+//     }),
+//     addProspect: builder.mutation<Prospect, AddProspectRequest>({
+//       query: (body) => ({
+//         url: "/prospect",
+//         method: "POST",
+//         body,
 //         headers: {
 //           Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
 //         },
@@ -109,10 +144,8 @@
 //   }),
 // });
 
-// export const { useGetProspectsQuery } = prospectApi;
+// export const { useGetProspectsQuery, useAddProspectMutation } = prospectApi;
 // export default prospectApi;
-
-
 
 
 import baseApi from "../../baseApi";
@@ -211,9 +244,9 @@ interface ProspectsResponse {
   data: Prospect[];
 }
 
-// Interface for the AddProspect request payload
- export interface AddProspectRequest {
-   
+// Interface for the AddProspect request payload with optional _id for updates
+export interface AddProspectRequest {
+  _id?: string; // Added for identifying the prospect to update
   storeName: string;
   storePhone: string;
   storePersonEmail: string;
@@ -228,9 +261,8 @@ interface ProspectsResponse {
   leadSource: string;
   note?: string;
   status: string;
-  competitorStatement?: string
+  competitorStatement?: string;
   assignedSalesPerson?: string;
-
 }
 
 const prospectApi = baseApi.injectEndpoints({
@@ -269,9 +301,29 @@ const prospectApi = baseApi.injectEndpoints({
         invalidatesTags: ["PROSPECT"],
       }),
     }),
+    updateProspect: builder.mutation<Prospect, Partial<AddProspectRequest> & { _id: string }>({
+      query: ({ _id, ...body }) => ({
+        url: `/prospect/${_id}`,
+        method: "PATCH",
+        body,
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
+        },
+      }),
+    }),
+    deleteProspect: builder.mutation<{ success: boolean; message?: string }, string>({
+      query: (id) => ({
+        url: `/prospect/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
+        },
+      }),
+    }),
    
   }),
 });
 
-export const { useGetProspectsQuery, useAddProspectMutation ,useConvertProspectMutation} = prospectApi;
+
+export const { useGetProspectsQuery, useAddProspectMutation, useUpdateProspectMutation, useDeleteProspectMutation,useConvertProspectMutation } = prospectApi;
 export default prospectApi;

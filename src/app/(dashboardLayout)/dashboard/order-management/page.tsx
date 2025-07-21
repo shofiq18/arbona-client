@@ -335,7 +335,6 @@ export default function OrderManagement(): React.ReactElement {
           </div>
         ))}
       </div>
-
       {/* Active Filters Display */}
       {showActiveFilters && activeFilters && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -347,7 +346,8 @@ export default function OrderManagement(): React.ReactElement {
               <div className="flex flex-wrap gap-2">
                 {activeFilters.startDate && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    From: {new Date(activeFilters.startDate).toLocaleDateString()}
+                    From:{" "}
+                    {new Date(activeFilters.startDate).toLocaleDateString()}
                   </span>
                 )}
 
@@ -373,13 +373,12 @@ export default function OrderManagement(): React.ReactElement {
 
                 {(typeof activeFilters.minOrderAmount === "number" ||
                   typeof activeFilters.maxOrderAmount === "number") && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                      Amount: ${activeFilters.minOrderAmount ?? 0} - $
-                      {activeFilters.maxOrderAmount ?? "∞"}
-                    </span>
-                  )}
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                    Amount: ${activeFilters.minOrderAmount ?? 0} - $
+                    {activeFilters.maxOrderAmount ?? "∞"}
+                  </span>
+                )}
               </div>
-
             </div>
             <Button
               variant="outline"
@@ -392,7 +391,6 @@ export default function OrderManagement(): React.ReactElement {
           </div>
         </div>
       )}
-
       {/* Section 2: Search & Filter options */}
       <div className="flex items-center justify-between space-x-4 mt-6 mb-10">
         <div className="relative max-w-xs">
@@ -429,10 +427,11 @@ export default function OrderManagement(): React.ReactElement {
             onOpenChange={setFilterOpen}
             trigger={
               <Button
-                className={`${activeFilters
+                className={`${
+                  activeFilters
                     ? "bg-[#FF7012] hover:bg-[#FF7012]/90"
                     : "bg-[#FF9012]"
-                  } relative`}
+                } relative`}
               >
                 Filter
                 {activeFilters && (
@@ -463,7 +462,6 @@ export default function OrderManagement(): React.ReactElement {
           </Button>
         </div>
       </div>
-
       {/* Results Summary */}
       {(searchTerm || activeFilters) && (
         <div className="mb-4 p-2 bg-gray-50 rounded border text-sm text-gray-600">
@@ -472,7 +470,6 @@ export default function OrderManagement(): React.ReactElement {
           {activeFilters && " with applied filters"}
         </div>
       )}
-
       {/* Section 3: Order Table */}
       <div className="border w-[85vw] border-gray-200 rounded-lg">
         <Table className="overflow-x-auto overflow-y-auto max-h-[500px] block">
@@ -558,13 +555,13 @@ export default function OrderManagement(): React.ReactElement {
                   <TableCell className="text-sm">
                     {order.paymentDueDate
                       ? new Date(order.paymentDueDate).toLocaleDateString(
-                        "en-US",
-                        {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        }
-                      )
+                          "en-US",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          }
+                        )
                       : "N/A"}
                   </TableCell>
                   <TableCell className="text-sm font-medium">
@@ -600,10 +597,11 @@ export default function OrderManagement(): React.ReactElement {
                   </TableCell>
                   <TableCell className="text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs capitalize font-medium ${order.paymentStatus === "paid"
+                      className={`px-2 py-1 rounded-full text-xs capitalize font-medium ${
+                        order.paymentStatus === "paid"
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
-                        }`}
+                      }`}
                     >
                       {order.paymentStatus}
                     </span>
@@ -720,30 +718,98 @@ export default function OrderManagement(): React.ReactElement {
                       </ReusableModal>
 
                       {/* Delete Button */}
-                      <button
-                        className="cursor-pointer hover:bg-red-100 p-2 rounded-full transition-colors"
-                        onClick={() => handleDeleteClick(order)}
-                        disabled={isDeleting}
+                      <ReusableModal
+                        open={deleteConfirmOpen}
+                        onOpenChange={setDeleteConfirmOpen}
+                        trigger={
+                          <button
+                            className="cursor-pointer hover:bg-red-100 p-2 rounded-full transition-colors"
+                            onClick={() => handleDeleteClick(order)}
+                            disabled={isDeleting}
+                          >
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 16 17"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M6.33317 6.62502C6.79341 6.62502 7.1665 6.99812 7.1665 7.45835V12.4584C7.1665 12.9186 6.79341 13.2917 6.33317 13.2917C5.87293 13.2917 5.49984 12.9186 5.49984 12.4584V7.45835C5.49984 6.99812 5.87293 6.62502 6.33317 6.62502Z"
+                                fill={isDeleting ? "#ccc" : "#ef4444"}
+                              />
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12.9998 3.50002V2.66669C12.9998 1.28598 11.8806 0.166687 10.4998 0.166687H5.49984C4.11913 0.166687 2.99984 1.28598 2.99984 2.66669V3.50002H1.74984C1.2896 3.50002 0.916504 3.87312 0.916504 4.33335C0.916504 4.79359 1.2896 5.16669 1.74984 5.16669H2.1665V14.3334C2.1665 15.7141 3.28579 16.8334 4.6665 16.8334H11.3332C12.7139 16.8334 13.8332 15.7141 13.8332 14.3334V5.16669H14.2498C14.7101 5.16669 15.0832 4.79359 15.0832 4.33335C15.0832 3.87312 14.7101 3.50002 14.2498 3.50002H12.9998Z"
+                                fill={isDeleting ? "#ccc" : "#ef4444"}
+                              />
+                            </svg>
+                          </button>
+                        }
+                        title="Confirm Delete"
                       >
-                        <svg
-                          width="14"
-                          height="14"
-                          viewBox="0 0 16 17"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M6.33317 6.62502C6.79341 6.62502 7.1665 6.99812 7.1665 7.45835V12.4584C7.1665 12.9186 6.79341 13.2917 6.33317 13.2917C5.87293 13.2917 5.49984 12.9186 5.49984 12.4584V7.45835C5.49984 6.99812 5.87293 6.62502 6.33317 6.62502Z"
-                            fill={isDeleting ? "#ccc" : "#ef4444"}
-                          />
-                          <path
-                            fillRule="evenodd"
-                            clipRule="evenodd"
-                            d="M12.9998 3.50002V2.66669C12.9998 1.28598 11.8806 0.166687 10.4998 0.166687H5.49984C4.11913 0.166687 2.99984 1.28598 2.99984 2.66669V3.50002H1.74984C1.2896 3.50002 0.916504 3.87312 0.916504 4.33335C0.916504 4.79359 1.2896 5.16669 1.74984 5.16669H2.1665V14.3334C2.1665 15.7141 3.28579 16.8334 4.6665 16.8334H11.3332C12.7139 16.8334 13.8332 15.7141 13.8332 14.3334V5.16669H14.2498C14.7101 5.16669 15.0832 4.79359 15.0832 4.33335C15.0832 3.87312 14.7101 3.50002 14.2498 3.50002H12.9998Z"
-                            fill={isDeleting ? "#ccc" : "#ef4444"}
-                          />
-                        </svg>
-                      </button>
+                        <div className="p-4">
+                          <div className="flex items-center justify-center mb-4">
+                            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                              <svg
+                                className="w-6 h-6 text-red-600"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                              </svg>
+                            </div>
+                          </div>
+
+                          <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                              Delete Order
+                            </h3>
+                            <p className="text-gray-600">
+                              Are you sure you want to delete order{" "}
+                              <span className="font-semibold">
+                                #{orderToDelete?.invoiceNumber}
+                              </span>
+                              ?
+                              {orderToDelete?.storeId?.storeName && (
+                                <>
+                                  {" "}
+                                  from{" "}
+                                  <span className="font-semibold">
+                                    {orderToDelete.storeId.storeName}
+                                  </span>
+                                </>
+                              )}
+                            </p>
+                            <p className="text-sm text-red-600 mt-2">
+                              This action cannot be undone.
+                            </p>
+                          </div>
+
+                          <div className="flex gap-3 justify-center">
+                            <Button
+                              variant="outline"
+                              onClick={handleDeleteCancel}
+                              disabled={isDeleting}
+                              className="min-w-[100px]"
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={handleDeleteConfirm}
+                              disabled={isDeleting}
+                              className="bg-red-600 hover:bg-red-700 min-w-[100px]"
+                            >
+                              {isDeleting ? "Deleting..." : "Delete"}
+                            </Button>
+                          </div>
+                        </div>
+                      </ReusableModal>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -752,75 +818,6 @@ export default function OrderManagement(): React.ReactElement {
           </TableBody>
         </Table>
       </div>
-
-      {/* Delete Confirmation Modal */}
-      <ReusableModal
-        open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
-        trigger={<button>Open Modal</button>}
-        title="Confirm Delete"
-      >
-        <div className="p-4">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Delete Order
-            </h3>
-            <p className="text-gray-600">
-              Are you sure you want to delete order{" "}
-              <span className="font-semibold">
-                #{orderToDelete?.invoiceNumber}
-              </span>
-              ?
-              {orderToDelete?.storeId?.storeName && (
-                <>
-                  {" "}
-                  from{" "}
-                  <span className="font-semibold">
-                    {orderToDelete.storeId.storeName}
-                  </span>
-                </>
-              )}
-            </p>
-            <p className="text-sm text-red-600 mt-2">
-              This action cannot be undone.
-            </p>
-          </div>
-
-          <div className="flex gap-3 justify-center">
-            <Button
-              variant="outline"
-              onClick={handleDeleteCancel}
-              disabled={isDeleting}
-              className="min-w-[100px]"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 min-w-[100px]"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </div>
-      </ReusableModal>
 
       {/* Pagination or Load More */}
       <div className="flex items-center justify-between mt-4">

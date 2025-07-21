@@ -373,10 +373,9 @@
 
 //       const result = await updateOrder(payload).unwrap();
 //       console.log("Update successful:", result);
-      
+
 //       toast.success("Order updated successfully!");
-      
-    
+
 //       if (onUpdateSuccess) {
 //         onUpdateSuccess();
 //       }
@@ -742,7 +741,7 @@
 //                 !selectedClient || orderItems.length === 0 || isOrderSubmitting
 //               }
 //               onClick={handleUpdateOrder}
-              
+
 //             >
 //               {isOrderSubmitting ? "Updating..." : "Update Order"}
 //             </Button>
@@ -754,18 +753,6 @@
 // };
 
 // export default UpdateOrderPage;
-
-
-
-
-
-
-
-
-
-
-
-
 
 "use client";
 
@@ -802,7 +789,7 @@ import { Button } from "./ui/button";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-// Updated interfaces to match your data structure
+// Interfaces
 interface UpdateOrderPayload {
   id: string;
   date?: string;
@@ -905,7 +892,20 @@ interface Order {
   profitPercentage: number;
   paymentStatus: string;
   products: Array<{
-    productId: string | null;
+    productId:
+      | string
+      | {
+          _id: string;
+          name: string;
+          salesPrice: number;
+          itemNumber: string;
+          categoryId: {
+            _id: string;
+            name: string;
+          };
+          quantity: number;
+          weightUnit: string;
+        };
     quantity: number;
     discount: number;
     _id: string;
@@ -920,13 +920,16 @@ interface UpdateOrderPageProps {
   order: Order;
   onUpdateSuccess?: () => void;
   onCancel?: () => void;
+  isModal?: boolean;
 }
 
 const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   order,
   onUpdateSuccess,
   onCancel,
+  isModal = false,
 }) => {
+  // State management
   const [selectedClient, setSelectedClient] = useState<string>(
     order?.storeId?._id ?? ""
   );
@@ -939,20 +942,26 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
       : ""
   );
   const [paymentAmountReceived, setPaymentAmountReceived] = useState<number>(
-    isNaN(Number(order?.paymentAmountReceived)) ? 0 : Number(order?.paymentAmountReceived)
+    isNaN(Number(order?.paymentAmountReceived))
+      ? 0
+      : Number(order?.paymentAmountReceived)
   );
   const [paymentStatus, setPaymentStatus] = useState<string>(
     order?.paymentStatus ?? "notPaid"
   );
   const [shippingCharge, setShippingCharge] = useState<number>(
-    isNaN(Number(order?.storeId?.shippingCharge)) ? 0 : Number(order?.storeId?.shippingCharge)
+    isNaN(Number(order?.storeId?.shippingCharge))
+      ? 0
+      : Number(order?.storeId?.shippingCharge)
   );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [isOrderInitialized, setIsOrderInitialized] = useState(false);
   const router = useRouter();
 
+  // API hooks
   const { data: customers } = useGetCustomersQuery();
   const clients = customers?.data ?? [];
 
@@ -969,26 +978,47 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const [updateOrder, { isLoading: isOrderSubmitting }] =
     useUpdateOrderMutation();
 
-  // Fetch product details for initial order items
+  // Helper function to safely extract product data - FIX FOR [object Object]
+  const extractProductData = (productId: any) => {
+    if (typeof productId === "string") {
+      return {
+        id: productId,
+        productData: products.find((p) => p._id === productId) || null,
+      };
+    } else if (productId && typeof productId === "object" && productId._id) {
+      return {
+        id: productId._id,
+        productData: productId,
+      };
+    }
+    return { id: null, productData: null };
+  };
+
+  // Initialize order items from existing order - FIXED VERSION
   useEffect(() => {
-    if (order?.products?.length && orderItems.length === 0 && products.length > 0) {
-      const fetchProductDetails = () => {
-        const initialOrderItems = order.products.map((orderProduct) => {
-          if (orderProduct?.productId) {
-            const product = products.find((p) => p._id === orderProduct.productId);
+    if (order?.products?.length && !isOrderInitialized) {
+      console.log("Initializing order items with data:", order.products);
+
+      const initialOrderItems = order.products
+        .map((orderProduct) => {
+          const { id: productId, productData } = extractProductData(
+            orderProduct.productId
+          );
+
+          if (productId && productData) {
             const productDetails: ProductDetails = {
-              id: orderProduct?.productId ?? "",
-              name: product?.name ?? `Product ${orderProduct?.productId ?? "Unknown"}`,
-              itemCode: product?.itemNumber ?? `SKU-${orderProduct?.productId ?? "Unknown"}`,
-              category: product?.categoryId?.name ?? "Unknown",
-              price: product?.salesPrice ?? 0,
-              availableQty: product?.quantity ?? 0,
-              unit: product?.weightUnit ?? "pcs",
+              id: productId,
+              name: productData.name || `Product ${productId}`,
+              itemCode: productData.itemNumber || `SKU-${productId}`,
+              category: productData.categoryId?.name || "Unknown",
+              price: Number(productData.salesPrice) || 0,
+              availableQty: Number(productData.quantity) || 0,
+              unit: productData.weightUnit || "pcs",
             };
 
-            const quantity = orderProduct?.quantity ?? 0;
-            const discount = orderProduct?.discount ?? 0;
-            const total = (product?.salesPrice ?? 0) * quantity - discount;
+            const quantity = Number(orderProduct.quantity) || 0;
+            const discount = Number(orderProduct.discount) || 0;
+            const total = productDetails.price * quantity - discount;
 
             return {
               product: productDetails,
@@ -999,16 +1029,19 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
             };
           }
           return null;
-        }).filter((item): item is OrderItem => item !== null);
+        })
+        .filter((item): item is OrderItem => item !== null);
 
-        if (initialOrderItems.length > 0) {
-          setOrderItems(initialOrderItems);
-        }
-      };
-      fetchProductDetails();
+      console.log("Processed order items:", initialOrderItems);
+
+      if (initialOrderItems.length > 0) {
+        setOrderItems(initialOrderItems);
+      }
+      setIsOrderInitialized(true);
     }
-  }, [order?.products, orderItems.length, products]);
+  }, [order?.products, products, isOrderInitialized]);
 
+  // Set default category
   useEffect(() => {
     if (categories?.length && !selectedCategoryId) {
       setSelectedCategoryId(categories[0]?._id ?? "");
@@ -1016,20 +1049,21 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
     }
   }, [categories, selectedCategoryId]);
 
+  // Product management functions
   const addToOrder = (product: Product) => {
     const item: ProductDetails = {
-      id: product?._id ?? "",
-      name: product?.name ?? "",
-      itemCode: product?.itemNumber ?? "",
-      price: product?.salesPrice ?? 0,
-      availableQty: product?.quantity ?? 0,
-      unit: product?.weightUnit ?? "",
-      category: product?.categoryId?.name ?? "",
+      id: product._id,
+      name: product.name,
+      itemCode: product.itemNumber,
+      price: product.salesPrice,
+      availableQty: product.quantity,
+      unit: product.weightUnit,
+      category: product.categoryId?.name || "",
     };
 
-    const exists = orderItems.find((i) => i?.product?.id === item.id);
+    const exists = orderItems.find((i) => i.product.id === item.id);
     if (exists) {
-      updateQuantity(item.id, (exists?.quantity ?? 0) + 1);
+      updateQuantity(item.id, exists.quantity + 1);
     } else {
       setOrderItems([
         ...orderItems,
@@ -1051,8 +1085,8 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
     }
     setOrderItems((items) =>
       items.map((item) => {
-        if (item?.product?.id === productId) {
-          const total = (item?.product?.price ?? 0) * qty - (item?.discount ?? 0);
+        if (item.product.id === productId) {
+          const total = item.product.price * qty - item.discount;
           return { ...item, quantity: qty, total };
         }
         return item;
@@ -1063,11 +1097,11 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const updateDiscount = (productId: string, discount: number) => {
     setOrderItems((items) =>
       items.map((item) =>
-        item?.product?.id === productId
+        item.product.id === productId
           ? {
               ...item,
               discount,
-              total: (item?.product?.price ?? 0) * (item?.quantity ?? 0) - discount,
+              total: item.product.price * item.quantity - discount,
             }
           : item
       )
@@ -1077,11 +1111,11 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const updatePrice = (productId: string, price: number) => {
     setOrderItems((items) =>
       items.map((item) =>
-        item?.product?.id === productId
+        item.product.id === productId
           ? {
               ...item,
               product: { ...item.product, price: price },
-              total: price * (item?.quantity ?? 0) - (item?.discount ?? 0),
+              total: price * item.quantity - item.discount,
             }
           : item
       )
@@ -1090,37 +1124,35 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
 
   const removeFromOrder = (productId: string) => {
     setOrderItems((items) =>
-      items.filter((item) => item?.product?.id !== productId)
+      items.filter((item) => item.product.id !== productId)
     );
   };
 
-  const filteredProducts =
-    products?.filter(
-      (product: Product) =>
-        product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product?.itemNumber?.toLowerCase().includes(searchTerm.toLowerCase())
-    ) ?? [];
+  // Filter products based on search term
+  const filteredProducts = products.filter(
+    (product: Product) =>
+      product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product?.itemNumber?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
+  // Calculate totals
   const calculateTotals = () => {
-    const totalAmount = orderItems.reduce(
-      (acc, item) => acc + (item?.total ?? 0),
-      0
-    );
+    const totalAmount = orderItems.reduce((acc, item) => acc + item.total, 0);
     const totalQuantity = orderItems.reduce(
-      (acc, item) => acc + (item?.quantity ?? 0),
+      (acc, item) => acc + item.quantity,
       0
     );
     return {
-      totalAmount: isNaN(totalAmount) ? 0 : totalAmount,
+      totalAmount,
       totalQuantity,
-      totalWeight: totalQuantity,
     };
   };
 
-  const { totalAmount, totalQuantity, totalWeight } = calculateTotals();
+  const { totalAmount, totalQuantity } = calculateTotals();
 
+  // Construct payload for API
   const constructOrderPayload = (): UpdateOrderPayload => ({
-    id: order?._id ?? "",
+    id: order._id,
     date: orderDate,
     storeId: selectedClient,
     paymentDueDate,
@@ -1129,15 +1161,16 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
     paymentAmountReceived: Math.round(paymentAmountReceived),
     paymentStatus,
     products: orderItems.map((item) => ({
-      productId: item?.product?.id ?? "",
-      quantity: Math.round(item?.quantity ?? 0),
-      discount: Math.round(item?.discount ?? 0),
+      productId: item.product.id,
+      quantity: Math.round(item.quantity),
+      discount: Math.round(item.discount),
     })),
   });
 
+  // Handle order update
   const handleUpdateOrder = async () => {
     if (!selectedClient || orderItems.length === 0) {
-      alert("Please select a client and add items");
+      toast.error("Please select a client and add items");
       return;
     }
 
@@ -1147,13 +1180,17 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
 
       const result = await updateOrder(payload).unwrap();
       console.log("Update successful:", result);
-      
+
       toast.success("Order updated successfully!");
-      
-      if (onUpdateSuccess) {
+
+      if (isModal && onUpdateSuccess) {
         onUpdateSuccess();
+      } else if (!isModal) {
+        router.push("/dashboard/order-management");
+        if (onUpdateSuccess) {
+          onUpdateSuccess();
+        }
       }
-      router.push("/dashboard/order-management");
     } catch (err: any) {
       console.error("Update order error:", err);
       const errorMessage =
@@ -1168,6 +1205,8 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
+    } else if (!isModal) {
+      router.back();
     }
   };
 
@@ -1176,7 +1215,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Edit className="w-5 h-5" />
-          Update Order #{order?.invoiceNumber ?? "N/A"}
+          Update Order #{order?.invoiceNumber || "N/A"}
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col overflow-hidden">
@@ -1191,23 +1230,21 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                 <SelectValue placeholder="Choose client..." />
               </SelectTrigger>
               <SelectContent>
-                {clients?.map((client) => (
-                  <SelectItem key={client?._id} value={client?._id ?? ""}>
+                {clients.map((client) => (
+                  <SelectItem key={client._id} value={client._id}>
                     <div>
-                      <span className="font-medium">
-                        {client?.storeName ?? "N/A"}
-                      </span>
+                      <span className="font-medium">{client.storeName}</span>
                       <div className="text-xs text-gray-500 flex items-center">
                         <MapPin className="w-3 h-3 mr-1" />
-                        {client?.shippingAddress ?? "N/A"}
+                        {client.shippingAddress}
                       </div>
                     </div>
                   </SelectItem>
-                )) ?? []}
+                ))}
               </SelectContent>
             </Select>
             <div className="text-xs text-muted-foreground">
-              Current: {order?.storeId?.storeName ?? "N/A"}
+              Current: {order?.storeId?.storeName || "N/A"}
             </div>
           </div>
           <div className="space-y-2">
@@ -1256,7 +1293,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
           </div>
         </div>
 
-        {/* Add search bar */}
+        {/* Search bar */}
         <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -1284,21 +1321,21 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                   {categoryLoading ? (
                     <p>Loading...</p>
                   ) : (
-                    categories?.map((cat: Category) => (
+                    categories.map((cat: Category) => (
                       <Button
-                        key={cat?._id}
+                        key={cat._id}
                         variant={
-                          cat?._id === selectedCategoryId ? "default" : "ghost"
+                          cat._id === selectedCategoryId ? "default" : "ghost"
                         }
                         className="w-full mb-2"
                         onClick={() => {
-                          setSelectedCategoryId(cat?._id ?? "");
-                          setSelectedCategoryName(cat?.name ?? "");
+                          setSelectedCategoryId(cat._id);
+                          setSelectedCategoryName(cat.name);
                         }}
                       >
-                        {cat?.name ?? "N/A"}
+                        {cat.name}
                       </Button>
-                    )) ?? []
+                    ))
                   )}
                 </ScrollArea>
               </CardContent>
@@ -1313,32 +1350,27 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
               <CardContent>
                 {productLoading ? (
                   <p>Loading products...</p>
-                ) : filteredProducts?.length === 0 ? (
+                ) : filteredProducts.length === 0 ? (
                   <p>No products found.</p>
                 ) : (
-                  filteredProducts?.map((product: Product) => {
+                  filteredProducts.map((product: Product) => {
                     const orderItem = orderItems.find(
-                      (item) => item?.product?.id === product?._id
+                      (item) => item.product.id === product._id
                     );
                     return (
                       <div
-                        key={product?._id}
+                        key={product._id}
                         className="border p-2 rounded mb-2"
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className="font-semibold">
-                              {product?.name ?? "N/A"}
-                            </div>
+                            <div className="font-semibold">{product.name}</div>
                             <div className="text-xs text-muted">
-                              SKU: {product?.itemNumber ?? "N/A"}
+                              SKU: {product.itemNumber}
                             </div>
                           </div>
                           <div className="text-sm font-semibold">
-                            ₹
-                            {orderItem?.product?.price ??
-                              product?.salesPrice ??
-                              0}
+                            ₹{orderItem?.product.price || product.salesPrice}
                           </div>
                         </div>
                         <div className="mt-2">
@@ -1351,23 +1383,23 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                     variant="outline"
                                     onClick={() =>
                                       updateQuantity(
-                                        product?._id ?? "",
-                                        (orderItem?.quantity ?? 0) - 1
+                                        product._id,
+                                        orderItem.quantity - 1
                                       )
                                     }
                                   >
                                     <Minus className="w-3 h-3" />
                                   </Button>
                                   <span className="font-medium w-6 text-center">
-                                    {orderItem?.quantity ?? 0}
+                                    {orderItem.quantity}
                                   </span>
                                   <Button
                                     size="icon"
                                     variant="outline"
                                     onClick={() =>
                                       updateQuantity(
-                                        product?._id ?? "",
-                                        (orderItem?.quantity ?? 0) + 1
+                                        product._id,
+                                        orderItem.quantity + 1
                                       )
                                     }
                                   >
@@ -1377,9 +1409,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                 <Button
                                   variant="destructive"
                                   size="sm"
-                                  onClick={() =>
-                                    removeFromOrder(product?._id ?? "")
-                                  }
+                                  onClick={() => removeFromOrder(product._id)}
                                 >
                                   Remove
                                 </Button>
@@ -1389,10 +1419,10 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                   Price:
                                   <Input
                                     type="number"
-                                    value={orderItem?.product?.price ?? 0}
+                                    value={orderItem.product.price}
                                     onChange={(e) =>
                                       updatePrice(
-                                        product?._id ?? "",
+                                        product._id,
                                         Number(e.target.value)
                                       )
                                     }
@@ -1404,10 +1434,10 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                   Discount:
                                   <Input
                                     type="number"
-                                    value={orderItem?.discount ?? 0}
+                                    value={orderItem.discount}
                                     onChange={(e) =>
                                       updateDiscount(
-                                        product?._id ?? "",
+                                        product._id,
                                         Number(e.target.value)
                                       )
                                     }
@@ -1416,7 +1446,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                   />
                                 </label>
                                 <span>
-                                  Total: ₹{(orderItem?.total ?? 0).toFixed(2)}
+                                  Total: ₹{orderItem.total.toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -1433,7 +1463,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                         </div>
                       </div>
                     );
-                  }) ?? []
+                  })
                 )}
               </CardContent>
             </Card>
@@ -1462,17 +1492,14 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                       >
                         <div className="flex-1">
                           <span className="font-medium block">
-                            {item?.product?.name?.startsWith("Product ")
-                              ? `Product ID: ${item?.product?.id}`
-                              : item?.product?.name ?? "N/A"}
+                            {item.product.name}
                           </span>
                           <span className="text-xs text-gray-500">
-                            Qty: {item?.quantity ?? 0} | Discount: ₹
-                            {item?.discount ?? 0}
+                            Qty: {item.quantity} | Discount: ₹{item.discount}
                           </span>
                         </div>
                         <span className="font-semibold ml-2">
-                          ₹{(item?.total ?? 0).toFixed(2)}
+                          ₹{item.total.toFixed(2)}
                         </span>
                       </div>
                     ))
@@ -1501,8 +1528,8 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
 
         <div className="flex justify-between mt-4">
           <div className="text-sm text-muted-foreground">
-            Original Order Amount: ₹{(order?.orderAmount ?? 0).toFixed(2)} |{" "}
-            Current Amount: ₹{(totalAmount + shippingCharge).toFixed(2)}
+            Original Order Amount: ₹{order?.orderAmount?.toFixed(2)} | Current
+            Amount: ₹{(totalAmount + shippingCharge).toFixed(2)}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCancel}>

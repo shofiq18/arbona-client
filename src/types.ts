@@ -1,6 +1,3 @@
-
-
-
 export interface Order {
   _id: string;
   date: string;
@@ -105,25 +102,23 @@ export interface ReusableModalProps {
   children: React.ReactNode;
 }
 
+// export interface FilterFormValues {
+//   hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
+//   paymentDueStartDate?: Date | string | number;
+//   paymentDueEndDate?: Date | string | number;
+//   storeIds?: string[]; // boolean was incorrect
+//   minOrderAmount?: number;
+//   maxOrderAmount?: number; // changed from string to number
+//   paymentStatus?: string | null; // better than `any`
+//   // orderStatus?: string | null;
+//   endDate?: Date | string | number;
+//   startDate?: Date | string | number;
+//   dateRange?: string;
+//   status?: string;
+//   storeId?: string;
+//   orderStatus?: string[];
 
-export interface FilterFormValues {
-  hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
-  paymentDueStartDate?: Date | string | number;
-  paymentDueEndDate?: Date | string | number;
-  storeIds?: string[]; // boolean was incorrect
-  minOrderAmount?: number;
-  maxOrderAmount?: number; // changed from string to number
-  paymentStatus?: string | null; // better than `any`
-  // orderStatus?: string | null;
-  endDate?: Date | string | number;
-  startDate?: Date | string | number;
-  dateRange?: string;
-  status?: string;
-  storeId?: string;
-  orderStatus?: string[]; 
-  
-}
-
+// }
 
 export interface AddOrderFormValues {
   date: string;
@@ -178,9 +173,8 @@ export interface AddOrderFormProps {
 //   totalOrders?: number;
 //   totalOrderAmount?: string;
 //   isCustomerSourceProspect?: boolean;
-  
-// }
 
+// }
 
 // "@/types/index.ts" or similar
 
@@ -200,10 +194,7 @@ interface CustomerOrder {
   paymentStatus: string;
 }
 
-
-
 export interface Customer {
-  
   _id: string;
   storeName: string;
   storePhone: string;
@@ -348,8 +339,6 @@ export interface GetProductResponse {
   data: Product[];
 }
 
-
-
 export interface Prospect {
   _id: string;
   storeName: string;
@@ -377,7 +366,6 @@ export interface Prospect {
     activity: string;
     activityDate: string;
     activityMedium: string;
-    
   }[];
   quotedList: {
     productObjId?: {
@@ -428,13 +416,13 @@ export interface ProspectsResponse {
 // types.ts or within the component file
 
 // QuotedListItem type (includes packetSize from the sample data)
- export interface QuotedListItem {
+export interface QuotedListItem {
   productObjId: string; // 24-char ObjectId (e.g., "686eea6ac3e14203529ced6c")
   itemNumber: string;
   itemName: string;
   packSize: string;
   price: number;
-   // Optional, 24-char ObjectId if required by API
+  // Optional, 24-char ObjectId if required by API
   packetSize?: string; // New field from sample data, optional if not always present
 }
 
@@ -442,11 +430,9 @@ export interface ProspectsResponse {
 export interface FollowUpActivity {
   activity: string;
   activityDate: string; // ISO date string (e.g., "2025-07-10")
-  activityMedium: "call" | "email" | "meeting" | "whatsapp"  // Updated to include "call"
+  activityMedium: "call" | "email" | "meeting" | "whatsapp"; // Updated to include "call"
   _id?: string; // Optional, 24-char ObjectId if required by API
 }
-
-
 
 // AddProspectRequest type (full form data structure)
 export interface AddProspectRequest {
@@ -471,5 +457,22 @@ export interface AddProspectRequest {
   isDeleted?: boolean;
 }
 
+// @/types/index.ts (or wherever your types are defined)
+export interface FilterFormValues {
+  startDate?: string;
+  endDate?: string;
+  paymentDueStartDate?: string;
+  paymentDueEndDate?: string;
+  orderStatus?: string[];
+  paymentStatus?: string[];
+  storeIds?: string[];
+  minOrderAmount?: number;
+  maxOrderAmount?: number;
+  hasOpenBalance?: boolean;
+}
 
-
+export interface OrderFilterFormProps {
+  onSubmit: (values: FilterFormValues) => void;
+  onClear?: () => void;
+  initialValues?: FilterFormValues | null;
+}

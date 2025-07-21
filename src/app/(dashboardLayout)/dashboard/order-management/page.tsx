@@ -347,7 +347,8 @@ export default function OrderManagement(): React.ReactElement {
               <div className="flex flex-wrap gap-2">
                 {activeFilters.startDate && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    From: {new Date(activeFilters.startDate).toLocaleDateString()}
+                    From:{" "}
+                    {new Date(activeFilters.startDate).toLocaleDateString()}
                   </span>
                 )}
 
@@ -373,13 +374,12 @@ export default function OrderManagement(): React.ReactElement {
 
                 {(typeof activeFilters.minOrderAmount === "number" ||
                   typeof activeFilters.maxOrderAmount === "number") && (
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                      Amount: ${activeFilters.minOrderAmount ?? 0} - $
-                      {activeFilters.maxOrderAmount ?? "∞"}
-                    </span>
-                  )}
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                    Amount: ${activeFilters.minOrderAmount ?? 0} - $
+                    {activeFilters.maxOrderAmount ?? "∞"}
+                  </span>
+                )}
               </div>
-
             </div>
             <Button
               variant="outline"
@@ -429,10 +429,11 @@ export default function OrderManagement(): React.ReactElement {
             onOpenChange={setFilterOpen}
             trigger={
               <Button
-                className={`${activeFilters
+                className={`${
+                  activeFilters
                     ? "bg-[#FF7012] hover:bg-[#FF7012]/90"
                     : "bg-[#FF9012]"
-                  } relative`}
+                } relative`}
               >
                 Filter
                 {activeFilters && (
@@ -558,13 +559,13 @@ export default function OrderManagement(): React.ReactElement {
                   <TableCell className="text-sm">
                     {order.paymentDueDate
                       ? new Date(order.paymentDueDate).toLocaleDateString(
-                        "en-US",
-                        {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        }
-                      )
+                          "en-US",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          }
+                        )
                       : "N/A"}
                   </TableCell>
                   <TableCell className="text-sm font-medium">
@@ -600,10 +601,11 @@ export default function OrderManagement(): React.ReactElement {
                   </TableCell>
                   <TableCell className="text-sm">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs capitalize font-medium ${order.paymentStatus === "paid"
+                      className={`px-2 py-1 rounded-full text-xs capitalize font-medium ${
+                        order.paymentStatus === "paid"
                           ? "bg-green-100 text-green-800"
                           : "bg-red-100 text-red-800"
-                        }`}
+                      }`}
                     >
                       {order.paymentStatus}
                     </span>
@@ -753,7 +755,7 @@ export default function OrderManagement(): React.ReactElement {
         </Table>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal
       <ReusableModal
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
@@ -820,7 +822,7 @@ export default function OrderManagement(): React.ReactElement {
             </Button>
           </div>
         </div>
-      </ReusableModal>
+      </ReusableModal> */}
 
       {/* Pagination or Load More */}
       <div className="flex items-center justify-between mt-4">

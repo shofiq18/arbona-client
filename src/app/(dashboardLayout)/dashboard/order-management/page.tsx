@@ -121,25 +121,24 @@ export default function OrderManagement(): React.ReactElement {
 
       // Create a Blob from the ArrayBuffer (this represents a PDF)
       const blob = new Blob([data], { type: "application/pdf" });
- const fileURL = URL.createObjectURL(blob);
+      const fileURL = URL.createObjectURL(blob);
 
-  
-    window.open(fileURL, "_blank");
+      window.open(fileURL, "_blank");
       // Create a temporary link to trigger the download
       // const link = document.createElement("a");
       // link.href = URL.createObjectURL(blob);
-      // link.download = "order_delivery-slip"; 
+      // link.download = "order_delivery-slip";
 
       // Clean up the URL object
       // URL.revokeObjectURL(link.href);
-       setTimeout(() => {
-      URL.revokeObjectURL(fileURL);
-    }, 10);
+      setTimeout(() => {
+        URL.revokeObjectURL(fileURL);
+      }, 10);
     } catch (err) {
       console.log(err);
     }
   };
-  
+
   // function handleAddOrderCancel() {
   //   setAddOrderOpen(false);
   // }
@@ -936,78 +935,6 @@ export default function OrderManagement(): React.ReactElement {
         </Table>
       </div>
 
-<<<<<<< HEAD
-=======
-      {/* Delete Confirmation Modal
-      <ReusableModal
-        open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
-        trigger={<button>Open Modal</button>}
-        title="Confirm Delete"
-      >
-        <div className="p-4">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-red-600"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
-            </div>
-          </div>
-
-          <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Delete Order
-            </h3>
-            <p className="text-gray-600">
-              Are you sure you want to delete order{" "}
-              <span className="font-semibold">
-                #{orderToDelete?.invoiceNumber}
-              </span>
-              ?
-              {orderToDelete?.storeId?.storeName && (
-                <>
-                  {" "}
-                  from{" "}
-                  <span className="font-semibold">
-                    {orderToDelete.storeId.storeName}
-                  </span>
-                </>
-              )}
-            </p>
-            <p className="text-sm text-red-600 mt-2">
-              This action cannot be undone.
-            </p>
-          </div>
-
-          <div className="flex gap-3 justify-center">
-            <Button
-              variant="outline"
-              onClick={handleDeleteCancel}
-              disabled={isDeleting}
-              className="min-w-[100px]"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 min-w-[100px]"
-            >
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </div>
-      </ReusableModal> */}
-
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
       {/* Pagination or Load More */}
       <div className="flex items-center justify-between mt-4">
         <div className="text-sm text-gray-500">

@@ -29,7 +29,7 @@ export default function ProspectDetails() {
   const [newSalespersonId, setNewSalespersonId] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
-const [converProspect]=useConvertProspectMutation()
+// const [converProspect]=useConvertProspectMutation()
 
 
   // Fetch prospects with RTK Query
@@ -68,17 +68,17 @@ const [converProspect]=useConvertProspectMutation()
 
 
   
-  const converProspacts=async(id:string)=>{
-    console.log("convert api",id)
- try {
-      await converProspect(id)
-      toast.success("Prospact Convert successfully");
+//   const converProspacts=async(id:string)=>{
+//     console.log("convert api",id)
+//  try {
+//       await converProspect(id)
+//       toast.success("Prospact Convert successfully");
      
-    } catch (err) {
-      toast.error("Failed to convert prospact");
-      console.error("convert error:", err);
-    }
-  }
+//     } catch (err) {
+//       toast.error("Failed to convert prospact");
+//       console.error("convert error:", err);
+//     }
+//   }
   const openModal = (prospect: Prospect, title: string, data: string) => {
     setSelectedProspect(prospect);
     setModalContent({ title, data });
@@ -246,7 +246,7 @@ const [converProspect]=useConvertProspectMutation()
                     )}
                   </td>
                   <td className="p-3">
-                    <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
+                    {/* <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button> */}
                   </td>
                   <td className="p-3 flex space-x-6 items-center">
                     <button

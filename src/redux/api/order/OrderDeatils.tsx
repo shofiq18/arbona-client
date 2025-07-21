@@ -9,8 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-<<<<<<< HEAD
-=======
 
 import {
   DropdownMenu,
@@ -20,7 +18,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
 import {
   Table,
   TableBody,
@@ -37,17 +34,11 @@ import {
   FileText,
   Download,
   MoreHorizontal,
-<<<<<<< HEAD
-} from "lucide-react";
-
-import { useGiteSingleOrderQuery } from "./orderManagementApi";
-=======
   DollarSign,
 } from "lucide-react";
 
 import { useGiteSingleOrderQuery } from "./orderManagementApi";
 import { ImFilePdf } from "react-icons/im";
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
 
 const OrderDeatils = ({ id }: { id: string }) => {
   const { data, isError, isLoading } = useGiteSingleOrderQuery(id);
@@ -92,8 +83,6 @@ const OrderDeatils = ({ id }: { id: string }) => {
       scanStatus: "Scanned",
     },
   ];
-<<<<<<< HEAD
-=======
   const handleDownloadInvice = async (id: string) => {
     try {
       // Fetch the PDF as a binary response (arrayBuffer)
@@ -206,7 +195,6 @@ const handleDownloadExcel = async () => {
   }
 };
 
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
   return (
     <div>
       {" "}
@@ -232,23 +220,11 @@ const handleDownloadExcel = async () => {
                 />
               </div>
               <Button size="sm" className="bg-green-600 hover:bg-green-700">
-<<<<<<< HEAD
-                <Search className="h-4 w-4" />
-=======
                 <DollarSign className="h-4 w-4" />
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
               </Button>
               <Button size="sm" variant="destructive">
                 <FileText className="h-4 w-4" />
               </Button>
-<<<<<<< HEAD
-              <Button size="sm" variant="outline">
-                <Download className="h-4 w-4" />
-              </Button>
-              <Button size="sm" variant="outline">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-=======
            
               <DropdownMenu>
                 <DropdownMenuTrigger> <ImFilePdf className="w-5 h-5 text-black" /></DropdownMenuTrigger>
@@ -271,7 +247,6 @@ const handleDownloadExcel = async () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
             </div>
           </div>
         </div>
@@ -300,11 +275,7 @@ const handleDownloadExcel = async () => {
                   <TableCell className="font-medium">
                     {item?.productId.name}
                   </TableCell>
-<<<<<<< HEAD
-                  <TableCell className="text-blue-600">
-=======
                   <TableCell   className="text-blue-600 cursor-pointer">
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
                     {item?.productId.itemNumber}
                   </TableCell>
                   <TableCell>{item.productId.barcodeString}</TableCell>

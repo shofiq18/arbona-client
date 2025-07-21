@@ -2,12 +2,8 @@
 
 import React from "react";
 import { useRouter, useParams } from "next/navigation";
-<<<<<<< HEAD
-import { useGetOrderByIdQuery } from "@/redux/api/order/orderManagementApi";
-=======
 import { useGiteSingleOrderQuery } from "@/redux/api/order/orderManagementApi";
 // import { useGetOrderByIdQuery } from "@/redux/api/order/orderManagementApi";
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
 
 // Enhanced interfaces based on your response (same as before)
 interface Category {
@@ -119,11 +115,7 @@ const OrderDetailsPage: React.FC = () => {
     data: response,
     isLoading,
     error,
-<<<<<<< HEAD
-  } = useGetOrderByIdQuery(orderId, {
-=======
   } = useGiteSingleOrderQuery(orderId, {
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
     skip: !orderId,
   });
 
@@ -425,11 +417,7 @@ const OrderDetailsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-<<<<<<< HEAD
-              {order.products.map((product) => {
-=======
               {order.products.map((product:any) => {
->>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
                 const subtotal =
                   product.quantity * product.productId.salesPrice;
                 const discountAmount = subtotal * (product.discount / 100);

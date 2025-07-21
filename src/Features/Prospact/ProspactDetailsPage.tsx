@@ -4,8 +4,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Image from "next/image";
 import { useGetProspectsQuery, useUpdateProspectMutation, useDeleteProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
-import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
+import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi"; // Assuming this exists
 import { Prospect } from "@/types";
 import Loading from "@/redux/Shared/Loading";
 import toast from "react-hot-toast";
@@ -28,6 +29,8 @@ export default function ProspectDetails() {
   const [newSalespersonId, setNewSalespersonId] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
+const [converProspect]=useConvertProspectMutation()
+
 
   // Fetch prospects with RTK Query
   const { data: prospectsResponse, error, isLoading, refetch } = useGetProspectsQuery(undefined, {
@@ -48,7 +51,7 @@ export default function ProspectDetails() {
 
   const prospects = prospectsResponse?.data || [];
 
-  console.log("quoteddata", prospects);
+  console.log("qoateddata", prospects);
 
   // Filter prospects based on search term
   const filteredProspects = prospects.filter((prospect) =>
@@ -63,6 +66,19 @@ export default function ProspectDetails() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
 
+
+  
+  const converProspacts=async(id:string)=>{
+    console.log("convert api",id)
+ try {
+      await converProspect(id)
+      toast.success("Prospact Convert successfully");
+     
+    } catch (err) {
+      toast.error("Failed to convert prospact");
+      console.error("convert error:", err);
+    }
+  }
   const openModal = (prospect: Prospect, title: string, data: string) => {
     setSelectedProspect(prospect);
     setModalContent({ title, data });
@@ -143,6 +159,9 @@ export default function ProspectDetails() {
               />
             </div>
             <div>
+              <button className="bg-yellow-500 text-white mr-4 px-4 py-2 rounded-lg hover:bg-yellow-600 transition duration-200">
+                Filter
+              </button>
               <button
                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
                 onClick={() => router.push("/dashboard/add-prospact")}
@@ -227,9 +246,7 @@ export default function ProspectDetails() {
                     )}
                   </td>
                   <td className="p-3">
-                    <button className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">
-                      Convert
-                    </button>
+                    <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
                   </td>
                   <td className="p-3 flex space-x-6 items-center">
                     <button

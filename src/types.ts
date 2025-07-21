@@ -309,3 +309,129 @@ export interface GetProductResponse {
   message: string;
   data: Product[];
 }
+
+
+
+export interface Prospect {
+  _id: string;
+  storeName: string;
+  storePhone: string;
+  storePersonEmail: string;
+  storePersonName: string;
+  storePersonPhone: string;
+  salesTaxId: string;
+  shippingAddress: string;
+  shippingState: string;
+  shippingZipcode: string;
+  miscellaneousDocImage: string;
+  leadSource: string;
+  note: string;
+  status: string;
+  assignedSalesPerson: {
+    _id: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+  followUpActivities: {
+    activity: string;
+    activityDate: string;
+    activityMedium: string;
+    
+  }[];
+  quotedList: {
+    productObjId?: {
+      _id: string;
+      name: string;
+      isDeleted: boolean;
+      competitorPrice: number;
+      packetSize: string;
+      weight: number;
+      weightUnit: string;
+      categoryId: string;
+      reorderPointOfQuantity: number;
+      salesPrice: number;
+      purchasePrice: number;
+      barcodeString: string;
+      itemNumber: string;
+      quantity: number;
+      warehouseLocation: string;
+      createdAt: string;
+      updatedAt: string;
+      __v: number;
+      incomingQuantity: number;
+      packageDimensions: {
+        length: number;
+        width: number;
+        height: number;
+        unit: string;
+      };
+    };
+    itemNumber: string;
+    itemName: string;
+    price: number;
+    // packetSize: string;
+  }[];
+  competitorStatement: string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export interface ProspectsResponse {
+  success: boolean;
+  message: string;
+  data: Prospect[];
+}
+
+// types.ts or within the component file
+
+// QuotedListItem type (includes packetSize from the sample data)
+ export interface QuotedListItem {
+  productObjId: string; // 24-char ObjectId (e.g., "686eea6ac3e14203529ced6c")
+  itemNumber: string;
+  itemName: string;
+  packSize: string;
+  price: number;
+   // Optional, 24-char ObjectId if required by API
+  packetSize?: string; // New field from sample data, optional if not always present
+}
+
+// FollowUpActivity type (includes call as a valid activityMedium)
+export interface FollowUpActivity {
+  activity: string;
+  activityDate: string; // ISO date string (e.g., "2025-07-10")
+  activityMedium: "call" | "email" | "meeting" | "whatsapp"  // Updated to include "call"
+  _id?: string; // Optional, 24-char ObjectId if required by API
+}
+
+
+
+// AddProspectRequest type (full form data structure)
+export interface AddProspectRequest {
+  storeName: string;
+  storePhone: string;
+  storePersonEmail: string;
+  storePersonName: string;
+  storePersonPhone: string;
+  salesTaxId: string;
+  shippingAddress: string;
+  shippingState: string;
+  shippingZipcode: string;
+  shippingCity: string;
+  miscellaneousDocImage?: string;
+  leadSource: string;
+  note?: string;
+  status: "new" | "contacted" | "qualified" | "rejected" | "converted";
+  competitorStatement?: string;
+  quotedList: QuotedListItem[];
+  followUpActivities: FollowUpActivity[]; // ✅ Update this line
+  assignedSalesPerson: string;
+  isDeleted?: boolean;
+}
+
+
+

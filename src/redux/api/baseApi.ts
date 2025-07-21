@@ -30,7 +30,8 @@ export const baseApi = createApi({
     "Containers",
     "Products",
     "ProductSegments", 
-    "Chart"
+    "Chart", 
+    "SalesUsers"
   ],
 });
 

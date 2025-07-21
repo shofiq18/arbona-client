@@ -3,7 +3,14 @@ import AddOrderPage from "@/components/AddOrderForm";
 import { OrderFilterForm } from "@/components/OrderFilterForm";
 import { ReusableModal } from "@/components/ReusableModal";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -15,6 +22,7 @@ import {
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
 import { FilterFormValues, Order } from "@/types";
+import Link from "next/link";
 import { useState } from "react";
 import { ImFilePdf } from "react-icons/im";
 
@@ -33,67 +41,66 @@ export default function OrderManagement(): React.ReactElement {
     error: object;
   };
 
-  console.log("check", orders)
+  console.log("check", orders);
   const [addOrderOpen, setAddOrderOpen] = useState(false);
 
-const handleDownload = async () => {
-   
-
+  const handleDownload = async () => {
     try {
       // Fetch the PDF as a binary response (arrayBuffer)
-      const response = await fetch( `${process.env.NEXT_PUBLIC_URL}/order/allOrdersPdf`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/allOrdersPdf`
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch PDF');
+        throw new Error("Failed to fetch PDF");
       }
 
       // Read the binary data as an ArrayBuffer
       const data = await response.arrayBuffer();
 
       // Create a Blob from the ArrayBuffer (this represents a PDF)
-      const blob = new Blob([data], { type: 'application/pdf' });
+      const blob = new Blob([data], { type: "application/pdf" });
 
       // Create a temporary link to trigger the download
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = 'order_details.pdf'; // Default file name
+      link.download = "order_details.pdf"; // Default file name
       link.click(); // Trigger the download
 
       // Clean up the URL object
       URL.revokeObjectURL(link.href);
     } catch (err) {
-     console.log(err)
-    } 
+      console.log(err);
+    }
   };
-// const handleDownloadDilverySlip = async () => {
-   
+  // const handleDownloadDilverySlip = async () => {
 
-//     try {
-//       // Fetch the PDF as a binary response (arrayBuffer)
-//       const response = await fetch( `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${}`);
+  //     try {
+  //       // Fetch the PDF as a binary response (arrayBuffer)
+  //       const response = await fetch( `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${}`);
 
-//       if (!response.ok) {
-//         throw new Error('Failed to fetch PDF');
-//       }
+  //       if (!response.ok) {
+  //         throw new Error('Failed to fetch PDF');
+  //       }
 
-//       // Read the binary data as an ArrayBuffer
-//       const data = await response.arrayBuffer();
+  //       // Read the binary data as an ArrayBuffer
+  //       const data = await response.arrayBuffer();
 
-//       // Create a Blob from the ArrayBuffer (this represents a PDF)
-//       const blob = new Blob([data], { type: 'application/pdf' });
+  //       // Create a Blob from the ArrayBuffer (this represents a PDF)
+  //       const blob = new Blob([data], { type: 'application/pdf' });
 
-//       // Create a temporary link to trigger the download
-//       const link = document.createElement('a');
-//       link.href = URL.createObjectURL(blob);
-//       link.download = 'order_details.pdf'; // Default file name
-//       link.click(); // Trigger the download
+  //       // Create a temporary link to trigger the download
+  //       const link = document.createElement('a');
+  //       link.href = URL.createObjectURL(blob);
+  //       link.download = 'order_details.pdf'; // Default file name
+  //       link.click(); // Trigger the download
 
-//       // Clean up the URL object
-//       URL.revokeObjectURL(link.href);
-//     } catch (err) {
-//      console.log(err)
-//     } 
-//   };
+  //       // Clean up the URL object
+  //       URL.revokeObjectURL(link.href);
+  //     } catch (err) {
+  //      console.log(err)
+  //     }
+  //   };
   // function handleAddOrderSubmit(values: AddOrderFormValues) {
   //   // Implement your add order logic here (API call, state update, etc.)
   //   console.log("Add Order:", values);
@@ -227,10 +234,10 @@ const handleDownload = async () => {
     <DropdownMenuSeparator/>
     <DropdownMenuItem>Invoice</DropdownMenuItem>
     <DropdownMenuItem>delivery slip</DropdownMenuItem>
- 
+
   </DropdownMenuContent>
 </DropdownMenu> */}
-          
+
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>
@@ -297,22 +304,24 @@ const handleDownload = async () => {
               <TableCell>
                 {/* Replace these with actual icons/buttons as needed */}
                 <span className="inline-flex space-x-2">
-                  <button className="cursor-pointer">
-                    <svg
-                      width="20"
-                      height="21"
-                      viewBox="0 0 20 21"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
-                        d="M10.0002 4.66669C15.1085 4.66669 17.5258 8.09166 18.3768 9.69284C18.6477 10.2027 18.6477 10.7974 18.3768 11.3072C17.5258 12.9084 15.1085 16.3334 10.0002 16.3334C4.89188 16.3334 2.4746 12.9084 1.62363 11.3072C1.35267 10.7974 1.35267 10.2027 1.62363 9.69284C2.4746 8.09166 4.89188 4.66669 10.0002 4.66669ZM5.69716 7.56477C4.31361 8.48147 3.50572 9.70287 3.09536 10.475C3.09078 10.4836 3.08889 10.4896 3.08807 10.4929C3.08724 10.4962 3.08708 10.5 3.08708 10.5C3.08708 10.5 3.08724 10.5038 3.08807 10.5071C3.08889 10.5104 3.09078 10.5164 3.09536 10.525C3.50572 11.2972 4.31361 12.5186 5.69716 13.4353C5.12594 12.5995 4.79188 11.5888 4.79188 10.5C4.79188 9.41127 5.12594 8.40055 5.69716 7.56477ZM14.3033 13.4353C15.6868 12.5186 16.4947 11.2972 16.905 10.525C16.9096 10.5164 16.9115 10.5104 16.9123 10.5071C16.9129 10.505 16.9133 10.5019 16.9133 10.5019L16.9133 10.5L16.913 10.4964L16.9123 10.4929C16.9115 10.4896 16.9096 10.4836 16.905 10.475C16.4947 9.70288 15.6868 8.48148 14.3033 7.56478C14.8745 8.40056 15.2085 9.41128 15.2085 10.5C15.2085 11.5888 14.8745 12.5995 14.3033 13.4353ZM6.45854 10.5C6.45854 8.54401 8.0442 6.95835 10.0002 6.95835C11.9562 6.95835 13.5419 8.54401 13.5419 10.5C13.5419 12.456 11.9562 14.0417 10.0002 14.0417C8.0442 14.0417 6.45854 12.456 6.45854 10.5Z"
-                        fill="#667085"
-                      />
-                    </svg>
-                  </button>
+                  <Link href={`/dashboard/order-management/${order._id}`}>
+                    <button className="cursor-pointer">
+                      <svg
+                        width="20"
+                        height="21"
+                        viewBox="0 0 20 21"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          clip-rule="evenodd"
+                          d="M10.0002 4.66669C15.1085 4.66669 17.5258 8.09166 18.3768 9.69284C18.6477 10.2027 18.6477 10.7974 18.3768 11.3072C17.5258 12.9084 15.1085 16.3334 10.0002 16.3334C4.89188 16.3334 2.4746 12.9084 1.62363 11.3072C1.35267 10.7974 1.35267 10.2027 1.62363 9.69284C2.4746 8.09166 4.89188 4.66669 10.0002 4.66669ZM5.69716 7.56477C4.31361 8.48147 3.50572 9.70287 3.09536 10.475C3.09078 10.4836 3.08889 10.4896 3.08807 10.4929C3.08724 10.4962 3.08708 10.5 3.08708 10.5C3.08708 10.5 3.08724 10.5038 3.08807 10.5071C3.08889 10.5104 3.09078 10.5164 3.09536 10.525C3.50572 11.2972 4.31361 12.5186 5.69716 13.4353C5.12594 12.5995 4.79188 11.5888 4.79188 10.5C4.79188 9.41127 5.12594 8.40055 5.69716 7.56477ZM14.3033 13.4353C15.6868 12.5186 16.4947 11.2972 16.905 10.525C16.9096 10.5164 16.9115 10.5104 16.9123 10.5071C16.9129 10.505 16.9133 10.5019 16.9133 10.5019L16.9133 10.5L16.913 10.4964L16.9123 10.4929C16.9115 10.4896 16.9096 10.4836 16.905 10.475C16.4947 9.70288 15.6868 8.48148 14.3033 7.56478C14.8745 8.40056 15.2085 9.41128 15.2085 10.5C15.2085 11.5888 14.8745 12.5995 14.3033 13.4353ZM6.45854 10.5C6.45854 8.54401 8.0442 6.95835 10.0002 6.95835C11.9562 6.95835 13.5419 8.54401 13.5419 10.5C13.5419 12.456 11.9562 14.0417 10.0002 14.0417C8.0442 14.0417 6.45854 12.456 6.45854 10.5Z"
+                          fill="#667085"
+                        />
+                      </svg>
+                    </button>
+                  </Link>
                   <button className="cursor-pointer">
                     <svg
                       width="20"
@@ -329,7 +338,8 @@ const handleDownload = async () => {
                       />
                     </svg>
                   </button>
-                  <button  className="cursor-pointer">
+
+                  <button className="cursor-pointer">
                     <svg
                       width="16"
                       height="17"

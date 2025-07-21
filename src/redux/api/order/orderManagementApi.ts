@@ -18,7 +18,6 @@ interface ProductSegmentResponse {
   data: ProductSegment[];
 }
 
-
 const orderManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getOrders: builder.query<Order[], void>({
@@ -33,9 +32,12 @@ const orderManagementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
+    giteSingleOrder: builder.query({
+      query: (id) => `/order/${id}`,
+    }),
     updateOrder: builder.mutation<Order, Partial<Order> & { id: number }>({
       query: ({ id, ...patch }) => ({
-        url: `/orders/${id}`,
+        url: `/order/${id}`,
         method: "PUT",
         body: patch,
       }),
@@ -52,8 +54,6 @@ const orderManagementApi = baseApi.injectEndpoints({
       query: () => "/order/getProductSegmentation",
       providesTags: ["ProductSegments"],
     }),
-
-    
   }),
 });
 
@@ -63,9 +63,6 @@ export const {
   useUpdateOrderMutation,
   useDeleteOrderMutation,
   useGetProductSegmentsQuery,
-
+  useGiteSingleOrderQuery,
 } = orderManagementApi;
 export default orderManagementApi;
-
-
-

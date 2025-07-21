@@ -17,10 +17,75 @@ import {
   useGetOrdersQuery,
   useDeleteOrderMutation,
 } from "@/redux/api/order/orderManagementApi";
-import { FilterFormValues, Order } from "@/types";
+import { FilterFormValues } from "@/types";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { ImFilePdf } from "react-icons/im";
+
+interface Order {
+  _id: string;
+  date: string;
+  invoiceNumber: string;
+  PONumber: string;
+  storeId: {
+    _id: string;
+    storeName: string;
+    storePhone: string;
+    storePersonEmail: string;
+    salesTaxId: string;
+    acceptedDeliveryDays: string[];
+    bankACHAccountInfo: string;
+    storePersonName: string;
+    storePersonPhone: string;
+    billingAddress: string;
+    billingState: string;
+    billingZipcode: string;
+    billingCity: string;
+    shippingAddress: string;
+    shippingState: string;
+    shippingZipcode: string;
+    shippingCity: string;
+    shippingCharge?: string;
+    creditApplication: string;
+    ownerLegalFrontImage: string;
+    ownerLegalBackImage: string;
+    voidedCheckImage: string;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
+  paymentDueDate: string;
+  orderAmount: number;
+  orderStatus: string;
+  paymentAmountReceived: number;
+  discountGiven: number;
+  openBalance: number;
+  profitAmount: number;
+  profitPercentage: number;
+  paymentStatus: string;
+  products: Array<{
+    productId: {
+      _id: string;
+      name: string;
+      salesPrice: number;
+      itemNumber: string;
+      categoryId: {
+        _id: string;
+        name: string;
+      };
+      quantity: number;
+      weightUnit: string;
+    };
+    quantity: number;
+    discount: number;
+    _id: string;
+  }>;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
 
 export default function OrderManagement(): React.ReactElement {
   const {

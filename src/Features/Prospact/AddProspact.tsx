@@ -1,211 +1,128 @@
 
 
+
+
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import { useAddCustomerMutation } from "@/redux/api/customers/customersApi";
 import toast from "react-hot-toast";
+import { AddProspectRequest, useAddProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
+import { FollowUpActivity, QuotedListItem } from "@/types";
+import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
+import { useGetInventoryQuery } from "@/redux/api/auth/inventory/inventoryApi";
+
+// Define enums
+const STATUS_OPTIONS = ["new", "contacted", "qualified", "rejected", "converted"] as const;
+type Status = typeof STATUS_OPTIONS[number];
+
+const ACTIVITY_MEDIUM_OPTIONS = ["call", "email", "meeting", "whatsapp"] as const;
+type ActivityMedium = typeof ACTIVITY_MEDIUM_OPTIONS[number];
+
+interface Product {
+  _id: string;
+  itemNumber: string;
+  name: string;
+  packetSize: string;
+  salesPrice: number;
+}
 
 interface FormData {
+  _id?: string;
   storeName: string;
-  storePersonName: string;
   storePhone: string;
-  storePersonPhone: string;
-  storeAuthorizedPersonName: string;
-  storeAuthorizedPersonNumber: string;
   storePersonEmail: string;
-  billingAddress: string;
-  billingCity: string;
-  billingState: string;
-  billingZipcode: string;
+  storePersonName: string;
+  storePersonPhone: string;
+  salesTaxId: string;
   shippingAddress: string;
-  shippingCity: string;
   shippingState: string;
   shippingZipcode: string;
-  salesTaxId: string;
-  termDays: string;
-  acceptDeliveryDays: string[];
-  shippingStatus: string;
+  shippingCity: string;
+  miscellaneousDocImage: string;
+  leadSource: string;
   note: string;
-  sameAsBillingAddress: boolean;
-  bankAchInfo: string;
-  creditApplication: string;
-  ownerLegalFrontImage: string;
-  ownerLegalBackImage: string;
-  voidedCheckImage: string;
-  miscellaneous: string;
-  [key: string]: string | string[] | boolean; // Index signature
-}
-
-interface FilePreviews {
-  creditApplication: string;
-  ownerLegalFrontImage: string;
-  ownerLegalBackImage: string;
-  voidedCheckImage: string;
-  miscellaneous: string;
-}
-
-interface FieldErrors {
-  [key: string]: string;
+  status: Status;
+  assignedSalesPerson: string;
+  followUpActivities: FollowUpActivity[];
+  quotedList: QuotedListItem[];
+  competitorStatement: string;
 }
 
 export default function AddProspact(): React.ReactElement {
   const [formData, setFormData] = useState<FormData>({
-    storeName: "",
-    storePersonName: "",
-    storePhone: "",
-    storePersonPhone: "",
-    storeAuthorizedPersonName: "",
-    storeAuthorizedPersonNumber: "",
-    storePersonEmail: "",
-    billingAddress: "",
-    billingCity: "",
-    billingState: "",
-    billingZipcode: "",
-    shippingAddress: "",
-    shippingCity: "",
-    shippingState: "",
-    shippingZipcode: "",
-    salesTaxId: "",
-    termDays: "30",
-    acceptDeliveryDays: [] as string[],
-    shippingStatus: "SILVER",
-    note: "",
-    sameAsBillingAddress: false,
-    bankAchInfo: "",
-    creditApplication: "",
-    ownerLegalFrontImage: "",
-    ownerLegalBackImage: "",
-    voidedCheckImage: "",
-    miscellaneous: "",
+    _id: "",
+    storeName: "Manual Paper Supplies",
+    storePhone: "555-0198",
+    storePersonEmail: "owner@royalpaper.com",
+    storePersonName: "Alice Johnson",
+    storePersonPhone: "555-0234",
+    salesTaxId: "TX-452198",
+    shippingAddress: "456 Elm Street",
+    shippingState: "Texas",
+    shippingZipcode: "75001",
+    shippingCity: "Dallas",
+    miscellaneousDocImage: "https://i.postimg.cc/fRyv1Djb/doc.png",
+    leadSource: "Trade Show",
+    note: "Interested in premium thermal paper, requests samples before bulk order.",
+    status: "contacted",
+    assignedSalesPerson: "6866f2a31b30a47987705344",
+    followUpActivities: [{ activity: "Follow-up call for samples feedback", activityDate: "2025-07-10", activityMedium: "call" }],
+    quotedList: [
+      {
+        productObjId: "686eea6ac3e14203529ced6c",
+        itemNumber: "PRO-14",
+        itemName: "Premium Thermal Paper Rolls",
+        packSize: "",
+        price: 150,
+        packetSize: "50 rolls",
+      },
+    ],
+    competitorStatement: "Currently buying from PaperWorld at lower price but quality issues reported.",
   });
-  const [filePreviews, setFilePreviews] = useState<FilePreviews>({
-    creditApplication: "",
-    ownerLegalFrontImage: "",
-    ownerLegalBackImage: "",
-    voidedCheckImage: "",
-    miscellaneous: "",
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
+  const [newQuote, setNewQuote] = useState<QuotedListItem>({
+    productObjId: "",
+    itemNumber: "",
+    itemName: "",
+    packSize: "",
+    price: 0,
+    packetSize: "",
   });
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [addCustomer, { isLoading, error }] = useAddCustomerMutation();
+  const [newFollowUp, setNewFollowUp] = useState<FollowUpActivity>({
+    activity: "",
+    activityDate: "",
+    activityMedium: "call",
+  });
+  const { data: inventoryData, isLoading: isInventoryLoading, isError: isInventoryError } = useGetInventoryQuery();
+  const { data: salesUsersResponse, error: salesError, isLoading: isUsersLoading } = useGetSalesUsersQuery();
+  const [addProspect, { isLoading: isSaving }] = useAddProspectMutation();
   const router = useRouter();
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Required fields
-  const requiredFields = [
-    "storeName",
-    "storePersonName",
-    "storePhone",
-    "storePersonPhone",
-    "storeAuthorizedPersonName",
-    "storeAuthorizedPersonNumber",
-    "storePersonEmail",
-    "billingAddress",
-    "billingCity",
-    "billingState",
-    "billingZipcode",
-    "shippingAddress",
-    "shippingCity",
-    "shippingState",
-    "shippingZipcode",
-    "termDays",
-    "acceptDeliveryDays",
-    "shippingStatus",
-    "bankAchInfo",
-    "creditApplication",
-    "ownerLegalFrontImage",
-    "ownerLegalBackImage",
-    "voidedCheckImage",
-  ];
-
-  // Handle input changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
-    }));
-    // Clear error for this field when user starts typing
-    setFieldErrors((prev) => {
-      const newErrors = { ...prev };
-      delete newErrors[name];
-      return newErrors;
-    });
-  };
-
-  // Handle same as billing address checkbox
-  const handleSameAsBillingAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked;
-    setFormData((prev) => ({
-      ...prev,
-      sameAsBillingAddress: isChecked,
-      ...(isChecked && {
-        shippingAddress: prev.billingAddress,
-        shippingCity: prev.billingCity,
-        shippingState: prev.billingState,
-        shippingZipcode: prev.billingZipcode,
-      }),
-    }));
-    // Clear shipping-related errors if checked
-    if (isChecked) {
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.shippingAddress;
-        delete newErrors.shippingCity;
-        delete newErrors.shippingState;
-        delete newErrors.shippingZipcode;
-        return newErrors;
-      });
-    }
-  };
-
-  // Handle acceptDeliveryDays checkbox changes
-  const handleDeliveryDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const day = e.target.value.toLowerCase();
-    const isChecked = e.target.checked;
-    setFormData((prev) => ({
-      ...prev,
-      acceptDeliveryDays: isChecked
-        ? [...prev.acceptDeliveryDays, day]
-        : prev.acceptDeliveryDays.filter((d) => d !== day),
-    }));
-    // Clear error for acceptDeliveryDays if at least one day is selected
-    if (isChecked || formData.acceptDeliveryDays.length > 0) {
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.acceptDeliveryDays;
-        return newErrors;
-      });
-    }
-  };
-
-  // Toggle dropdown visibility
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
-  };
-
-  // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    if (isInventoryError) {
+      console.error("Error fetching inventory:", isInventoryError);
+      toast.error("Failed to load inventory.");
+    }
+  }, [isInventoryError]);
 
-  // Handle file uploads to ImgBB
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+  useEffect(() => {
+    if (salesError) {
+      console.error("Error fetching sales users:", salesError);
+      toast.error("Failed to load sales users.");
+    }
+  }, [salesError]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -213,399 +130,269 @@ export default function AddProspact(): React.ReactElement {
     formDataUpload.append("image", file);
     formDataUpload.append("key", process.env.NEXT_PUBLIC_IMGBB_API_KEY || "YOUR_IMGBB_API_KEY");
 
-    try {
-      const response = await fetch("https://api.imgbb.com/1/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
-      const result = await response.json();
-      if (result.success) {
-        setFormData((prev) => ({
-          ...prev,
-          [field]: result.data.url,
-        }));
-        setFilePreviews((prev) => ({
-          ...prev,
-          [field]: file.type.startsWith("image/") ? result.data.url : file.name,
-        }));
-        // Clear error for this field after successful upload
-        setFieldErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[field];
-          return newErrors;
+    fetch("https://api.imgbb.com/1/upload", {
+      method: "POST",
+      body: formDataUpload,
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        if (result.success) {
+          setFormData((prev) => ({ ...prev, miscellaneousDocImage: result.data.url }));
+        }
+      })
+      .catch(() => {});
+  };
+
+  const handleQuoteInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (name === "productObjId" && inventoryData?.data) {
+      const selectedProduct = inventoryData.data.find((p: Product) => p._id === value);
+      if (selectedProduct) {
+        setNewQuote({
+          productObjId: selectedProduct._id,
+          itemNumber: selectedProduct.itemNumber,
+          itemName: selectedProduct.name,
+          packSize: selectedProduct.packetSize,
+          price: selectedProduct.salesPrice,
+          packetSize: selectedProduct.packetSize || "",
         });
-      } else {
-        setUploadError(result.error?.message || "Failed to upload image");
       }
-    } catch (err) {
-      setUploadError("Error uploading to ImgBB");
     }
   };
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Validate required fields
-    const newErrors: FieldErrors = {};
-    requiredFields.forEach((field) => {
-      if (!formData[field]) {
-        newErrors[field] = "This field is required.";
-      } else if (field === "acceptDeliveryDays" && formData[field].length === 0) {
-        newErrors[field] = "At least one delivery day is required.";
-      } else if (field === "termDays" && (parseInt(formData[field]) <= 0 || !formData[field])) {
-        newErrors[field] = "Valid term days are required.";
-      }
-    });
-    if (Object.keys(newErrors).length > 0) {
-      setFieldErrors(newErrors);
+  const handleFollowUpInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewFollowUp((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const addQuote = () => {
+    if (!newQuote.productObjId || !newQuote.itemNumber || !newQuote.itemName || !newQuote.packSize || !newQuote.price) {
+      toast.error("All required quote fields must be filled.");
       return;
     }
+    setFormData((prev) => ({
+      ...prev,
+      quotedList: [...prev.quotedList, { ...newQuote, packetSize: newQuote.packetSize || "" }],
+    }));
+    setNewQuote({ productObjId: "", itemNumber: "", itemName: "", packSize: "", price: 0, packetSize: "" });
+    setIsQuoteModalOpen(false);
+  };
 
+  const addFollowUp = () => {
+    if (!newFollowUp.activity || !newFollowUp.activityDate || !newFollowUp.activityMedium) {
+      toast.error("All required follow-up fields must be filled.");
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      followUpActivities: [...prev.followUpActivities, { ...newFollowUp }],
+    }));
+    setNewFollowUp({ activity: "", activityDate: "", activityMedium: "call" });
+    setIsFollowUpModalOpen(false);
+  };
+
+  const handleDeleteQuote = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      quotedList: prev.quotedList.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleDeleteFollowUp = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      followUpActivities: prev.followUpActivities.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload: AddProspectRequest = {
+     
+      storeName: formData.storeName,
+      storePhone: formData.storePhone,
+      storePersonEmail: formData.storePersonEmail,
+      storePersonName: formData.storePersonName,
+      storePersonPhone: formData.storePersonPhone,
+      salesTaxId: formData.salesTaxId || undefined,
+      shippingAddress: formData.shippingAddress,
+      shippingState: formData.shippingState,
+      shippingZipcode: formData.shippingZipcode,
+      shippingCity: formData.shippingCity,
+      miscellaneousDocImage: formData.miscellaneousDocImage || undefined,
+      leadSource: formData.leadSource,
+      note: formData.note || undefined,
+      status: formData.status,
+      assignedSalesPerson: formData.assignedSalesPerson || undefined,
+      followUpActivities: formData.followUpActivities,
+      quotedList: formData.quotedList,
+      competitorStatement: formData.competitorStatement,
+    };
+
+    console.log("check local data", payload);
     try {
-      const payload = {
-        storeName: formData.storeName,
-        storePhone: formData.storePhone,
-        storePersonEmail: formData.storePersonEmail,
-        storePersonName: formData.storePersonName,
-        storePersonPhone: formData.storePersonPhone,
-        storeAuthorizedPersonName: formData.storeAuthorizedPersonName,
-        storeAuthorizedPersonNumber: formData.storeAuthorizedPersonNumber,
-        billingAddress: formData.billingAddress,
-        billingCity: formData.billingCity,
-        billingState: formData.billingState,
-        billingZipcode: formData.billingZipcode,
-        shippingAddress: formData.shippingAddress,
-        shippingCity: formData.shippingCity,
-        shippingState: formData.shippingState,
-        shippingZipcode: formData.shippingZipcode,
-        salesTaxId: formData.salesTaxId,
-        acceptedDeliveryDays: formData.acceptDeliveryDays,
-        bankACHAccountInfo: formData.bankAchInfo,
-        creditApplication: formData.creditApplication || undefined,
-        ownerLegalFrontImage: formData.ownerLegalFrontImage || undefined,
-        ownerLegalBackImage: formData.ownerLegalBackImage || undefined,
-        voidedCheckImage: formData.voidedCheckImage || undefined,
-        termDays: formData.termDays ? parseInt(formData.termDays) : undefined,
-        shippingStatus: formData.shippingStatus || undefined,
-        note: formData.note || undefined,
-        miscellaneous: formData.miscellaneous || undefined,
-      };
-
-      await addCustomer(payload).unwrap();
-      console.log("added customer", payload);
-      toast.success("Customer Added successfully");
-      router.push("/dashboard/customers");
-    } catch (err: any) {
-      console.error("Failed to add customer:", err);
-      if (err?.data?.errorSources) {
-        const errors = err.data.errorSources.reduce((acc: FieldErrors, source: any) => {
-          acc[source.path] = source.message;
-          return acc;
-        }, {});
-        setFieldErrors(errors);
-      } else {
-        toast.error("An unexpected error occurred.");
-      }
+      await addProspect(payload).unwrap();
+      toast.success("Prospect Added successfully");
+      router.push("/dashboard/prospact");
+    } catch (err) {
+      console.error("Failed to add prospect:", err);
+      toast.error("An unexpected error occurred.");
     }
   };
 
-  const handleCancel = () => {
-    router.push("/dashboard/prospact");
-  };
+  const handleCancel = () => router.push("/dashboard/prospact");
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Add Prospact Details</h1>
+      <h1 className="text-2xl font-bold mb-6">Add Prospect Details</h1>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <select
+            id="status"
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
+        {/* Store Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="storeName">Store Name *</Label>
+            <Label htmlFor="storeName">Store Name</Label>
             <Input
               id="storeName"
               name="storeName"
               value={formData.storeName}
               onChange={handleInputChange}
-              required
               placeholder="Enter store name"
               className="w-full"
-            />
-            {fieldErrors.storeName && <p className="text-red-500 text-sm">{fieldErrors.storeName}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="storePersonName">Customer Full Name *</Label>
-            <Input
-              id="storePersonName"
-              name="storePersonName"
-              value={formData.storePersonName}
-              onChange={handleInputChange}
               required
-              placeholder="Enter customer full name"
-              className="w-full"
             />
-            {fieldErrors.storePersonName && <p className="text-red-500 text-sm">{fieldErrors.storePersonName}</p>}
           </div>
-        </div>
-
-        {/* Phone Numbers */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="storePhone">Store Phone Number *</Label>
+            <Label htmlFor="storePhone">Store Phone Number</Label>
             <Input
               id="storePhone"
               name="storePhone"
               type="tel"
               value={formData.storePhone}
               onChange={handleInputChange}
-              required
               placeholder="Enter store phone number"
               className="w-full"
             />
-            {fieldErrors.storePhone && <p className="text-red-500 text-sm">{fieldErrors.storePhone}</p>}
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="storePersonPhone">Cell Phone Number *</Label>
+            <Label htmlFor="storePersonName">Customer Full Name</Label>
+            <Input
+              id="storePersonName"
+              name="storePersonName"
+              value={formData.storePersonName}
+              onChange={handleInputChange}
+              placeholder="Enter customer full name"
+              className="w-full"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="storePersonPhone">Cell Phone Number</Label>
             <Input
               id="storePersonPhone"
               name="storePersonPhone"
               type="tel"
               value={formData.storePersonPhone}
               onChange={handleInputChange}
-              required
               placeholder="Enter cell phone number"
               className="w-full"
             />
-            {fieldErrors.storePersonPhone && <p className="text-red-500 text-sm">{fieldErrors.storePersonPhone}</p>}
           </div>
         </div>
 
-        {/* Authorized Person */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="storeAuthorizedPersonName">
-              Store Authorized Person Name (For Order) *
-            </Label>
-            <Input
-              id="storeAuthorizedPersonName"
-              name="storeAuthorizedPersonName"
-              value={formData.storeAuthorizedPersonName}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter authorized person name"
-              className="w-full"
-            />
-            {fieldErrors.storeAuthorizedPersonName && (
-              <p className="text-red-500 text-sm">{fieldErrors.storeAuthorizedPersonName}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="storeAuthorizedPersonNumber">
-              Store Authorized Person Number (For Order) *
-            </Label>
-            <Input
-              id="storeAuthorizedPersonNumber"
-              name="storeAuthorizedPersonNumber"
-              type="tel"
-              value={formData.storeAuthorizedPersonNumber}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter authorized person number"
-              className="w-full"
-            />
-            {fieldErrors.storeAuthorizedPersonNumber && (
-              <p className="text-red-500 text-sm">{fieldErrors.storeAuthorizedPersonNumber}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Email Address */}
         <div className="space-y-2">
-          <Label htmlFor="storePersonEmail">Email Address *</Label>
+          <Label htmlFor="storePersonEmail">Email Address</Label>
           <Input
             id="storePersonEmail"
             name="storePersonEmail"
             type="email"
             value={formData.storePersonEmail}
             onChange={handleInputChange}
-            required
             placeholder="Enter email address"
             className="w-full"
           />
-          {fieldErrors.storePersonEmail && <p className="text-red-500 text-sm">{fieldErrors.storePersonEmail}</p>}
         </div>
 
-        {/* Billing Address */}
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="billingAddress">Billing Address *</Label>
-            <textarea
-              id="billingAddress"
-              name="billingAddress"
-              value={formData.billingAddress}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter billing address"
-              rows={3}
-              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-            />
-            {fieldErrors.billingAddress && <p className="text-red-500 text-sm">{fieldErrors.billingAddress}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="billingCity">Billing City *</Label>
-              <Input
-                id="billingCity"
-                name="billingCity"
-                value={formData.billingCity}
-                onChange={handleInputChange}
-                required
-                placeholder="Enter billing city"
-                className="w-full"
-              />
-              {fieldErrors.billingCity && <p className="text-red-500 text-sm">{fieldErrors.billingCity}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="billingState">Billing State *</Label>
-              <select
-                id="billingState"
-                name="billingState"
-                value={formData.billingState}
-                onChange={handleInputChange}
-                required
-                
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Select State</option>
-                <option value="AL">Alabama</option>
-                <option value="AK">Alaska</option>
-                <option value="AZ">Arizona</option>
-                <option value="AR">Arkansas</option>
-                <option value="CA">California</option>
-                <option value="CO">Colorado</option>
-                <option value="CT">Connecticut</option>
-                <option value="DE">Delaware</option>
-                <option value="FL">Florida</option>
-                <option value="GA">Georgia</option>
-                {/* Add more states as needed */}
-              </select>
-              {fieldErrors.billingState && <p className="text-red-500 text-sm">{fieldErrors.billingState}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="billingZipcode">Billing Zipcode *</Label>
-              <Input
-                id="billingZipcode"
-                name="billingZipcode"
-                value={formData.billingZipcode}
-                onChange={handleInputChange}
-                required
-                placeholder="Enter billing zipcode"
-                className="w-full"
-              />
-              {fieldErrors.billingZipcode && <p className="text-red-500 text-sm">{fieldErrors.billingZipcode}</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Same as Billing Address Checkbox */}
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="sameAsBillingAddress"
-            name="sameAsBillingAddress"
-            checked={formData.sameAsBillingAddress}
-            onChange={handleSameAsBillingAddress}
-            className="h-4 w-4 rounded border-gray-300"
+        <div className="space-y-2">
+          <Label htmlFor="salesTaxId">Sales Tax ID</Label>
+          <Input
+            id="salesTaxId"
+            name="salesTaxId"
+            value={formData.salesTaxId}
+            onChange={handleInputChange}
+            placeholder="Enter sales tax ID"
+            className="w-full"
           />
-          <Label
-            htmlFor="sameAsBillingAddress"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Same as Billing Address
-          </Label>
         </div>
 
-        {/* Shipping Address */}
+        {/* Shipping Information */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="shippingAddress">Shipping Address *</Label>
+            <Label htmlFor="shippingAddress">Shipping Address</Label>
             <textarea
               id="shippingAddress"
               name="shippingAddress"
               value={formData.shippingAddress}
               onChange={handleInputChange}
-              required
               placeholder="Enter shipping address"
               rows={3}
-              disabled={formData.sameAsBillingAddress}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             />
-            {fieldErrors.shippingAddress && <p className="text-red-500 text-sm">{fieldErrors.shippingAddress}</p>}
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="shippingCity">Shipping City *</Label>
+              <Label htmlFor="shippingCity">Shipping City</Label>
               <Input
                 id="shippingCity"
                 name="shippingCity"
                 value={formData.shippingCity}
                 onChange={handleInputChange}
-                required
                 placeholder="Enter shipping city"
-                disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
-              {fieldErrors.shippingCity && <p className="text-red-500 text-sm">{fieldErrors.shippingCity}</p>}
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="shippingState">Shipping State *</Label>
-              <select
+              <Label htmlFor="shippingState">Shipping State</Label>
+              <Input
                 id="shippingState"
                 name="shippingState"
                 value={formData.shippingState}
                 onChange={handleInputChange}
-                required
-                
-                disabled={formData.sameAsBillingAddress}
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Select State</option>
-                <option value="AL">Alabama</option>
-                <option value="AK">Alaska</option>
-                <option value="AZ">Arizona</option>
-                <option value="AR">Arkansas</option>
-                <option value="CA">California</option>
-                <option value="CO">Colorado</option>
-                <option value="CT">Connecticut</option>
-                <option value="DE">Delaware</option>
-                <option value="FL">Florida</option>
-                <option value="GA">Georgia</option>
-                {/* Add more states as needed */}
-              </select>
-              {fieldErrors.shippingState && <p className="text-red-500 text-sm">{fieldErrors.shippingState}</p>}
+                placeholder="Enter shipping state"
+                className="w-full"
+              />
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="shippingZipcode">Shipping Zipcode *</Label>
+              <Label htmlFor="shippingZipcode">Shipping Zipcode</Label>
               <Input
                 id="shippingZipcode"
                 name="shippingZipcode"
                 value={formData.shippingZipcode}
                 onChange={handleInputChange}
-                required
                 placeholder="Enter shipping zipcode"
-                disabled={formData.sameAsBillingAddress}
                 className="w-full"
               />
-              {fieldErrors.shippingZipcode && <p className="text-red-500 text-sm">{fieldErrors.shippingZipcode}</p>}
             </div>
           </div>
         </div>
@@ -613,99 +400,60 @@ export default function AddProspact(): React.ReactElement {
         {/* Additional Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="salesTaxId">Sales Tax ID</Label>
-            <Input
-              id="salesTaxId"
-              name="salesTaxId"
-              value={formData.salesTaxId}
-              onChange={handleInputChange}
-              placeholder="Enter sales tax ID"
-              className="w-full"
-            />
-            {fieldErrors.salesTaxId && <p className="text-red-500 text-sm">{fieldErrors.salesTaxId}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="termDays">Term Days *</Label>
-            <Input
-              id="termDays"
-              name="termDays"
-              type="number"
-              value={formData.termDays}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter term days"
-              className="w-full"
-            />
-            {fieldErrors.termDays && <p className="text-red-500 text-sm">{fieldErrors.termDays}</p>}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="acceptDeliveryDays">Accept Delivery Days *</Label>
-            <div className="relative" ref={dropdownRef}>
-              <div
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors cursor-pointer hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                onClick={toggleDropdown}
-              >
-                {formData.acceptDeliveryDays.length > 0
-                  ? formData.acceptDeliveryDays
-                      .map((day) => day.charAt(0).toUpperCase() + day.slice(1))
-                      .join(", ")
-                  : "Select days"}
-              </div>
-              {isDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-md p-2">
-                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map(
-                    (day) => (
-                      <div key={day} className="flex items-center space-x-2 py-1">
-                        <input
-                          type="checkbox"
-                          id={`acceptDeliveryDays-${day}`}
-                          name="acceptDeliveryDays"
-                          value={day}
-                          checked={formData.acceptDeliveryDays.includes(day.toLowerCase())}
-                          onChange={handleDeliveryDaysChange}
-                          className="h-4 w-4 rounded border-gray-300"
-                        />
-                        <Label
-                          htmlFor={`acceptDeliveryDays-${day}`}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          {day}
-                        </Label>
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-            </div>
-            {fieldErrors.acceptDeliveryDays && (
-              <p className="text-red-500 text-sm">{fieldErrors.acceptDeliveryDays}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="shippingStatus">Shipping Status *</Label>
-            <select
-              id="shippingStatus"
-              name="shippingStatus"
-              value={formData.shippingStatus}
-              onChange={handleInputChange}
-              required
-              
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            <Label htmlFor="miscellaneousDocImage">Miscellaneous Doc Image</Label>
+            <label
+              htmlFor="miscellaneousDocImage"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2 w-full"
             >
-              <option value="SILVER">SILVER</option>
-              <option value="GOLD">GOLD</option>
-              <option value="PLATINUM">PLATINUM</option>
-            </select>
-            {fieldErrors.shippingStatus && <p className="text-red-500 text-sm">{fieldErrors.shippingStatus}</p>}
+              {formData.miscellaneousDocImage ? (
+                <img
+                  src={formData.miscellaneousDocImage}
+                  alt="Doc Preview"
+                  className="w-32 h-32 object-cover rounded"
+                />
+              ) : (
+                <>
+                  <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                      />
+                    </svg>
+                  </div>
+                  <span className="text-sm text-gray-500">Click to upload</span>
+                </>
+              )}
+              <input
+                type="file"
+                id="miscellaneousDocImage"
+                name="miscellaneousDocImage"
+                accept="image/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+            </label>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="leadSource">Lead Source</Label>
+            <Input
+              id="leadSource"
+              name="leadSource"
+              value={formData.leadSource}
+              onChange={handleInputChange}
+              placeholder="Enter lead source"
+              className="w-full"
+            />
           </div>
         </div>
 
-        {/* Note */}
         <div className="space-y-2">
           <Label htmlFor="note">Note</Label>
           <textarea
@@ -717,107 +465,290 @@ export default function AddProspact(): React.ReactElement {
             rows={3}
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-          {fieldErrors.note && <p className="text-red-500 text-sm">{fieldErrors.note}</p>}
         </div>
 
-        <Separator />
-
-        {/* Bank ACH Account Information */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Bank ACH Account Information *</h3>
+          <Label htmlFor="competitorStatement">Competitor Statement</Label>
           <textarea
-            id="bankAchInfo"
-            name="bankAchInfo"
-            value={formData.bankAchInfo}
+            id="competitorStatement"
+            name="competitorStatement"
+            value={formData.competitorStatement}
             onChange={handleInputChange}
-            placeholder="Enter bank ACH account information"
-            rows={5}
-            required
+            placeholder="Enter competitor statement"
+            rows={3}
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            required
           />
-          {fieldErrors.bankAchInfo && <p className="text-red-500 text-sm">{fieldErrors.bankAchInfo}</p>}
         </div>
 
-        {/* File Uploads */}
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            
+        <div className="space-y-2">
+          <Label htmlFor="assignedSalesPerson">Assigned Sales Person ID</Label>
+          <select
+            id="assignedSalesPerson"
+            name="assignedSalesPerson"
+            value={formData.assignedSalesPerson}
+            onChange={handleInputChange}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isUsersLoading}
+          >
+            <option value="">Select Sales Person</option>
+            {salesUsersResponse?.data
+              ?.filter((user) => user.role === "salesUser")
+              .map((user) => (
+                <option key={user._id} value={user._id}>
+                  {user.email} ({user._id})
+                </option>
+              ))}
+          </select>
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="miscellaneous">Additional Doc</Label>
-              <label
-                htmlFor="miscellaneous"
-                className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-gray-400 transition-colors cursor-pointer flex flex-col items-center justify-center space-y-2"
-              >
-                {filePreviews.miscellaneous ? (
-                  filePreviews.miscellaneous.startsWith("http") ? (
-                    <img
-                      src={filePreviews.miscellaneous}
-                      alt="Miscellaneous Preview"
-                      className="w-16 h-16 object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-500 truncate max-w-full">
-                      {filePreviews.miscellaneous}
-                    </span>
-                  )
-                ) : (
-                  <>
-                    <div className="w-8 h-8 bg-gray-100 rounded flex items-center justify-center">
-                      <svg
-                        className="w-4 h-4 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+        <div className="flex space-x-4">
+          <Button type="button" onClick={() => setIsQuoteModalOpen(true)} className="bg-blue-600 text-white">
+            Quote Info
+          </Button>
+          <Button type="button" onClick={() => setIsFollowUpModalOpen(true)} className="bg-green-600 text-white">
+            Follow Up
+          </Button>
+        </div>
+
+        {/* Quoted List Table */}
+        {formData.quotedList.length > 0 && (
+          <div className="overflow-x-auto">
+            <Label>Quoted Items</Label>
+            <table className="w-full text-sm text-left text-gray-500 mt-2">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2">Product ID</th>
+                  <th className="px-4 py-2">Item #</th>
+                  <th className="px-4 py-2">Item Name</th>
+                  <th className="px-4 py-2">Pack Size</th>
+                  <th className="px-4 py-2">Price ($)</th>
+                  <th className="px-4 py-2">Packet Size</th>
+                  <th className="px-4 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {formData.quotedList.map((item, index) => (
+                  <tr key={index} className="bg-white border-b">
+                    <td className="px-4 py-2">{item.productObjId}</td>
+                    <td className="px-4 py-2">{item.itemNumber}</td>
+                    <td className="px-4 py-2">{item.itemName}</td>
+                    <td className="px-4 py-2">{item.packSize}</td>
+                    <td className="px-4 py-2">${item.price}</td>
+                    <td className="px-4 py-2">{item.packetSize || "N/A"}</td>
+                    <td className="px-4 py-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteQuote(index)}
+                        className="text-white"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm text-gray-500">Click to upload</span>
-                  </>
-                )}
-                <input
-                  type="file"
-                  id="miscellaneous"
-                  name="miscellaneous"
-                  accept="image/*,.pdf"
-                  onChange={(e) => handleFileUpload(e, "miscellaneous")}
-                  className="hidden"
-                />
-              </label>
-              {fieldErrors.miscellaneous && <p className="text-red-500 text-sm">{fieldErrors.miscellaneous}</p>}
-            </div>
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        )}
 
-        {/* Upload Error */}
-        {uploadError && <p className="text-red-500 text-sm">{uploadError}</p>}
+        {/* Follow Up Activities Table */}
+        {formData.followUpActivities.length > 0 && (
+          <div className="overflow-x-auto">
+            <Label>Follow Up Activities</Label>
+            <table className="w-full text-sm text-left text-gray-500 mt-2">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2">Activity</th>
+                  <th className="px-4 py-2">Date</th>
+                  <th className="px-4 py-2">Medium</th>
+                  <th className="px-4 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {formData.followUpActivities.map((activity, index) => (
+                  <tr key={index} className="bg-white border-b">
+                    <td className="px-4 py-2">{activity.activity}</td>
+                    <td className="px-4 py-2">{activity.activityDate}</td>
+                    <td className="px-4 py-2">{activity.activityMedium}</td>
+                    <td className="px-4 py-2">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteFollowUp(index)}
+                        className="text-white"
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
-        {/* Action Buttons */}
-        <div className="flex justify-end   space-x-4 pt-6">
+        <div className="flex justify-end space-x-4 pt-6">
           <Button
             type="button"
             variant="outline"
             onClick={handleCancel}
-            className="px-6 py-2 cursor-pointer text-white hover:text-white bg-gray-500 hover:bg-gray-600 "
-            disabled={isLoading}
+            className="px-6 py-2 cursor-pointer text-white hover:text-white bg-gray-500 hover:bg-gray-600"
+            disabled={isSaving}
           >
             Cancel
           </Button>
           <Button
             type="submit"
             className="px-6 py-2 bg-red-600 hover:bg-red-700 cursor-pointer text-white"
-            disabled={isLoading || formData.acceptDeliveryDays.length === 0}
+            disabled={isSaving}
           >
-            {isLoading ? "Saving..." : "Save"}
+            {isSaving ? "Saving..." : "Save"}
           </Button>
         </div>
       </form>
+
+      {isQuoteModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Add Quote Info</h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="productObjId">Product ID</Label>
+                <select
+                  id="productObjId"
+                  name="productObjId"
+                  value={newQuote.productObjId}
+                  onChange={handleQuoteInputChange}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={isInventoryLoading}
+                >
+                  <option value="">Select Product</option>
+                  {inventoryData?.data?.map((product: Product) => (
+                    <option key={product._id} value={product._id}>
+                      {product.name} ({product._id})
+                    </option>
+                  )) || <option disabled>No products available</option>}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="itemNumber">Item Number</Label>
+                <Input
+                  id="itemNumber"
+                  name="itemNumber"
+                  value={newQuote.itemNumber}
+                  onChange={handleQuoteInputChange}
+                  placeholder="Item Number"
+                  className="w-full"
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="itemName">Item Name</Label>
+                <Input
+                  id="itemName"
+                  name="itemName"
+                  value={newQuote.itemName}
+                  onChange={handleQuoteInputChange}
+                  placeholder="Item Name"
+                  className="w-full"
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="packSize">Pack Size</Label>
+                <Input
+                  id="packSize"
+                  name="packSize"
+                  value={newQuote.packSize}
+                  onChange={handleQuoteInputChange}
+                  placeholder="Pack Size"
+                  className="w-full"
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Price ($)</Label>
+                <Input
+                  id="price"
+                  name="price"
+                  type="number"
+                  value={newQuote.price}
+                  onChange={handleQuoteInputChange}
+                  placeholder="Price"
+                  className="w-full"
+                  disabled
+                />
+              </div>
+            </div>
+            <div className="flex justify-end space-x-4 mt-4">
+              <Button type="button" onClick={() => setIsQuoteModalOpen(false)} variant="outline">
+                Cancel
+              </Button>
+              <Button type="button" onClick={addQuote} className="bg-blue-600 text-white">
+                Add Quote
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isFollowUpModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Add Follow Up</h2>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="activity">Activity</Label>
+                <Input
+                  id="activity"
+                  name="activity"
+                  value={newFollowUp.activity}
+                  onChange={handleFollowUpInputChange}
+                  placeholder="Enter activity"
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="activityDate">Date</Label>
+                <Input
+                  id="activityDate"
+                  name="activityDate"
+                  type="date"
+                  value={newFollowUp.activityDate}
+                  onChange={handleFollowUpInputChange}
+                  className="w-full"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="activityMedium">Medium</Label>
+                <select
+                  id="activityMedium"
+                  name="activityMedium"
+                  value={newFollowUp.activityMedium}
+                  onChange={handleFollowUpInputChange}
+                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {ACTIVITY_MEDIUM_OPTIONS.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-4 mt-4">
+              <Button type="button" onClick={() => setIsFollowUpModalOpen(false)} variant="outline">
+                Cancel
+              </Button>
+              <Button type="button" onClick={addFollowUp} className="bg-green-600 text-white">
+                Add Follow Up
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

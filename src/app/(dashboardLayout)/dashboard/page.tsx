@@ -1,7 +1,6 @@
 
 
 
-
 "use client";
 
 import {
@@ -16,8 +15,9 @@ import { Separator } from "@/components/ui/separator";
 import { FaArrowRightFromBracket } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Cookies from "js-cookie";
-import { jwtDecode } from "jwt-decode"; // Import jwt-decode
+import Cookies from "js-cookie"; // Explicit import
+import { jwtDecode } from "jwt-decode";
+import { Button } from "@/components/ui/button";
 
 interface DecodedToken {
   email: string;
@@ -50,6 +50,9 @@ export default function AppSidebar() {
     Cookies.remove("role");
     window.location.href = "/"; // Redirect to login
   };
+
+  // Logic to hide button if role is "salesuser"
+  const shouldHideButton = role === "salesuser";
 
   return (
     <Sidebar>
@@ -253,6 +256,13 @@ export default function AppSidebar() {
                 <FaArrowRightFromBracket className="text-gray-500" />
               </span>
             </div>
+            {!shouldHideButton && (
+              <Link href="/signup">
+                <Button className="bg-green-600 hover:bg-green-700 text-white w-full mb-2">
+                  Create User
+                </Button>
+              </Link>
+            )}
           </SidebarMenu>
         </div>
       </SidebarContent>

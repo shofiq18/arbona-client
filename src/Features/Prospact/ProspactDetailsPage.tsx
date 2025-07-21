@@ -51,7 +51,7 @@ const [converProspect]=useConvertProspectMutation()
 
   
   const converProspacts=async(id:string)=>{
-    console.log(id)
+    console.log("convert api",id)
  try {
       await converProspect(id)
       toast.success("Prospact Convert successfully");

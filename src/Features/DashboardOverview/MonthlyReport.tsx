@@ -107,7 +107,7 @@ const MonthlyReport: React.FC = () => {
         </div>
       </div>
 
-      <div className="col-span-3 h-40 xl:h-44 2xl:h-52">
+      <div className="col-span-3 h-40 xl:h-124 2xl:h-110">
         <Line data={chartData} options={chartOptions} />
       </div>
     </div>

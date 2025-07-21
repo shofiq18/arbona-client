@@ -242,7 +242,10 @@ const prospectApi = baseApi.injectEndpoints({
         headers: {
           Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
         },
+       providesTags: ["PROSPECT"],
+       
       }),
+      
     }),
     addProspect: builder.mutation<Prospect, AddProspectRequest>({
       query: (body) => ({
@@ -252,10 +255,23 @@ const prospectApi = baseApi.injectEndpoints({
         headers: {
           Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
         },
+        invalidatesTags: ["PROSPECT"],
       }),
     }),
+    convertProspect: builder.mutation<Prospect, string>({
+      query: (id) => ({
+        url:`/prospect/${id}/make-customer`,
+        method: "POST",
+        
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
+        },
+        invalidatesTags: ["PROSPECT"],
+      }),
+    }),
+   
   }),
 });
 
-export const { useGetProspectsQuery, useAddProspectMutation } = prospectApi;
+export const { useGetProspectsQuery, useAddProspectMutation ,useConvertProspectMutation} = prospectApi;
 export default prospectApi;

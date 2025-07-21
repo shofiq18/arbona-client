@@ -6,11 +6,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import { useGetProspectsQuery } from "@/redux/api/auth/prospact/prospactApi";
+import { useConvertProspectMutation, useGetProspectsQuery } from "@/redux/api/auth/prospact/prospactApi";
 import { Prospect } from "@/types";
 import Loading from "@/redux/Shared/Loading";
 import { toast } from "react-toastify";
-import { useConvertProspectMutation, useDeleteProspectMutation } from "@/redux/api/prospact/prospact.Api";
+
 
 export default function ProspectDetails() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -21,7 +21,7 @@ export default function ProspectDetails() {
   const itemsPerPage = 10;
   const router = useRouter();
 const [converProspect]=useConvertProspectMutation()
-const [deleteProspect]=useDeleteProspectMutation()
+
 
   // Fetch prospects from API
   const { data: prospectsResponse, error, isLoading , refetch } = useGetProspectsQuery(undefined);
@@ -49,21 +49,11 @@ const [deleteProspect]=useDeleteProspectMutation()
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
 
 
-  const deleteProspacts=async(id:string)=>{
-    console.log(id)
- try {
-      await deleteProspect(id).unwrap();
-      toast.success("Prospact deleted successfully");
-     
-    } catch (err) {
-      toast.error("Failed to delete prospact");
-      console.error("Delete error:", err);
-    }
-  }
+  
   const converProspacts=async(id:string)=>{
     console.log(id)
  try {
-      await converProspect(id).unwrap();
+      await converProspect(id)
       toast.success("Prospact Convert successfully");
      
     } catch (err) {
@@ -192,7 +182,7 @@ const [deleteProspect]=useDeleteProspectMutation()
                   </td>
                   <td className="p-3">
                     <button className="text-blue-500 mr-2 hover:text-blue-700">✎</button>
-                    <button onClick={()=>deleteProspacts(prospect._id)} className="text-red-500 hover:text-red-700">🗑</button>
+                    <button  className="text-red-500 hover:text-red-700">🗑</button>
                   </td>
                 </tr>
               ))}

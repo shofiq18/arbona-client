@@ -3,6 +3,7 @@ import AddOrderPage from "@/components/AddOrderForm";
 import { OrderFilterForm } from "@/components/OrderFilterForm";
 import { ReusableModal } from "@/components/ReusableModal";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { useGetOrdersQuery } from "@/redux/api/order/orderManagementApi";
 import { FilterFormValues, Order } from "@/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ImFilePdf } from "react-icons/im";
 
 export default function OrderManagement(): React.ReactElement {
@@ -64,6 +65,35 @@ const handleDownload = async () => {
      console.log(err)
     } 
   };
+// const handleDownloadDilverySlip = async () => {
+   
+
+//     try {
+//       // Fetch the PDF as a binary response (arrayBuffer)
+//       const response = await fetch( `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${}`);
+
+//       if (!response.ok) {
+//         throw new Error('Failed to fetch PDF');
+//       }
+
+//       // Read the binary data as an ArrayBuffer
+//       const data = await response.arrayBuffer();
+
+//       // Create a Blob from the ArrayBuffer (this represents a PDF)
+//       const blob = new Blob([data], { type: 'application/pdf' });
+
+//       // Create a temporary link to trigger the download
+//       const link = document.createElement('a');
+//       link.href = URL.createObjectURL(blob);
+//       link.download = 'order_details.pdf'; // Default file name
+//       link.click(); // Trigger the download
+
+//       // Clean up the URL object
+//       URL.revokeObjectURL(link.href);
+//     } catch (err) {
+//      console.log(err)
+//     } 
+//   };
   // function handleAddOrderSubmit(values: AddOrderFormValues) {
   //   // Implement your add order logic here (API call, state update, etc.)
   //   console.log("Add Order:", values);
@@ -191,6 +221,16 @@ const handleDownload = async () => {
           >
             <AddOrderPage />
           </ReusableModal>
+          {/* <DropdownMenu>
+  <DropdownMenuTrigger>  <ImFilePdf className="w-5 h-5 text-black" /></DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuSeparator/>
+    <DropdownMenuItem>Invoice</DropdownMenuItem>
+    <DropdownMenuItem>delivery slip</DropdownMenuItem>
+ 
+  </DropdownMenuContent>
+</DropdownMenu> */}
+          
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>

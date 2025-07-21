@@ -1,63 +1,82 @@
-
-
 "use client";
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import Image from "next/image";
-import { useConvertProspectMutation, useDeleteProspectMutation, useGetProspectsQuery, useUpdateProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
-import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi"; // Assuming this exists
-import { Prospect } from "@/types";
+import Image from "next/image"; // Image is imported but not used. Consider removing if not needed.
+import {
+  useConvertProspectMutation,
+  useDeleteProspectMutation,
+  useGetProspectsQuery,
+  useUpdateProspectMutation,
+} from "@/redux/api/auth/prospact/prospactApi";
+import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
+import { Prospect } from "@/types"; // Make sure your Prospect type matches your API response
 import Loading from "@/redux/Shared/Loading";
 import toast from "react-hot-toast";
 
+// It's generally better to handle token in baseApi.ts
+// or use an interceptor if you use it in many places.
+// For this component, it's fine as long as you have 'use client'.
 const getTokenFromCookie = () => {
   const cookies = document.cookie.split('; ');
   const tokenCookie = cookies.find(cookie => cookie.startsWith('token='));
   const token = tokenCookie ? tokenCookie.split('=')[1] : '';
-  if (!token) alert("No token found in cookies. Please log in.");
+  if (!token) {
+    // In a real app, you might redirect to login or show a more graceful error
+    console.warn("No token found in cookies. Please log in.");
+    // alert("No token found in cookies. Please log in."); // Avoid alert in production components
+  }
   return token;
 };
+
 
 export default function ProspectDetails() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
   const [modalContent, setModalContent] = useState<{ title: string; data: string } | null>(null);
+
   const [newSalespersonId, setNewSalespersonId] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
-const [converProspect]=useConvertProspectMutation()
 
+  // Uncomment this if you intend to use the convert mutation
+  const [convertProspect] = useConvertProspectMutation();
+
+
+  // Fetch all salespeople
+  const {
+    data: salesUsersResponse,
+    isLoading: isSalesUsersLoading,
+    error: salesUsersError,
+  } = useGetSalesUsersQuery(undefined);
 
   // Fetch prospects with RTK Query
   const { data: prospectsResponse, error, isLoading, refetch } = useGetProspectsQuery(undefined, {
     refetchOnMountOrArgChange: true, // Ensures data is fresh on mount or arg change
   });
 
-  // Fetch all salespeople
-  const { data: salesUsersResponse, isLoading: isSalesUsersLoading, error: salesUsersError } =
-    useGetSalesUsersQuery(undefined);
-
   // Update and delete prospect mutations
   const [updateProspect, { isLoading: isUpdating }] = useUpdateProspectMutation();
   const [deleteProspect, { isLoading: isDeleting }] = useDeleteProspectMutation();
 
-  // Handle loading and error states
+  // Handle loading and error states for main data
   if (isLoading) return <div className="min-h-screen p-4 text-center"><Loading/></div>;
   if (error) return <div className="min-h-screen p-4 text-center">Error loading prospects</div>;
 
-  const prospects = prospectsResponse?.data || [];
+  const prospects = prospectsResponse?.data || []; // Ensure prospects is always an array
 
-  console.log("qoateddata", prospects);
+  console.log("qoateddata", prospects); // Typo here: "qoateddata" should be "quotedData"
 
   // Filter prospects based on search term
-  const filteredProspects = prospects.filter((prospect) =>
-    prospect.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prospect.storePersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    prospect.assignedSalesPerson.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProspects = prospects.filter(
+    (prospect) =>
+      prospect.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prospect.storePersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      prospect.assignedSalesPerson.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
@@ -66,19 +85,20 @@ const [converProspect]=useConvertProspectMutation()
   const endIndex = startIndex + itemsPerPage;
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
 
-
-  
-  const converProspacts=async(id:string)=>{
-    console.log("convert api",id)
- try {
-      await converProspect(id)
-      toast.success("Prospact Convert successfully");
-     
+  // Function to handle prospect conversion
+  const handleConvertProspect = async (id: string) => {
+    console.log("convert api", id);
+    try {
+      await convertProspect(id).unwrap(); // Use unwrap() to get the actual data or throw error
+      toast.success("Prospect converted successfully!");
+      refetch(); // Refetch prospects to update the list
     } catch (err) {
-      toast.error("Failed to convert prospact");
-      console.error("convert error:", err);
+      toast.error("Failed to convert prospect");
+      console.error("Convert error:", err);
+      // You might want to display a more specific error message based on 'err'
     }
-  }
+  };
+
   const openModal = (prospect: Prospect, title: string, data: string) => {
     setSelectedProspect(prospect);
     setModalContent({ title, data });
@@ -97,15 +117,10 @@ const [converProspect]=useConvertProspectMutation()
     setIsUpdateModalOpen(true);
   };
 
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedProspect(null);
-    setNewSalespersonId("");
-  };
-
+  // Correct and unique definition of handleUpdateProspect
   const handleUpdateProspect = async () => {
     if (!selectedProspect || !selectedProspect._id || !newSalespersonId) {
-      alert("Invalid prospect or salesperson ID.");
+      toast.error("Invalid prospect or salesperson ID."); // Use toast for user feedback
       return;
     }
 
@@ -116,10 +131,10 @@ const [converProspect]=useConvertProspectMutation()
       await refetch(); // Wait for refetch to complete
       closeUpdateModal();
       toast.success("Prospect Salesperson updated successfully!");
-    } catch (err) {
+    } catch (err: any) { // Type 'err' as 'any' or more specific type if known
       console.error("Failed to update prospect:", err);
-      const errorMessage = err || "Unknown error";
-      alert(`Error updating prospect: ${errorMessage}. Check console for details.`);
+      const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
+      toast.error(`Error updating prospect: ${errorMessage}`);
     }
   };
 
@@ -132,11 +147,17 @@ const [converProspect]=useConvertProspectMutation()
       await deleteProspect(prospectId).unwrap();
       await refetch(); // Wait for refetch to complete
       toast.success("Prospect deleted successfully!");
-    } catch (err) {
+    } catch (err: any) { // Type 'err' as 'any' or more specific type if known
       console.error("Failed to delete prospect:", err);
-      const errorMessage = err || "Unknown error";
-      alert(`Error deleting prospect: ${errorMessage}. Check console for details.`);
+      const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
+      toast.error(`Error deleting prospect: ${errorMessage}`);
     }
+  };
+
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedProspect(null);
+    setNewSalespersonId("");
   };
 
   const handleUpdateRedirect = (prospectId: string) => {
@@ -146,7 +167,9 @@ const [converProspect]=useConvertProspectMutation()
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">Prospect Details</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">
+          Prospect Details
+        </h2>
         <div>
           <div className="flex justify-between my-8 sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
@@ -246,7 +269,8 @@ const [converProspect]=useConvertProspectMutation()
                     )}
                   </td>
                   <td className="p-3">
-                    <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
+                    {/* Convert button - uncommented and linked to handleConvertProspect */}
+                    <button onClick={() => handleConvertProspect(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
                   </td>
                   <td className="p-3 flex space-x-6 items-center">
                     <button
@@ -310,7 +334,9 @@ const [converProspect]=useConvertProspectMutation()
             <select
               value={itemsPerPage}
               onChange={(e) => {
-                setCurrentPage(1);
+                // If you uncommented this part and want to use itemsPerPage for actual pagination size
+                // setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Reset to first page when items per page changes
               }}
               className="p-1 border border-gray-300 rounded"
             >
@@ -321,6 +347,7 @@ const [converProspect]=useConvertProspectMutation()
           </div>
         </div>
 
+        {/* Modal for Quote Status / Competitor Statement / Notes */}
         {isModalOpen && modalContent && selectedProspect && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-md">
@@ -338,6 +365,7 @@ const [converProspect]=useConvertProspectMutation()
           </div>
         )}
 
+        {/* Modal for Update Salesperson - Rendered ONLY ONCE */}
         {isUpdateModalOpen && selectedProspect && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
@@ -345,8 +373,9 @@ const [converProspect]=useConvertProspectMutation()
               <div className="space-y-4">
                 <p>Current Salesperson ID: {selectedProspect.assignedSalesPerson._id}</p>
                 <div className="flex space-x-4">
-                  <label className="block text-sm font-medium text-gray-700">New Salesperson:</label>
+                  <label htmlFor="newSalesperson" className="block text-sm font-medium text-gray-700">New Salesperson:</label>
                   <select
+                    id="newSalesperson" // Added ID for accessibility
                     value={newSalespersonId}
                     onChange={(e) => setNewSalespersonId(e.target.value)}
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -357,13 +386,17 @@ const [converProspect]=useConvertProspectMutation()
                     ) : isSalesUsersLoading ? (
                       <option disabled>Loading...</option>
                     ) : (
-                      salesUsersResponse?.data
-                        ?.filter((user) => user.role === "salesUser")
-                        .map((user) => (
-                          <option key={user._id} value={user._id}>
-                            {user.email} ({user._id})
-                          </option>
-                        ))
+                      // Add a default "Select Salesperson" option
+                      <>
+                        <option value="">Select a Salesperson</option>
+                        {(salesUsersResponse?.data || [])
+                          .filter((user) => user.role === "salesUser")
+                          .map((user) => (
+                            <option key={user._id} value={user._id}>
+                              {user.email} ({user._id})
+                            </option>
+                          ))}
+                      </>
                     )}
                   </select>
                 </div>

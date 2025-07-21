@@ -1,16 +1,39 @@
-
-
-
 export interface Order {
   _id: string;
-  date: string; // e.g., "2025-07-05"
+  date: string;
   invoiceNumber: string;
   PONumber: string;
-  storeId: string;
+  storeId: {
+    _id: string;
+    storeName: string;
+    storePhone: string;
+    storePersonEmail: string;
+    salesTaxId: string;
+    acceptedDeliveryDays: string[];
+    bankACHAccountInfo: string;
+    storePersonName: string;
+    storePersonPhone: string;
+    billingAddress: string;
+    billingState: string;
+    billingZipcode: string;
+    billingCity: string;
+    shippingAddress: string;
+    shippingState: string;
+    shippingZipcode: string;
+    shippingCity: string;
+    shippingCharge: string;
+    creditApplication: string;
+    ownerLegalFrontImage: string;
+    ownerLegalBackImage: string;
+    voidedCheckImage: string;
+    isDeleted: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+  };
   paymentDueDate: string;
   orderAmount: number;
   orderStatus: string;
-  isDeleted: boolean;
   paymentAmountReceived: number;
   discountGiven: number;
   openBalance: number;
@@ -18,63 +41,84 @@ export interface Order {
   profitPercentage: number;
   paymentStatus: string;
   products: Array<{
-    productId: {
-      packageDimensions?: {
-        length: number;
-        width: number;
-        height: number;
-        unit: string;
-      };
-      _id: string;
-      name: string;
-      packetQuantity: number;
-      packingUnit: string;
-      weight: number;
-      weightUnit: string;
-      categoryId: string;
-      reorderPointOfQuantity: number;
-      salesPrice: number;
-      purchasePrice: number;
-      barcodeString: string;
-      itemNumber: string;
-      quantity: number;
-      warehouseLocation: string;
-      createdAt: string;
-      updatedAt: string;
-      __v: number;
-    };
+    productId: string | null;
     quantity: number;
     discount: number;
     _id: string;
   }>;
+  isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;
 }
 
+// export interface FilterFormValues {
+//   hasOpenBalance: undefined;
+//   paymentDueStartDate: boolean;
+//   paymentDueEndDate: boolean;
+//   storeIds: boolean;
+//   minOrderAmount: number;
+//   maxOrderAmount: string;
+//   paymentStatus: any;
+//   orderStatus: any;
+//   endDate: any;
+//   startDate: any;
+//   // Define your filter form values here
+//   dateRange?: string;
+//   status?: string;
+//   storeId?: string;
+//   // Add other filter fields as needed
+// }
+
+// export interface ReusableModalProps {
+//   open: boolean;
+//   onOpenChange: (open: boolean) => void;
+//   trigger: React.ReactNode;
+//   title: string;
+//   children: React.ReactNode;
+// }
+
+// export interface FilterFormValues {
+//   fromDate: string;
+//   toDate: string;
+//   fromDueDate: string;
+//   toDueDate: string;
+//   storeName: string;
+//   productStatus: string;
+//   orderStatus: string;
+//   verificationStatus: string;
+// }
+
+// export interface OrderFilterFormProps {
+//   onSubmit: (values: FilterFormValues) => void;
+//   onClear?: () => void;
+// }
+
 export interface ReusableModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trigger: React.ReactNode;
+  trigger: React.ReactNode; // required
   title: string;
   children: React.ReactNode;
 }
 
-export interface FilterFormValues {
-  fromDate: string;
-  toDate: string;
-  fromDueDate: string;
-  toDueDate: string;
-  storeName: string;
-  productStatus: string;
-  orderStatus: string;
-  verificationStatus: string;
-}
+// export interface FilterFormValues {
+//   hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
+//   paymentDueStartDate?: Date | string | number;
+//   paymentDueEndDate?: Date | string | number;
+//   storeIds?: string[]; // boolean was incorrect
+//   minOrderAmount?: number;
+//   maxOrderAmount?: number; // changed from string to number
+//   paymentStatus?: string | null; // better than `any`
+//   // orderStatus?: string | null;
+//   endDate?: Date | string | number;
+//   startDate?: Date | string | number;
+//   dateRange?: string;
+//   status?: string;
+//   storeId?: string;
+//   orderStatus?: string[];
 
-export interface OrderFilterFormProps {
-  onSubmit: (values: FilterFormValues) => void;
-  onClear?: () => void;
-}
+// }
 
 export interface AddOrderFormValues {
   date: string;
@@ -129,9 +173,8 @@ export interface AddOrderFormProps {
 //   totalOrders?: number;
 //   totalOrderAmount?: string;
 //   isCustomerSourceProspect?: boolean;
-  
-// }
 
+// }
 
 // "@/types/index.ts" or similar
 
@@ -151,10 +194,7 @@ interface CustomerOrder {
   paymentStatus: string;
 }
 
-
-
 export interface Customer {
-  
   _id: string;
   storeName: string;
   storePhone: string;
@@ -299,8 +339,6 @@ export interface GetProductResponse {
   data: Product[];
 }
 
-
-
 export interface Prospect {
   _id: string;
   storeName: string;
@@ -328,7 +366,6 @@ export interface Prospect {
     activity: string;
     activityDate: string;
     activityMedium: string;
-    
   }[];
   quotedList: {
     productObjId?: {
@@ -379,13 +416,13 @@ export interface ProspectsResponse {
 // types.ts or within the component file
 
 // QuotedListItem type (includes packetSize from the sample data)
- export interface QuotedListItem {
+export interface QuotedListItem {
   productObjId: string; // 24-char ObjectId (e.g., "686eea6ac3e14203529ced6c")
   itemNumber: string;
   itemName: string;
   packSize: string;
   price: number;
-   // Optional, 24-char ObjectId if required by API
+  // Optional, 24-char ObjectId if required by API
   packetSize?: string; // New field from sample data, optional if not always present
 }
 
@@ -393,11 +430,9 @@ export interface ProspectsResponse {
 export interface FollowUpActivity {
   activity: string;
   activityDate: string; // ISO date string (e.g., "2025-07-10")
-  activityMedium: "call" | "email" | "meeting" | "whatsapp"  // Updated to include "call"
+  activityMedium: "call" | "email" | "meeting" | "whatsapp"; // Updated to include "call"
   _id?: string; // Optional, 24-char ObjectId if required by API
 }
-
-
 
 // AddProspectRequest type (full form data structure)
 export interface AddProspectRequest {
@@ -422,5 +457,22 @@ export interface AddProspectRequest {
   isDeleted?: boolean;
 }
 
+// @/types/index.ts (or wherever your types are defined)
+export interface FilterFormValues {
+  startDate?: string;
+  endDate?: string;
+  paymentDueStartDate?: string;
+  paymentDueEndDate?: string;
+  orderStatus?: string[];
+  paymentStatus?: string[];
+  storeIds?: string[];
+  minOrderAmount?: number;
+  maxOrderAmount?: number;
+  hasOpenBalance?: boolean;
+}
 
-
+export interface OrderFilterFormProps {
+  onSubmit: (values: FilterFormValues) => void;
+  onClear?: () => void;
+  initialValues?: FilterFormValues | null;
+}

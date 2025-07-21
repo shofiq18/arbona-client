@@ -9,6 +9,7 @@ export const productsApi = baseApi.injectEndpoints({
         { type: "Products", id: categoryId },
       ],
     }),
+    
   }),
 });
 

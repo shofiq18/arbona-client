@@ -94,8 +94,16 @@ interface ProspectsResponse {
   data: Prospect[];
 }
 
-// Interface for the AddProspect request payload
+// Interface for a single prospect response
+interface ProspectResponse {
+  success: boolean;
+  message: string;
+  data: Prospect;
+}
+
+// Interface for the AddProspect request payload with optional _id for updates
 export interface AddProspectRequest {
+  _id?: string; // Added for identifying the prospect to update
   storeName: string;
   storePhone: string;
   storePersonEmail: string;
@@ -112,6 +120,7 @@ export interface AddProspectRequest {
   status: string;
   competitorStatement?: string;
   assignedSalesPerson?: string;
+  followUpActivities?: string;
 }
 
 const prospectApi = baseApi.injectEndpoints({
@@ -126,6 +135,15 @@ const prospectApi = baseApi.injectEndpoints({
          providesTags: ["PROSPECT"]
       }),
     
+    }),
+    getProspectById: builder.query<ProspectResponse, string>({
+      query: (id) => ({
+        url: `/prospect/${id}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Use token for auth if required
+        },
+      }),
     }),
     addProspect: builder.mutation<Prospect, AddProspectRequest>({
       query: (body) => ({
@@ -172,6 +190,8 @@ const prospectApi = baseApi.injectEndpoints({
         },
          invalidatesTags: ["PROSPECT"], // Add this to re-fetch prospects after deletion
       }),
+ 
+
     
   }),
   }),

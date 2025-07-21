@@ -168,12 +168,7 @@ export default function AllGetProducts() {
           >
             <PlusCircle className="h-4 w-4" /> Add Product
           </Button>
-          <Button
-            variant="outline"
-            className="text-gray-500 border border-gray-300 hover:bg-gray-500"
-          >
-            <FaFilePdf className="h-4 w-4" />
-          </Button>
+          
         </div>
       </div>
 

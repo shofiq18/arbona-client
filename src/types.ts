@@ -55,21 +55,31 @@ export interface Order {
   __v: number;
 }
 
-export interface FilterFormValues {
-  // Define your filter form values here
-  dateRange?: string;
-  status?: string;
-  storeId?: string;
-  // Add other filter fields as needed
-}
+// export interface FilterFormValues {
+//   hasOpenBalance: undefined;
+//   paymentDueStartDate: boolean;
+//   paymentDueEndDate: boolean;
+//   storeIds: boolean;
+//   minOrderAmount: number;
+//   maxOrderAmount: string;
+//   paymentStatus: any;
+//   orderStatus: any;
+//   endDate: any;
+//   startDate: any;
+//   // Define your filter form values here
+//   dateRange?: string;
+//   status?: string;
+//   storeId?: string;
+//   // Add other filter fields as needed
+// }
 
-export interface ReusableModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  trigger: React.ReactNode;
-  title: string;
-  children: React.ReactNode;
-}
+// export interface ReusableModalProps {
+//   open: boolean;
+//   onOpenChange: (open: boolean) => void;
+//   trigger: React.ReactNode;
+//   title: string;
+//   children: React.ReactNode;
+// }
 
 // export interface FilterFormValues {
 //   fromDate: string;
@@ -82,10 +92,38 @@ export interface ReusableModalProps {
 //   verificationStatus: string;
 // }
 
-export interface OrderFilterFormProps {
-  onSubmit: (values: FilterFormValues) => void;
-  onClear?: () => void;
+// export interface OrderFilterFormProps {
+//   onSubmit: (values: FilterFormValues) => void;
+//   onClear?: () => void;
+// }
+
+export interface ReusableModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  trigger: React.ReactNode; // required
+  title: string;
+  children: React.ReactNode;
 }
+
+
+export interface FilterFormValues {
+  hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
+  paymentDueStartDate?: Date | string | number;
+  paymentDueEndDate?: Date | string | number;
+  storeIds?: string[]; // boolean was incorrect
+  minOrderAmount?: number;
+  maxOrderAmount?: number; // changed from string to number
+  paymentStatus?: string | null; // better than `any`
+  // orderStatus?: string | null;
+  endDate?: Date | string | number;
+  startDate?: Date | string | number;
+  dateRange?: string;
+  status?: string;
+  storeId?: string;
+  orderStatus?: string[]; 
+  
+}
+
 
 export interface AddOrderFormValues {
   date: string;

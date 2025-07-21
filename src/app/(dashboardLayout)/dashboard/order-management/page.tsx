@@ -351,26 +351,32 @@ export default function OrderManagement(): React.ReactElement {
                     {new Date(activeFilters.startDate).toLocaleDateString()}
                   </span>
                 )}
+
                 {activeFilters.endDate && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
                     To: {new Date(activeFilters.endDate).toLocaleDateString()}
                   </span>
                 )}
-                {activeFilters.orderStatus?.length > 0 && (
+
+                {Array.isArray(activeFilters.orderStatus) &&
+                  activeFilters.orderStatus.length > 0 && (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                      Status: {activeFilters.orderStatus.join(", ")}
+                    </span>
+                  )}
+
+                {Array.isArray(activeFilters.paymentStatus) &&
+                  activeFilters.paymentStatus.length > 0 && (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                      Payment: {activeFilters.paymentStatus.join(", ")}
+                    </span>
+                  )}
+
+                {(typeof activeFilters.minOrderAmount === "number" ||
+                  typeof activeFilters.maxOrderAmount === "number") && (
                   <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    Status: {activeFilters.orderStatus.join(", ")}
-                  </span>
-                )}
-                {activeFilters.paymentStatus?.length > 0 && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    Payment: {activeFilters.paymentStatus.join(", ")}
-                  </span>
-                )}
-                {(activeFilters.minOrderAmount !== undefined ||
-                  activeFilters.maxOrderAmount !== undefined) && (
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    Amount: ${activeFilters.minOrderAmount || 0} - $
-                    {activeFilters.maxOrderAmount || "∞"}
+                    Amount: ${activeFilters.minOrderAmount ?? 0} - $
+                    {activeFilters.maxOrderAmount ?? "∞"}
                   </span>
                 )}
               </div>
@@ -749,10 +755,11 @@ export default function OrderManagement(): React.ReactElement {
         </Table>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal
       <ReusableModal
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
+        trigger={<button>Open Modal</button>}
         title="Confirm Delete"
       >
         <div className="p-4">
@@ -815,7 +822,7 @@ export default function OrderManagement(): React.ReactElement {
             </Button>
           </div>
         </div>
-      </ReusableModal>
+      </ReusableModal> */}
 
       {/* Pagination or Load More */}
       <div className="flex items-center justify-between mt-4">

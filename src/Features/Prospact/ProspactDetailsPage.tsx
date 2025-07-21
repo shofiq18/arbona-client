@@ -6,7 +6,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import { useGetProspectsQuery, useUpdateProspectMutation, useDeleteProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
+import { useGetProspectsQuery, useUpdateProspectMutation, useDeleteProspectMutation, useConvertProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
 import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi"; // Assuming this exists
 import { Prospect } from "@/types";
 import Loading from "@/redux/Shared/Loading";
@@ -31,6 +31,8 @@ export default function ProspectDetails() {
   const [newSalespersonId, setNewSalespersonId] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
+const [converProspect]=useConvertProspectMutation()
+
 
   // Fetch prospects from API with refetch capability
   const { data: prospectsResponse, error, isLoading, refetch } = useGetProspectsQuery(undefined);
@@ -51,6 +53,7 @@ export default function ProspectDetails() {
 
   console.log("qoateddata", prospects);
 
+
   // Filter prospects based on search term
   const filteredProspects = prospects.filter((prospect) =>
     prospect.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -64,6 +67,19 @@ export default function ProspectDetails() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
 
+
+  
+  const converProspacts=async(id:string)=>{
+    console.log("convert api",id)
+ try {
+      await converProspect(id)
+      toast.success("Prospact Convert successfully");
+     
+    } catch (err) {
+      toast.error("Failed to convert prospact");
+      console.error("convert error:", err);
+    }
+  }
   const openModal = (prospect: Prospect, title: string, data: string) => {
     setSelectedProspect(prospect);
     setModalContent({ title, data });
@@ -236,9 +252,7 @@ export default function ProspectDetails() {
                     )}
                   </td>
                   <td className="p-3">
-                    <button className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">
-                      Convert
-                    </button>
+                    <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
                   </td>
                   <td className=" p-3 flex space-x-6 item-centen">
                     <button

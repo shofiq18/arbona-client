@@ -50,6 +50,14 @@ const orderManagementApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Orders"],
     }),
+    giteSingleOrder: builder.query({
+      query: (id) => `/order/${id}`,
+    }),
+    // updateOrder: builder.mutation<Order, Partial<Order> & { id: number }>({
+    //   query: ({ id, ...patch }) => ({
+    //     url: `/order/${id}`,
+    //     method: "PUT",
+        
     updateOrder: builder.mutation<any, UpdateOrderPayload>({
       query: ({ id, ...patch }) => ({
         url: `/order/${id}`, // Changed to singular to match your backend
@@ -69,6 +77,7 @@ const orderManagementApi = baseApi.injectEndpoints({
       query: () => "/order/getProductSegmentation",
       providesTags: ["ProductSegments"],
     }),
+   
   }),
 });
 
@@ -78,5 +87,7 @@ export const {
   useUpdateOrderMutation,
   useDeleteOrderMutation,
   useGetProductSegmentsQuery,
+  useGiteSingleOrderQuery,
 } = orderManagementApi;
+
 export default orderManagementApi;

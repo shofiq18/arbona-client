@@ -9,6 +9,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+<<<<<<< HEAD
+=======
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
 import {
   Table,
   TableBody,
@@ -25,9 +37,17 @@ import {
   FileText,
   Download,
   MoreHorizontal,
+<<<<<<< HEAD
 } from "lucide-react";
 
 import { useGiteSingleOrderQuery } from "./orderManagementApi";
+=======
+  DollarSign,
+} from "lucide-react";
+
+import { useGiteSingleOrderQuery } from "./orderManagementApi";
+import { ImFilePdf } from "react-icons/im";
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
 
 const OrderDeatils = ({ id }: { id: string }) => {
   const { data, isError, isLoading } = useGiteSingleOrderQuery(id);
@@ -72,6 +92,121 @@ const OrderDeatils = ({ id }: { id: string }) => {
       scanStatus: "Scanned",
     },
   ];
+<<<<<<< HEAD
+=======
+  const handleDownloadInvice = async (id: string) => {
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+
+      // Create a temporary link to trigger the download
+      const fileURL = URL.createObjectURL(blob);
+
+  
+    window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip"; 
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+       setTimeout(() => {
+      URL.revokeObjectURL(fileURL);
+    }, 10);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleDownloadDilverySlip = async (id: string) => {
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+ const fileURL = URL.createObjectURL(blob);
+
+  
+    window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip"; 
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+       setTimeout(() => {
+      URL.revokeObjectURL(fileURL);
+    }, 10);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+const handleDownloadExcel = async () => {
+  try {
+   
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true` 
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Excel file");
+    }
+
+ 
+    const data = await response.arrayBuffer();
+
+   
+    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
+
+    
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    
+    link.download = `order_repo.xl`; 
+  
+   
+    document.body.appendChild(link);
+    
+   
+    link.click(); 
+    
+   
+    document.body.removeChild(link); 
+
+    
+    URL.revokeObjectURL(link.href);
+  } catch (err) {
+    console.error("Error downloading Excel file:", err);
+   
+  }
+};
+
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
   return (
     <div>
       {" "}
@@ -97,17 +232,46 @@ const OrderDeatils = ({ id }: { id: string }) => {
                 />
               </div>
               <Button size="sm" className="bg-green-600 hover:bg-green-700">
+<<<<<<< HEAD
                 <Search className="h-4 w-4" />
+=======
+                <DollarSign className="h-4 w-4" />
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
               </Button>
               <Button size="sm" variant="destructive">
                 <FileText className="h-4 w-4" />
               </Button>
+<<<<<<< HEAD
               <Button size="sm" variant="outline">
                 <Download className="h-4 w-4" />
               </Button>
               <Button size="sm" variant="outline">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
+=======
+           
+              <DropdownMenu>
+                <DropdownMenuTrigger> <ImFilePdf className="w-5 h-5 text-black" /></DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadInvice(data.data._id)}
+                  >
+                    Invoice
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadDilverySlip(data.data._id)}
+                  >
+                    delivery slip
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleDownloadExcel}
+                  >
+                    Pro
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
             </div>
           </div>
         </div>
@@ -136,7 +300,11 @@ const OrderDeatils = ({ id }: { id: string }) => {
                   <TableCell className="font-medium">
                     {item?.productId.name}
                   </TableCell>
+<<<<<<< HEAD
                   <TableCell className="text-blue-600">
+=======
+                  <TableCell   className="text-blue-600 cursor-pointer">
+>>>>>>> 7c48c3d5dd1a01755aae309c24355a0513855f4f
                     {item?.productId.itemNumber}
                   </TableCell>
                   <TableCell>{item.productId.barcodeString}</TableCell>

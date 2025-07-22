@@ -22,6 +22,7 @@ import { FilterFormValues } from "@/types";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 import { ImFilePdf } from "react-icons/im";
+import { FaFileExcel } from "react-icons/fa6";
 
 interface Order {
   _id: string;
@@ -293,11 +294,11 @@ export default function OrderManagement(): React.ReactElement {
   // Calculate filtered statistics for cards
   const filteredStats = useMemo(() => {
     const totalOrderAmount = filteredOrders.reduce(
-      (sum, order) => sum + order.orderAmount,
+      (sum:Number, order:any) => sum + order.orderAmount,
       0
     );
     const totalOpenAmount = filteredOrders.reduce(
-      (sum, order) => sum + Math.max(0, order.openBalance),
+      (sum:any, order:any) => sum + Math.max(0, order.openBalance),
       0
     );
     const totalOrders = filteredOrders.length;
@@ -400,6 +401,53 @@ export default function OrderManagement(): React.ReactElement {
     console.log(error);
     return <div>Error loading orders</div>;
   }
+
+  const handleDownloadExcel = async () => {
+
+  try {
+    const token = Cookies?.get("token");
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true`,{
+         headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `${token}`,
+  },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Excel file");
+    }
+
+ 
+    const data = await response.arrayBuffer();
+
+   
+    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
+
+    
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    
+    link.download = `order_repo.xl`; 
+  
+   
+    document.body.appendChild(link);
+    
+   
+    link.click(); 
+    
+   
+    document.body.removeChild(link); 
+
+    
+    URL.revokeObjectURL(link.href);
+  } catch (err) {
+    console.error("Error downloading Excel file:", err);
+   
+  }
+};
 
   return (
     <div>
@@ -580,6 +628,9 @@ export default function OrderManagement(): React.ReactElement {
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>
+          <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
+            <FaFileExcel className="w-5 h-5 text-black" />
+          </Button>
         </div>
       </div>
       {/* Results Summary */}
@@ -661,9 +712,11 @@ export default function OrderManagement(): React.ReactElement {
                       {order.invoiceNumber}
                     </Link>
                   </TableCell>
-                  <TableCell  className="text-sm">
+                  <TableCell   className="text-sm cursor-pointer text-blue-600 font-medium hover:underline">
+                <Link href={`/dashboard/order-management/${order._id}`}>
                  {order.PONumber}
                    
+                </Link>
                   
                   </TableCell>
                   <TableCell className="text-sm font-medium">

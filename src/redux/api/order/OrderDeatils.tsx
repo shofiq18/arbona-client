@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import Cookies from "js-cookie";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,9 +36,9 @@ import {
   MoreHorizontal,
   DollarSign,
 } from "lucide-react";
-import Cookies from "js-cookie";
 import { useGiteSingleOrderQuery } from "./orderManagementApi";
 import { ImFilePdf } from "react-icons/im";
+import Link from "next/link";
 
 
 const OrderDeatils = ({ id }: { id: string }) => {
@@ -205,10 +205,17 @@ const OrderDeatils = ({ id }: { id: string }) => {
 // };
 
   const handleDownloadInvice = async (id: string) => {
+    
     try {
-      // Fetch the PDF as a binary response (arrayBuffer)
+       const token = Cookies?.get("token");
+     
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`
+        `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`,{
+         headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `${token}`,
+  },
+      }
         
       );
 
@@ -242,10 +249,17 @@ const OrderDeatils = ({ id }: { id: string }) => {
     }
   };
   const handleDownloadDilverySlip = async (id: string) => {
+
     try {
+       const token = Cookies?.get("token");
       // Fetch the PDF as a binary response (arrayBuffer)
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`
+        `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`,{
+         headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `${token}`,
+  },
+      }
         
       );
 
@@ -277,46 +291,6 @@ const OrderDeatils = ({ id }: { id: string }) => {
     }
   };
   
-const handleDownloadExcel = async () => {
-  try {
-   
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true` 
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch Excel file");
-    }
-
- 
-    const data = await response.arrayBuffer();
-
-   
-    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
-
-    
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    
-    
-    link.download = `order_repo.xl`; 
-  
-   
-    document.body.appendChild(link);
-    
-   
-    link.click(); 
-    
-   
-    document.body.removeChild(link); 
-
-    
-    URL.revokeObjectURL(link.href);
-  } catch (err) {
-    console.error("Error downloading Excel file:", err);
-   
-  }
-};
 
  if (isLoading) {
     return <div className="p-6 text-center text-gray-700">Loading order details...</div>;
@@ -350,9 +324,12 @@ const handleDownloadExcel = async () => {
                   className="pl-10 w-64"
                 />
               </div>
+              <Link href={`/dashboard/order-management/${data.data._id}/${data.data.storeId._id}`}>
               <Button size="sm" className="bg-green-600 hover:bg-green-700">
                 <DollarSign className="h-4 w-4" />
               </Button>
+              </Link>
+              
               <Button size="sm" variant="destructive">
                 <FileText className="h-4 w-4" />
               </Button>
@@ -371,11 +348,11 @@ const handleDownloadExcel = async () => {
                   >
                     delivery slip
                   </DropdownMenuItem>
-                  <DropdownMenuItem
+                  {/* <DropdownMenuItem
                     onClick={handleDownloadExcel}
                   >
                     Pro
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>

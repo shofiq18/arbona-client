@@ -78,7 +78,18 @@ const orderManagementApi = baseApi.injectEndpoints({
       query: () => "/order/getProductSegmentation",
       providesTags: ["ProductSegments"],
     }),
-   
+     getPaymentHistory: builder.query({
+      query: (id) => `/payment/${id}/customersPayments`,
+    }),
+      insertPayment: builder.mutation<any, any>({
+      query: (order) => ({
+        url: "/payment",
+        method: "POST",
+        body: order,
+      }),
+      invalidatesTags: ["Orders"],
+    }),
+  
   }),
 });
 
@@ -89,6 +100,8 @@ export const {
   useDeleteOrderMutation,
   useGetProductSegmentsQuery,
   useGiteSingleOrderQuery,
+  useGetPaymentHistoryQuery,
+  useInsertPaymentMutation
 } = orderManagementApi;
 
 export default orderManagementApi;

@@ -430,7 +430,7 @@ export default function OrderManagement(): React.ReactElement {
     link.href = URL.createObjectURL(blob);
     
     
-    link.download = `order_repo.xl`; 
+    link.download = `order_repo.xlsx`; 
   
    
     document.body.appendChild(link);

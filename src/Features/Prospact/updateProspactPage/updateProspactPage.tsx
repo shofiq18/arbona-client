@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -7,8 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { useUpdateProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
-import { FollowUpActivity, QuotedListItem } from "@/types";
+import { useGetProspectByIdQuery, useUpdateProspectMutation } from "@/redux/api/auth/prospact/prospactApi";
+import { QuotedListItem } from "@/types";
 import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
 import { useGetInventoryQuery } from "@/redux/api/auth/inventory/inventoryApi";
 import Cookies from "js-cookie";
@@ -20,11 +21,26 @@ const ACTIVITY_MEDIUM_OPTIONS = ["call", "email", "meeting", "whatsapp"] as cons
 type ActivityMedium = typeof ACTIVITY_MEDIUM_OPTIONS[number];
 
 interface Product {
-  _id: string;
+  _id?: string;
   itemNumber: string;
   name: string;
   packetSize: string;
   salesPrice: number;
+}
+interface AssignedSalesPerson {
+  _id: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+  password?: string; // Optional, as it might not always be returned
+}
+export interface FollowUpActivity {
+  activity: string;
+  activityDate: string; // ISO date string (e.g., "2025-07-10")
+  activityMedium:string // Updated to include "call"
+  // Optional, 24-char ObjectId if required by API
 }
 
 interface FormData {
@@ -42,21 +58,28 @@ interface FormData {
   miscellaneousDocImage: string;
   leadSource: string;
   note: string;
-  status: Status;
-  assignedSalesPerson: string;
+  status: string;
+  assignedSalesPerson: AssignedSalesPerson|null
   followUpActivities: FollowUpActivity[];
   quotedList: QuotedListItem[];
   competitorStatement: string;
 }
 
-interface UpdateProspectPageProps {
-  prospect: FormData;
-  onUpdateSuccess?: () => void;
-  onCancel?: () => void;
-}
+export default function UpdateProspectPage({ prospectId }: { prospectId: string }): React.ReactElement {
+  // --- ALL HOOKS MUST BE CALLED HERE, UNCONDITIONALLY AND AT THE TOP LEVEL ---
 
-export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel }: UpdateProspectPageProps): React.ReactElement {
-  const [formData, setFormData] = useState<FormData>(prospect);
+  // RTK Query Hooks
+  const { data: prospectResponse, isLoading, error } = useGetProspectByIdQuery(prospectId);
+  console.log("ddddddddddddd", prospectResponse)
+  const { data: inventoryData, isLoading: isInventoryLoading, isError: isInventoryError } = useGetInventoryQuery();
+  const { data: salesUsersResponse, error: salesError, isLoading: isUsersLoading } = useGetSalesUsersQuery();
+  const [updateProspect, { isLoading: isSaving }] = useUpdateProspectMutation();
+
+  // React Router Hook
+  const router = useRouter();
+
+  // React State Hooks
+  const [formData, setFormData] = useState<FormData | null>(null); // Initialize with null
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
@@ -64,7 +87,6 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
     productObjId: "",
     itemNumber: "",
     itemName: "",
-    packSize: "",
     price: 0,
     packetSize: "",
   });
@@ -73,18 +95,32 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
     activityDate: "",
     activityMedium: "call",
   });
-  const { data: inventoryData, isLoading: isInventoryLoading, isError: isInventoryError } = useGetInventoryQuery();
-  const { data: salesUsersResponse, error: salesError, isLoading: isUsersLoading } = useGetSalesUsersQuery();
-  const [updateProspect, { isLoading: isSaving }] = useUpdateProspectMutation();
-  const router = useRouter();
+
+  // --- useEffects to handle data loading and initialization ---
+  useEffect(() => {
+    if (prospectResponse?.data && !formData) {
+      // Ensure productObjId is a string when initializing from fetched data
+      const processedQuotedList = prospectResponse.data.quotedList.map(item => ({
+        ...item,
+        productObjId: typeof item.productObjId === 'object' && item.productObjId !== null
+          ? (item.productObjId as any)._id // Cast to any to access _id if it's an object
+          : item.productObjId, // Otherwise, use it as is (should be string)
+      }));
+
+      setFormData({
+        ...prospectResponse.data,
+        quotedList: processedQuotedList,
+      });
+      console.log("Initial formData set:", { ...prospectResponse.data, quotedList: processedQuotedList }); // Debug log
+    }
+  }, [prospectResponse, formData]); // Add formData to dependencies to prevent re-initialization
 
   useEffect(() => {
     if (isInventoryError) {
       console.error("Error fetching inventory:", isInventoryError);
       toast.error("Failed to load inventory.");
     }
-    console.log("Initial quotedList:", prospect.quotedList); // Debug log
-  }, [isInventoryError, prospect.quotedList]);
+  }, [isInventoryError]);
 
   useEffect(() => {
     if (salesError) {
@@ -93,9 +129,21 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
     }
   }, [salesError]);
 
+  // --- Conditional Rendering for Loading/Error States ---
+  if (isLoading || !formData) { // Check formData as well, as it's initialized async
+    return <div className="min-h-screen p-4 text-center">Loading...</div>;
+  }
+  if (error || !prospectResponse?.data) {
+    console.error("Error loading prospect:", error); // Log the actual error for debugging
+    return <div className="min-h-screen p-4 text-center">Error loading prospect: {error ? (error as any).message : "Unknown error"}</div>;
+  }
+
+  // At this point, formData is guaranteed to be available and initialized
+  // We can use `formData` directly in the JSX and handlers
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev!, [name]: value })); // Using non-null assertion as formData is guaranteed
     setValidationErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -114,27 +162,36 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
       .then((response) => response.json())
       .then((result) => {
         if (result.success) {
-          setFormData((prev) => ({ ...prev, miscellaneousDocImage: result.data.url }));
+          setFormData((prev) => ({ ...prev!, miscellaneousDocImage: result.data.url }));
           setValidationErrors((prev) => ({ ...prev, miscellaneousDocImage: "" }));
         }
       })
-      .catch(() => {});
+      .catch((uploadError) => {
+        console.error("Image upload failed:", uploadError);
+        toast.error("Image upload failed.");
+      });
   };
 
   const handleQuoteInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
     const { name, value } = e.target;
+    // Only update if the selected input is 'productObjId' and inventory data exists
     if (name === "productObjId" && inventoryData?.data) {
       const selectedProduct = inventoryData.data.find((p: Product) => p._id === value);
       if (selectedProduct) {
         setNewQuote({
-          productObjId: selectedProduct._id, // Store only _id as string
+          productObjId: selectedProduct._id, // Ensure this is the ID string
           itemNumber: selectedProduct.itemNumber,
           itemName: selectedProduct.name,
-          packSize: selectedProduct.packetSize,
           price: selectedProduct.salesPrice,
-          packetSize: selectedProduct.packetSize || "",
+          packetSize: selectedProduct.packetSize || "", // Duplicating for robustness or if `packSize` refers to something else
         });
+      } else {
+        // Clear newQuote fields if no product is selected (e.g., "Select Product" is chosen)
+        setNewQuote({ productObjId: "", itemNumber: "", itemName: "",  price: 0, packetSize: "" });
       }
+    } else {
+        // For other inputs within the quote modal (like price if it were editable)
+        setNewQuote((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -144,15 +201,15 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
   };
 
   const addQuote = () => {
-    if (!newQuote.productObjId || !newQuote.itemNumber || !newQuote.itemName || !newQuote.packSize || !newQuote.price) {
+    if (!newQuote.productObjId || !newQuote.itemNumber || !newQuote.itemName ||  newQuote.price === 0) {
       toast.error("All required quote fields must be filled.");
       return;
     }
     setFormData((prev) => ({
-      ...prev,
-      quotedList: [...prev.quotedList, { ...newQuote, packetSize: newQuote.packetSize || "" }],
+      ...prev!,
+      quotedList: [...prev!.quotedList, { ...newQuote, packetSize: newQuote.packetSize || "" }],
     }));
-    setNewQuote({ productObjId: "", itemNumber: "", itemName: "", packSize: "", price: 0, packetSize: "" });
+    setNewQuote({ productObjId: "", itemNumber: "", itemName: "",  price: 0, packetSize: "" });
     setIsQuoteModalOpen(false);
   };
 
@@ -162,8 +219,8 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
       return;
     }
     setFormData((prev) => ({
-      ...prev,
-      followUpActivities: [...prev.followUpActivities, { ...newFollowUp }],
+      ...prev!,
+      followUpActivities: [...prev!.followUpActivities, { ...newFollowUp }],
     }));
     setNewFollowUp({ activity: "", activityDate: "", activityMedium: "call" });
     setIsFollowUpModalOpen(false);
@@ -171,38 +228,51 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
 
   const handleDeleteQuote = (index: number) => {
     setFormData((prev) => ({
-      ...prev,
-      quotedList: prev.quotedList.filter((_, i) => i !== index),
+      ...prev!,
+      quotedList: prev!.quotedList.filter((_, i) => i !== index),
     }));
   };
 
   const handleDeleteFollowUp = (index: number) => {
     setFormData((prev) => ({
-      ...prev,
-      followUpActivities: prev.followUpActivities.filter((_, i) => i !== index),
+      ...prev!,
+      followUpActivities: prev!.followUpActivities.filter((_, i) => i !== index),
     }));
   };
 
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
+    if (!formData) { // Defensive check, though should be covered by initial renders
+        errors.general = "Form data not loaded.";
+        setValidationErrors(errors);
+        return false;
+    }
+
     if (!formData.storeName.trim()) errors.storeName = "Store name is required.";
+    // Regex for phone numbers: Allows 3 digits - 4 digits (e.g., 555-0198)
     if (!formData.storePhone.match(/^\d{3}-\d{4}$/)) errors.storePhone = "Store phone must be in 555-0198 format.";
+    // Regex for email
     if (!formData.storePersonEmail.match(/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/)) errors.storePersonEmail = "Invalid email format.";
     if (!formData.storePersonName.trim()) errors.storePersonName = "Customer name is required.";
+    // Regex for cell phone numbers: Allows 3 digits - 4 digits (e.g., 555-0234)
     if (!formData.storePersonPhone.match(/^\d{3}-\d{4}$/)) errors.storePersonPhone = "Cell phone must be in 555-0234 format.";
     if (!formData.shippingAddress.trim()) errors.shippingAddress = "Shipping address is required.";
     if (!formData.shippingCity.trim()) errors.shippingCity = "Shipping city is required.";
     if (!formData.shippingState.trim()) errors.shippingState = "Shipping state is required.";
+    // Regex for 5-digit zipcode
     if (!formData.shippingZipcode.match(/^\d{5}$/)) errors.shippingZipcode = "Zipcode must be 5 digits.";
     if (!formData.leadSource.trim()) errors.leadSource = "Lead source is required.";
     if (!formData.competitorStatement.trim()) errors.competitorStatement = "Competitor statement is required.";
     if (!formData.assignedSalesPerson) errors.assignedSalesPerson = "Salesperson is required.";
 
-    // Validate quotedList
-    if (formData.quotedList.length > 0) {
+    // Validate quotedList - ensure all required fields are present if list is not empty
+    if (formData.quotedList.length === 0) {
+      // Consider if an empty quotedList is valid or required
+      // errors.quotedList = "At least one quoted item is required.";
+    } else {
       formData.quotedList.forEach((item, index) => {
-        if (!item.productObjId) {
-          errors[`quotedList[${index}].productObjId`] = "Product ID is required for all quoted items.";
+        if (!item.productObjId || !item.itemNumber || !item.itemName ||  item.price === 0) {
+          errors[`quotedList[${index}]`] = `Quoted item ${index + 1} has missing required fields.`;
         }
       });
     }
@@ -214,6 +284,11 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData) {
+        toast.error("Form data is not loaded. Please try again.");
+        return;
+    }
+
     if (!validateForm()) {
       toast.error("Please fix the validation errors.");
       return;
@@ -222,38 +297,39 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
     const token = Cookies.get("token");
     if (!token) {
       toast.error("Authentication token missing. Please log in.");
+      router.push("/login"); // Redirect to login
       return;
     }
 
-    // Filter out invalid quotedList items before submission
+    // Filter out items without a productObjId for submission
+    // This is a safety measure if some items somehow got added without a productObjId
     const validQuotedList = formData.quotedList.filter(item => item.productObjId);
 
-    const payload = {
+    const payload: Partial<FormData> = {
       _id: formData._id,
       storeName: formData.storeName,
       storePhone: formData.storePhone,
       storePersonEmail: formData.storePersonEmail,
       storePersonName: formData.storePersonName,
       storePersonPhone: formData.storePersonPhone,
-      salesTaxId: formData.salesTaxId || undefined,
+      salesTaxId: formData.salesTaxId || undefined, // Allow optional
       shippingAddress: formData.shippingAddress,
       shippingState: formData.shippingState,
       shippingZipcode: formData.shippingZipcode,
       shippingCity: formData.shippingCity,
-      miscellaneousDocImage: formData.miscellaneousDocImage || undefined,
+      miscellaneousDocImage: formData.miscellaneousDocImage || undefined, // Allow optional
       leadSource: formData.leadSource,
-      note: formData.note || undefined,
+      note: formData.note || undefined, // Allow optional
       status: formData.status,
-      assignedSalesPerson: formData.assignedSalesPerson || undefined,
+      assignedSalesPerson: formData.assignedSalesPerson || undefined, // Allow optional, though required in validation
       followUpActivities: formData.followUpActivities,
       quotedList: validQuotedList, // Use filtered list
       competitorStatement: formData.competitorStatement,
     };
 
     try {
-      await updateProspect(payload).unwrap();
+      await updateProspect(payload as any).unwrap(); // Cast to any if type mismatch persists, though ideally fix types
       toast.success("Prospect updated successfully");
-      if (onUpdateSuccess) onUpdateSuccess();
       router.push("/dashboard/prospact");
     } catch (err: any) {
       console.error("Failed to update prospect:", err);
@@ -263,7 +339,6 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
   };
 
   const handleCancel = () => {
-    if (onCancel) onCancel();
     router.push("/dashboard/prospact");
   };
 
@@ -520,7 +595,7 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
           <select
             id="assignedSalesPerson"
             name="assignedSalesPerson"
-            value={formData.assignedSalesPerson}
+            value={formData.assignedSalesPerson?._id} //fix the error 
             onChange={handleInputChange}
             className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
             disabled={isUsersLoading}
@@ -546,14 +621,13 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
 
         {formData.quotedList.length > 0 && (
           <div className="overflow-x-auto">
-            <Label>Quoted Items</Label>
+            <Label className="block my-2">Quoted Items</Label>
             <table className="w-full text-sm text-left text-gray-500 mt-2">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
                   <th className="px-4 py-2">Product ID</th>
                   <th className="px-4 py-2">Item #</th>
                   <th className="px-4 py-2">Item Name</th>
-                  <th className="px-4 py-2">Pack Size</th>
                   <th className="px-4 py-2">Price ($)</th>
                   <th className="px-4 py-2">Packet Size</th>
                   <th className="px-4 py-2">Action</th>
@@ -562,10 +636,9 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
               <tbody>
                 {formData.quotedList.map((item, index) => (
                   <tr key={index} className="bg-white border-b">
-                    <td className="px-4 py-2">{item.productObjId ? item.productObjId._id || "N/A" : "N/A"}</td>
+                    <td className="px-4 py-2">{item.productObjId || "N/A"}</td>
                     <td className="px-4 py-2">{item.itemNumber}</td>
                     <td className="px-4 py-2">{item.itemName}</td>
-                    <td className="px-4 py-2">{item.packSize}</td>
                     <td className="px-4 py-2">${item.price}</td>
                     <td className="px-4 py-2">{item.packetSize || "N/A"}</td>
                     <td className="px-4 py-2">
@@ -582,13 +655,16 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
                 ))}
               </tbody>
             </table>
-            {validationErrors.quotedList && <span className="text-red-500 text-sm">{validationErrors.quotedList}</span>}
+            {/* Display specific quoted list errors if any */}
+            {Object.keys(validationErrors).filter(key => key.startsWith('quotedList[')).map((key) => (
+              <span key={key} className="text-red-500 text-sm block mt-1">{validationErrors[key]}</span>
+            ))}
           </div>
         )}
 
         {formData.followUpActivities.length > 0 && (
           <div className="overflow-x-auto">
-            <Label>Follow Up Activities</Label>
+            <Label className="block my-2">Follow Up Activities</Label>
             <table className="w-full text-sm text-left text-gray-500 mt-2">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
@@ -659,7 +735,7 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
                   <option value="">Select Product</option>
                   {inventoryData?.data?.map((product: Product) => (
                     <option key={product._id} value={product._id}>
-                      {product.name} ({product._id})
+                      {product.name} (Item #: {product.itemNumber})
                     </option>
                   )) || <option disabled>No products available</option>}
                 </select>
@@ -670,10 +746,9 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
                   id="itemNumber"
                   name="itemNumber"
                   value={newQuote.itemNumber}
-                  onChange={handleQuoteInputChange}
                   placeholder="Item Number"
                   className="w-full"
-                  disabled
+                  disabled // This field is auto-filled
                 />
               </div>
               <div className="space-y-2">
@@ -682,24 +757,12 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
                   id="itemName"
                   name="itemName"
                   value={newQuote.itemName}
-                  onChange={handleQuoteInputChange}
                   placeholder="Item Name"
                   className="w-full"
-                  disabled
+                  disabled // This field is auto-filled
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="packSize">Pack Size</Label>
-                <Input
-                  id="packSize"
-                  name="packSize"
-                  value={newQuote.packSize}
-                  onChange={handleQuoteInputChange}
-                  placeholder="Pack Size"
-                  className="w-full"
-                  disabled
-                />
-              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="price">Price ($)</Label>
                 <Input
@@ -707,10 +770,21 @@ export default function UpdateProspectPage({ prospect, onUpdateSuccess, onCancel
                   name="price"
                   type="number"
                   value={newQuote.price}
-                  onChange={handleQuoteInputChange}
                   placeholder="Price"
                   className="w-full"
-                  disabled
+                  disabled // This field is auto-filled
+                />
+              </div>
+              {/* Added Packet Size if it's meant to be distinct or displayed */}
+              <div className="space-y-2">
+                <Label htmlFor="packetSize">Packet Size (from Product)</Label>
+                <Input
+                  id="packetSize"
+                  name="packetSize"
+                  value={newQuote.packetSize}
+                  placeholder="Packet Size"
+                  className="w-full"
+                  disabled // This field is auto-filled
                 />
               </div>
             </div>

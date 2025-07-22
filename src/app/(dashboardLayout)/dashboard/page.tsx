@@ -99,27 +99,29 @@ export default function AppSidebar() {
                       </Link>
                     </button>
                   )}
-                  {/* Order management */}
-                  {isAdmin && (
+
+                   {/* Prospact */}
+                  {(isAdmin || role === "user" || role === "salesuser") && (
                     <button
                       className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${
-                        pathname === "/dashboard/order-management"
+                        pathname === "/dashboard/prospact"
                           ? "bg-green-700 text-white text-lg"
                           : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
                       }`}
                     >
-                      <Link href="/dashboard/order-management" className="flex items-center gap-2 w-full">
+                      <Link href="/dashboard/prospact" className="flex items-center gap-2 w-full">
                         <Image
-                          src="/dashboardIcons/Vector.png"
+                          src="/dashboardIcons/Layer_1.png"
                           width={20}
                           height={20}
                           alt="Profile"
                           className="rounded-full"
                         />
-                        <span className="text-[16px]">Order Management</span>
+                        <span className="text-[16px]">Prospect</span>
                       </Link>
                     </button>
                   )}
+
                   {/* Customer */}
                   {isAdmin && (
                     <button
@@ -141,6 +143,28 @@ export default function AppSidebar() {
                       </Link>
                     </button>
                   )}
+                  {/* Order management */}
+                  {isAdmin && (
+                    <button
+                      className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${
+                        pathname === "/dashboard/order-management"
+                          ? "bg-green-700 text-white text-lg"
+                          : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
+                      }`}
+                    >
+                      <Link href="/dashboard/order-management" className="flex items-center gap-2 w-full">
+                        <Image
+                          src="/dashboardIcons/Vector.png"
+                          width={20}
+                          height={20}
+                          alt="Profile"
+                          className="rounded-full"
+                        />
+                        <span className="text-[16px]">Order Management</span>
+                      </Link>
+                    </button>
+                  )}
+                  
                   {/* Inventory */}
                   {isAdmin && (
                     <button
@@ -183,27 +207,7 @@ export default function AppSidebar() {
                       </Link>
                     </button>
                   )}
-                  {/* Prospact */}
-                  {(isAdmin || role === "user" || role === "salesuser") && (
-                    <button
-                      className={`flex w-full items-center gap-2 rounded-sm px-4 py-2.5 transition-colors ${
-                        pathname === "/dashboard/prospact"
-                          ? "bg-green-700 text-white text-lg"
-                          : "text-[#D5D6E2] hover:bg-[#F7F7F81A] hover:text-white focus:bg-[#F7F7F81A] focus:text-white"
-                      }`}
-                    >
-                      <Link href="/dashboard/prospact" className="flex items-center gap-2 w-full">
-                        <Image
-                          src="/dashboardIcons/Layer_1.png"
-                          width={20}
-                          height={20}
-                          alt="Profile"
-                          className="rounded-full"
-                        />
-                        <span className="text-[16px]">Prospect</span>
-                      </Link>
-                    </button>
-                  )}
+                 
                   {/* Container */}
                   {isAdmin && (
                     <button

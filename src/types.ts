@@ -241,8 +241,10 @@ export interface ContainerProduct {
   itemNumber: string;
   quantity: number;
   perCaseCost: number;
+  packetSize: string;
   purchasePrice: number;
   salesPrice: number;
+  
 }
 
 export interface Container {
@@ -362,11 +364,7 @@ export interface Prospect {
     updatedAt: string;
     __v: number;
   };
-  followUpActivities: {
-    activity: string;
-    activityDate: string;
-    activityMedium: string;
-  }[];
+  
   quotedList: {
     productObjId?: {
       _id: string;
@@ -420,7 +418,7 @@ export interface QuotedListItem {
   productObjId: string; // 24-char ObjectId (e.g., "686eea6ac3e14203529ced6c")
   itemNumber: string;
   itemName: string;
-  packSize: string;
+  
   price: number;
   // Optional, 24-char ObjectId if required by API
   packetSize?: string; // New field from sample data, optional if not always present
@@ -430,8 +428,8 @@ export interface QuotedListItem {
 export interface FollowUpActivity {
   activity: string;
   activityDate: string; // ISO date string (e.g., "2025-07-10")
-  activityMedium: "call" | "email" | "meeting" | "whatsapp"; // Updated to include "call"
-  _id?: string; // Optional, 24-char ObjectId if required by API
+  activityMedium:string; // Updated to include "call"
+  // Optional, 24-char ObjectId if required by API
 }
 
 // AddProspectRequest type (full form data structure)

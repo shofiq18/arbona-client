@@ -1,20 +1,17 @@
 
-
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUpDown, PlusCircle } from "lucide-react";
-import { FaFilePdf } from "react-icons/fa6";
+import { ArrowUpDown, PlusCircle, FileText } from "lucide-react"; // FileText is already imported
+import { FaFilePdf } from "react-icons/fa6"; // Keep this if you use it elsewhere, otherwise it can be removed
 import {
-
   useGetInventoryQuery,
   useDeleteInventoryMutation,
   useUpdateInventoryMutation,
   payload,
   UpdateInventoryPayload,
-
 } from "@/redux/api/auth/inventory/inventoryApi";
 import {
   Table,
@@ -36,9 +33,6 @@ import { useRouter } from "next/navigation";
 import Loading from "@/redux/Shared/Loading";
 import ErrorState from "@/redux/Shared/ErrorState";
 
-
-
-
 export default function AllGetProducts() {
   const [search, setSearch] = useState("");
   const router = useRouter();
@@ -50,9 +44,10 @@ export default function AllGetProducts() {
   console.log("get data", products);
 
   // Filter products based on search
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()) ||
-    (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
+  const filteredProducts = products.filter(
+    (product) =>
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
   );
 
   // Calculate profit percentage dynamically
@@ -68,7 +63,6 @@ export default function AllGetProducts() {
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-
   // Permission check (replace with your auth logic)
   const hasDeletePermission = true; // Placeholder
 
@@ -81,16 +75,12 @@ export default function AllGetProducts() {
     try {
       await deleteInventory(_id).unwrap();
       setIsDeleteOpen(false);
-
-      toast.success(' Product deleted Successfully !')
+      toast.success("Product deleted Successfully !");
     } catch (error) {
       console.error("Failed to delete product:", error);
       toast.error("Failed to delete product.");
     }
   };
-
-
-
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -120,7 +110,6 @@ export default function AllGetProducts() {
         packageDimensions: selectedProduct.packageDimensions,
       };
 
-
       const updatedProduct = await updateInventory(payload).unwrap();
 
       // Update local state if needed
@@ -134,16 +123,16 @@ export default function AllGetProducts() {
     }
   };
 
-   if(isLoading){
-    return <Loading  title="All Product Loading... " message="all product fetch successfully "/>
-   }
-
-   if (isError){
-    return <ErrorState title="loading error" message="fetching error"/>
-   }
+  
 
 
+  if (isLoading) {
+    return <Loading title="All Product Loading... " message="all product fetch successfully " />;
+  }
 
+  if (isError) {
+    return <ErrorState title="loading error" message="fetching error" />;
+  }
 
   return (
     <div className="p-4">
@@ -168,6 +157,7 @@ export default function AllGetProducts() {
           >
             <PlusCircle className="h-4 w-4" /> Add Product
           </Button>
+          {/* Export to XL Button with icon only */}
           
         </div>
       </div>
@@ -176,7 +166,18 @@ export default function AllGetProducts() {
       <Table className="w-full overflow-x-auto">
         <TableHeader>
           <TableRow className="bg-gray-100 text-gray-700">
-            {["Category", "Product Name", "Qty On Hand", "Purchase Price", "Sales Price", "Profit", "Profit %", "Competitor Price", "Action"].map((heading, index) => (
+            {[
+              "Product Name",
+              "Category",
+              "Qty",
+              "Incoming Qty",
+              "Purchase Price",
+              "Sales Price",
+              "Profit",
+              "Profit %",
+              "Competitor Price",
+              "Action",
+            ].map((heading, index) => (
               <TableHead key={index} className="p-2 whitespace-nowrap font-medium text-left">
                 <div className="flex items-center gap-1">
                   {heading}
@@ -190,11 +191,12 @@ export default function AllGetProducts() {
         <TableBody>
           {filteredProducts.map((product, idx) => (
             <TableRow key={idx} className="text-sm">
-              <TableCell>{product.categoryId?.name || ""}</TableCell>
               <TableCell className="text-blue-600 underline cursor-pointer">
                 {product.name}
               </TableCell>
+              <TableCell>{product.categoryId?.name || ""}</TableCell>
               <TableCell>{product.quantity?.toLocaleString() ?? ""}</TableCell>
+              <TableCell>{product.incomingQuantity?.toLocaleString() ?? ""}</TableCell>
               <TableCell>
                 {product.purchasePrice ? `$${product.purchasePrice.toFixed(2)}` : ""}
               </TableCell>
@@ -240,39 +242,37 @@ export default function AllGetProducts() {
                     </DialogTrigger>
                     <DialogContent className="max-w-4xl!">
                       <DialogHeader>
-                        <DialogTitle>Product Details</DialogTitle>
+                        <DialogTitle className="text-3xl">Product Details</DialogTitle>
                       </DialogHeader>
                       {selectedProduct && (
-                        <div className="space-y-4  md:grid grid-cols-2 ">
-                          <div>
+                        <div className="space-y-4 md:grid grid-cols-2">
+                          <div className="space-y-2">
                             <p><strong>ID:</strong> {selectedProduct._id}</p>
-                          <p><strong>Name:</strong> {selectedProduct.name}</p>
-                          <p><strong>Category:</strong> {selectedProduct.categoryId?.name || "N/A"}</p>
-                          <p><strong>Description:</strong> {selectedProduct.description || "N/A"}</p>
-                          <p><strong>Item Number:</strong> {selectedProduct.itemNumber || "N/A"}</p>
-                          <p><strong>Barcode:</strong> {selectedProduct.barcodeString || "N/A"}</p>
-                          <p><strong>Packet Size:</strong> {selectedProduct.packetSize || "N/A"}</p>
-                          <p><strong>Weight:</strong> {selectedProduct.weight} {selectedProduct.weightUnit}</p>
-                          <p><strong>Quantity:</strong> {selectedProduct.quantity?.toLocaleString() ?? "N/A"}</p>
-                          <p><strong>Reorder Point:</strong> {selectedProduct.reorderPointOfQuantity}</p>
-                          <p><strong>Warehouse Location:</strong> {selectedProduct.warehouseLocation || "N/A"}</p>
+                            <p><strong>Name:</strong> {selectedProduct.name}</p>
+                            <p><strong>Category:</strong> {selectedProduct.categoryId?.name || "N/A"}</p>
+                            <p><strong>Description:</strong> {selectedProduct.description || "N/A"}</p>
+                            <p><strong>Item Number:</strong> {selectedProduct.itemNumber || "N/A"}</p>
+                            <p><strong>Barcode:</strong> {selectedProduct.barcodeString || "N/A"}</p>
+                            <p><strong>Packet Size:</strong> {selectedProduct.packetSize || "N/A"}</p>
+                            <p><strong>Weight:</strong> {selectedProduct.weight} {selectedProduct.weightUnit}</p>
+                            <p><strong>Quantity:</strong> {selectedProduct.quantity?.toLocaleString() ?? "N/A"}</p>
+                            <p><strong>Reorder Point:</strong> {selectedProduct.reorderPointOfQuantity}</p>
+                            <p><strong>Warehouse Location:</strong> {selectedProduct.warehouseLocation || "N/A"}</p>
                           </div>
-                          <div>
-                              <p><strong>Purchase Price:</strong> ${selectedProduct.purchasePrice?.toFixed(2) ?? "N/A"}</p>
-                          <p><strong>Sales Price:</strong> ${selectedProduct.salesPrice?.toFixed(2) ?? "N/A"}</p>
-                          <p><strong>Profit:</strong> ${(selectedProduct.salesPrice && selectedProduct.purchasePrice
-                            ? (selectedProduct.salesPrice - selectedProduct.purchasePrice).toFixed(2)
-                            : "N/A")}</p>
-                          <p><strong>Profit %:</strong> {selectedProduct.purchasePrice && selectedProduct.salesPrice
-                            ? `${calculateProfitPercentage(selectedProduct.purchasePrice, selectedProduct.salesPrice)}%`
-                            : "N/A"}</p>
-                          <p><strong>Competitor Price:</strong> ${selectedProduct.competitorPrice?.toFixed(2) ?? "N/A"}</p>
-                          <p><strong>Package Dimensions:</strong> {selectedProduct.packageDimensions?.length} x {selectedProduct.packageDimensions?.width} x {selectedProduct.packageDimensions?.height} {selectedProduct.packageDimensions?.unit}</p>
-                          <p><strong>Created At:</strong> {new Date(selectedProduct.createdAt).toLocaleString()}</p>
-                          <p><strong>Updated At:</strong> {new Date(selectedProduct.updatedAt).toLocaleString()}</p>
+                          <div className="space-y-2">
+                            <p><strong>Purchase Price:</strong> ${selectedProduct.purchasePrice?.toFixed(2) ?? "N/A"}</p>
+                            <p><strong>Sales Price:</strong> ${selectedProduct.salesPrice?.toFixed(2) ?? "N/A"}</p>
+                            <p><strong>Profit:</strong> ${(selectedProduct.salesPrice && selectedProduct.purchasePrice
+                              ? (selectedProduct.salesPrice - selectedProduct.purchasePrice).toFixed(2)
+                              : "N/A")}</p>
+                            <p><strong>Profit %:</strong> {selectedProduct.purchasePrice && selectedProduct.salesPrice
+                              ? `${calculateProfitPercentage(selectedProduct.purchasePrice, selectedProduct.salesPrice)}%`
+                              : "N/A"}</p>
+                            <p><strong>Competitor Price:</strong> ${selectedProduct.competitorPrice?.toFixed(2) ?? "N/A"}</p>
+                            <p><strong>Package Dimensions:</strong> {selectedProduct.packageDimensions?.length} x {selectedProduct.packageDimensions?.width} x {selectedProduct.packageDimensions?.height} {selectedProduct.packageDimensions?.unit}</p>
+                            <p><strong>Created At:</strong> {new Date(selectedProduct.createdAt).toLocaleString()}</p>
+                            <p><strong>Updated At:</strong> {new Date(selectedProduct.updatedAt).toLocaleString()}</p>
                           </div>
-                          
-                          
                           <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>Close</Button>
                         </div>
                       )}
@@ -524,7 +524,6 @@ export default function AllGetProducts() {
           </select>
         </div>
       </div>
-
     </div>
   );
 }

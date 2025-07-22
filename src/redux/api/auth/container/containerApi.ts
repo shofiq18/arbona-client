@@ -12,6 +12,7 @@ export interface ContainerProduct {
   perCaseCost: number;
   purchasePrice: number;
   salesPrice: number;
+  packetSize: string;
 }
 
 // Full container object

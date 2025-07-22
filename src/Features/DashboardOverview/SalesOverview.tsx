@@ -5,6 +5,7 @@
 import { useGetInventoryQuery } from "@/redux/api/auth/inventory/inventoryApi";
 import { useGetSalesOverviewDataQuery } from "@/redux/api/dashboard/dashboardApi";
 import Loading from "@/redux/Shared/Loading";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 const SalesOverview = () => {
@@ -86,10 +87,13 @@ const SalesOverview = () => {
           Previous 7 days <span className="text-green-400">↑ {overviewData.trends.totalSales}%</span>
         </p>
       </div>
-      <div className="bg-[#219EBC] text-white p-4 rounded-lg">
-        <h3 className="text-base md:text-lg mb-2">Due Amount</h3>
+      <Link href="/dashboard/order-management" passHref>
+      <div className="bg-[#219EBC] text-white p-4 rounded-lg cursor-pointer"> {/* Added cursor-pointer for visual feedback */}
+        <h3 className="text-base md:text-xl mb-2">Due Amount</h3>
         <p className="text-3xl md:text-4xl font-bold mb-2">${overviewData.dueAmount}</p>
+        
       </div>
+    </Link>
       <div className="bg-[#1F6F97] text-white p-4 rounded-lg">
         <h3 className="text-base md:text-lg mb-2">Orders (Last 7 Days)</h3>
         <p className="text-3xl md:text-4xl font-bold mb-2">{overviewData.ordersLast7Days}</p>
@@ -102,10 +106,13 @@ const SalesOverview = () => {
           <h3 className="text-lg">Total Product</h3>
           <p className="text-4xl font-bold">{overviewData.totalProducts}</p>
         </div>
-        <div className="text-white pl-4">
+        <Link href="/dashboard/inventory" passHref>
+          <div className="text-white pl-4 cursor-pointer">
           <h3 className="text-lg">Low Stock Product</h3>
           <p className="text-4xl font-bold">{overviewData.lowStockProducts}</p>
         </div>
+        </Link>
+        
       </div>
     </div>
   );

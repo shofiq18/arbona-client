@@ -6,6 +6,8 @@
 import { useGetCustomerQuery } from "@/redux/api/customers/customersApi";
 import { useParams } from "next/navigation";
 import Loading from "@/redux/Shared/Loading"; // Adjust path as needed
+import Link from "next/link";
+
 
 const CustomerDetailsPage: React.FC = () => {
   const params = useParams();
@@ -132,7 +134,7 @@ const CustomerDetailsPage: React.FC = () => {
               <table className="w-full text-left border-collapse text-sm min-w-[800px]">
                 <thead className="bg-gray-100 text-gray-700">
                   <tr>
-                    <th className="p-3 whitespace-nowrap">Invoice #</th>
+                    
                     <th className="p-3 whitespace-nowrap">PO #</th>
                     <th className="p-3 whitespace-nowrap">Date</th>
                     <th className="p-3 whitespace-nowrap">Due Date</th>
@@ -149,8 +151,12 @@ const CustomerDetailsPage: React.FC = () => {
                 <tbody>
                   {customer.customerOrders.map((order) => (
                     <tr key={order._id} className="border-t hover:bg-gray-50">
-                      <td className="p-3 whitespace-nowrap text-gray-700">{order.invoiceNumber}</td>
-                      <td className="p-3 whitespace-nowrap text-gray-700">{order.PONumber}</td>
+                      
+                     <td className="p-3 whitespace-nowrap text-gray-700">
+                    <Link href={`/admin/payments/${order._id}`} className="text-blue-600 hover:underline">
+                      {order.PONumber}
+                    </Link>
+                  </td>
                       <td className="p-3 whitespace-nowrap text-gray-700">{new Date(order.date).toLocaleDateString()}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">{order.paymentDueDate}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">${order.orderAmount.toFixed(2)}</td>

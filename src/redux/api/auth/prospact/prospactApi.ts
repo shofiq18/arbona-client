@@ -197,5 +197,5 @@ const prospectApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetProspectsQuery, useAddProspectMutation, useConvertProspectMutation, useUpdateProspectMutation,useDeleteProspectMutation } = prospectApi;
+export const { useGetProspectsQuery, useGetProspectByIdQuery,  useAddProspectMutation, useConvertProspectMutation, useUpdateProspectMutation,useDeleteProspectMutation } = prospectApi;
 export default prospectApi;

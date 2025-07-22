@@ -85,238 +85,238 @@ const OrderDeatils = ({ id }: { id: string }) => {
     },
   ];
 
-const handleDownloadInvice = async (id: string) => {
-  try {
-    const token = Cookies?.get("token");
-    console.log(token)
-    if (!token) {
-      console.error('Authentication token not found. Please log in.');
-      return; // Stop execution if no token
-    }
+// const handleDownloadInvice = async (id: string) => {
+//   try {
+//     const token = Cookies?.get("token");
+//     console.log(token)
+//     if (!token) {
+//       console.error('Authentication token not found. Please log in.');
+//       return; // Stop execution if no token
+//     }
 
-    // Fetch the PDF as a binary response (arrayBuffer)
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`,
-      {
-        headers: {
-          'Authorization': `${token}`, // Add the Bearer token
-          'Content-Type': 'application/json', // Good practice, though PDF download might not strictly need it
-        },
-      }
-    );
-
-    console.log(response)
-    if (!response.ok) {
-      throw new Error("Failed to fetch PDF");
-    }
-
-    const data = await response.arrayBuffer();
-    const blob = new Blob([data], { type: "application/pdf" });
-    const fileURL = URL.createObjectURL(blob);
-
-    window.open(fileURL, "_blank");
-
-    setTimeout(() => {
-      URL.revokeObjectURL(fileURL);
-    }, 10);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-//----------------------------------------------------------------------------------------------------
-
-const handleDownloadDilverySlip = async (id: string) => {
-  try {
-    const token = Cookies?.get("token");
-    if (!token) {
-      console.error('Authentication token not found. Please log in.');
-      return; // Stop execution if no token
-    }
-
-    // Fetch the PDF as a binary response (arrayBuffer)
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`,
-      {
-        headers: {
-          'Authorization': `${token}`, // Add the Bearer token
-          'Content-Type': 'application/json', // Good practice
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch PDF");
-    }
-
-    const data = await response.arrayBuffer();
-    const blob = new Blob([data], { type: "application/pdf" });
-    const fileURL = URL.createObjectURL(blob);
-
-    window.open(fileURL, "_blank");
-
-    setTimeout(() => {
-      URL.revokeObjectURL(fileURL);
-    }, 10);
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-//----------------------------------------------------------------------------------------------------
-
-const handleDownloadExcel = async () => {
-  try {
-    const token = Cookies?.get("token"); // Get token from localStorage
-    if (!token) {
-      console.error('Authentication token not found. Please log in.');
-      return; // Stop execution if no token
-    }
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true`,
-      {
-        headers: {
-          'Authorization': `${token}`, // Add the Bearer token
-          'Content-Type': 'application/json', // Good practice
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch Excel file");
-    }
-
-    const data = await response.arrayBuffer();
-    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `order_repo.xl`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    URL.revokeObjectURL(link.href);
-  } catch (err) {
-    console.error("Error downloading Excel file:", err);
-  }
-};
-
-//   const handleDownloadInvice = async (id: string) => {
-//     try {
-//       // Fetch the PDF as a binary response (arrayBuffer)
-//       const response = await fetch(
-//         `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`
-        
-//       );
-
-//       if (!response.ok) {
-//         throw new Error("Failed to fetch PDF");
+//     // Fetch the PDF as a binary response (arrayBuffer)
+//     const response = await fetch(
+//       `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`,
+//       {
+//         headers: {
+//           'Authorization': `${token}`, // Add the Bearer token
+//           'Content-Type': 'application/json', // Good practice, though PDF download might not strictly need it
+//         },
 //       }
+//     );
 
-//       // Read the binary data as an ArrayBuffer
-//       const data = await response.arrayBuffer();
+//     console.log(response)
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch PDF");
+//     }
 
-//       // Create a Blob from the ArrayBuffer (this represents a PDF)
-//       const blob = new Blob([data], { type: "application/pdf" });
+//     const data = await response.arrayBuffer();
+//     const blob = new Blob([data], { type: "application/pdf" });
+//     const fileURL = URL.createObjectURL(blob);
 
-//       // Create a temporary link to trigger the download
-//       const fileURL = URL.createObjectURL(blob);
-
-  
 //     window.open(fileURL, "_blank");
-//       // Create a temporary link to trigger the download
-//       // const link = document.createElement("a");
-//       // link.href = URL.createObjectURL(blob);
-//       // link.download = "order_delivery-slip"; 
 
-//       // Clean up the URL object
-//       // URL.revokeObjectURL(link.href);
-//        setTimeout(() => {
+//     setTimeout(() => {
 //       URL.revokeObjectURL(fileURL);
 //     }, 10);
-//     } catch (err) {
-//       console.log(err);
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
+// //----------------------------------------------------------------------------------------------------
+
+// const handleDownloadDilverySlip = async (id: string) => {
+//   try {
+//     const token = Cookies?.get("token");
+//     if (!token) {
+//       console.error('Authentication token not found. Please log in.');
+//       return; // Stop execution if no token
 //     }
-//   };
-//   const handleDownloadDilverySlip = async (id: string) => {
-//     try {
-//       // Fetch the PDF as a binary response (arrayBuffer)
-//       const response = await fetch(
-//         `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`
-        
-//       );
 
-//       if (!response.ok) {
-//         throw new Error("Failed to fetch PDF");
+//     // Fetch the PDF as a binary response (arrayBuffer)
+//     const response = await fetch(
+//       `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`,
+//       {
+//         headers: {
+//           'Authorization': `${token}`, // Add the Bearer token
+//           'Content-Type': 'application/json', // Good practice
+//         },
 //       }
+//     );
 
-//       // Read the binary data as an ArrayBuffer
-//       const data = await response.arrayBuffer();
+//     if (!response.ok) {
+//       throw new Error("Failed to fetch PDF");
+//     }
 
-//       // Create a Blob from the ArrayBuffer (this represents a PDF)
-//       const blob = new Blob([data], { type: "application/pdf" });
-//  const fileURL = URL.createObjectURL(blob);
+//     const data = await response.arrayBuffer();
+//     const blob = new Blob([data], { type: "application/pdf" });
+//     const fileURL = URL.createObjectURL(blob);
 
-  
 //     window.open(fileURL, "_blank");
-//       // Create a temporary link to trigger the download
-//       // const link = document.createElement("a");
-//       // link.href = URL.createObjectURL(blob);
-//       // link.download = "order_delivery-slip"; 
 
-//       // Clean up the URL object
-//       // URL.revokeObjectURL(link.href);
-//        setTimeout(() => {
+//     setTimeout(() => {
 //       URL.revokeObjectURL(fileURL);
 //     }, 10);
-//     } catch (err) {
-//       console.log(err);
-//     }
-//   };
-  
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
+
+// //----------------------------------------------------------------------------------------------------
+
 // const handleDownloadExcel = async () => {
 //   try {
-   
+//     const token = Cookies?.get("token"); // Get token from localStorage
+//     if (!token) {
+//       console.error('Authentication token not found. Please log in.');
+//       return; // Stop execution if no token
+//     }
+
 //     const response = await fetch(
-//       `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true` 
+//       `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true`,
+//       {
+//         headers: {
+//           'Authorization': `${token}`, // Add the Bearer token
+//           'Content-Type': 'application/json', // Good practice
+//         },
+//       }
 //     );
 
 //     if (!response.ok) {
 //       throw new Error("Failed to fetch Excel file");
 //     }
 
- 
 //     const data = await response.arrayBuffer();
+//     const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
 
-   
-//     const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
-
-    
 //     const link = document.createElement("a");
 //     link.href = URL.createObjectURL(blob);
-    
-    
-//     link.download = `order_repo.xl`; 
-  
-   
-//     document.body.appendChild(link);
-    
-   
-//     link.click(); 
-    
-   
-//     document.body.removeChild(link); 
+//     link.download = `order_repo.xl`;
 
-    
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+
 //     URL.revokeObjectURL(link.href);
 //   } catch (err) {
 //     console.error("Error downloading Excel file:", err);
-   
 //   }
 // };
+
+  const handleDownloadInvice = async (id: string) => {
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/orderInvoice/${id}`
+        
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+
+      // Create a temporary link to trigger the download
+      const fileURL = URL.createObjectURL(blob);
+
+  
+    window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip"; 
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+       setTimeout(() => {
+      URL.revokeObjectURL(fileURL);
+    }, 10);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const handleDownloadDilverySlip = async (id: string) => {
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/deliverySheet/${id}`
+        
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+ const fileURL = URL.createObjectURL(blob);
+
+  
+    window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip"; 
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+       setTimeout(() => {
+      URL.revokeObjectURL(fileURL);
+    }, 10);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
+const handleDownloadExcel = async () => {
+  try {
+   
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true` 
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Excel file");
+    }
+
+ 
+    const data = await response.arrayBuffer();
+
+   
+    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
+
+    
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    
+    link.download = `order_repo.xl`; 
+  
+   
+    document.body.appendChild(link);
+    
+   
+    link.click(); 
+    
+   
+    document.body.removeChild(link); 
+
+    
+    URL.revokeObjectURL(link.href);
+  } catch (err) {
+    console.error("Error downloading Excel file:", err);
+   
+  }
+};
 
  if (isLoading) {
     return <div className="p-6 text-center text-gray-700">Loading order details...</div>;

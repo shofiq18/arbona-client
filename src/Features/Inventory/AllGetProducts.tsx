@@ -35,11 +35,14 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loading from "@/redux/Shared/Loading";
 import ErrorState from "@/redux/Shared/ErrorState";
+import ProductFiltersModal from "./FilterModal";
 
 
 
 
 export default function AllGetProducts() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState("");
   const router = useRouter();
   const { data, isLoading, isError } = useGetInventoryQuery();
@@ -48,12 +51,57 @@ export default function AllGetProducts() {
   const products: payload[] = data?.data ?? [];
 
   console.log("get data", products);
+const [activeFilters, setActiveFilters] = useState({
+    category: "",
+    product: "",
+    outOfStock: false,
+    lowStock: false,
+  });
+const handleApplyFilters = (newFilters:any) => {
 
+    setActiveFilters(newFilters);
+
+    setIsModalOpen(false); // Close the modal after applying filters
+
+    setCurrentPage(1); // Reset to the first page when filters change
+
+   
+
+  };
   // Filter products based on search
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()) ||
-    (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
-  );
+  // const filteredProducts = products.filter((product) =>
+  //   product.name.toLowerCase().includes(search.toLowerCase()) ||
+  //   (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
+  // );
+   const filteredProducts = products.filter((product) => {
+    const matchesSearch =
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase());
+
+    const matchesCategory = activeFilters.category
+      ? (product.categoryId?.name || "") === activeFilters.category
+      : true;
+
+    const matchesProduct = activeFilters.product
+      ? product.name === activeFilters.product
+      : true;
+
+    const matchesOutOfStock = activeFilters.outOfStock
+      ? (product.quantity ?? 0) === 0
+      : true;
+
+   const matchesLowStock = activeFilters.lowStock
+  ? (product.quantity ?? 0) < 50 && (product.quantity ?? 0) > 0 
+  : true;
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesProduct &&
+      matchesOutOfStock &&
+      matchesLowStock
+    );
+  });
 
   // Calculate profit percentage dynamically
   const calculateProfitPercentage = (purchasePrice: number, salesPrice: number) => {
@@ -67,6 +115,7 @@ export default function AllGetProducts() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  
 
 
   // Permission check (replace with your auth logic)
@@ -125,7 +174,10 @@ export default function AllGetProducts() {
 
       // Update local state if needed
       setSelectedProduct(updatedProduct);
+     
+      
       setIsUpdateOpen(false);
+  
       toast.success("Product updated successfully!");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -155,13 +207,20 @@ export default function AllGetProducts() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="flex gap-2">
-          <Button
+        <div  className="flex gap-2">
+          <Button onClick={() => setIsModalOpen(true)}
             variant="outline"
             className="bg-orange-500 text-white hover:bg-orange-600"
           >
             Filter
           </Button>
+           <ProductFiltersModal open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        filterData={products} 
+        onApplyFilters={handleApplyFilters} 
+        currentFilters={activeFilters} 
+
+/ >
           <Button
             className="bg-red-600 cursor-pointer hover:bg-red-700 text-white gap-2"
             onClick={() => router.push("/dashboard/add-product")}
@@ -192,8 +251,163 @@ export default function AllGetProducts() {
             <TableRow key={idx} className="text-sm">
               <TableCell>{product.categoryId?.name || ""}</TableCell>
               <TableCell className="text-blue-600 underline cursor-pointer">
-                {product.name}
-              </TableCell>
+
+      <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
+                    <DialogTrigger asChild>
+                      <button
+                        className="cursor-pointer"
+                        onClick={() => setSelectedProduct(product)}
+                      >
+                      {
+                        product.name
+                      }
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl!">
+                      <DialogHeader>
+                        <DialogTitle>Update Product</DialogTitle>
+                      </DialogHeader>
+                      {selectedProduct && (
+                        <form onSubmit={handleUpdate} className="space-y-4">
+                          <Input
+                            value={selectedProduct.name || ""}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, name: e.target.value })}
+                            placeholder="Product Name"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.description ?? ""}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, description: e.target.value })}
+                            placeholder="Description"
+                          />
+                          <Input
+                            value={selectedProduct.packetSize ?? ""}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, packetSize: e.target.value })}
+                            placeholder="Packet Size"
+                            required
+                          />
+                          <div className="flex gap-2">
+                            <Input
+                              value={selectedProduct.weight?.toString() ?? "0"}
+                              onChange={(e) => setSelectedProduct({ ...selectedProduct, weight: parseFloat(e.target.value) || 0 })}
+                              type="number"
+                              step="0.1"
+                              placeholder="Weight"
+                              required
+                            />
+                            <Input
+                              value={selectedProduct.weightUnit ?? ""}
+                              onChange={(e) => setSelectedProduct({ ...selectedProduct, weightUnit: e.target.value })}
+                              placeholder="Unit (e.g., KILOGRAM)"
+                              required
+                            />
+                          </div>
+                          <Input
+                            value={selectedProduct?.categoryId?._id || ""}
+                            readOnly
+                            placeholder="Category ID"
+                          />
+                          <Input
+                            value={selectedProduct.reorderPointOfQuantity?.toString() ?? "0"}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, reorderPointOfQuantity: parseInt(e.target.value) || 0 })}
+                            type="number"
+                            placeholder="Reorder Point"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.quantity?.toString() ?? "0"}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, quantity: parseInt(e.target.value) || 0 })}
+                            type="number"
+                            placeholder="Quantity"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.warehouseLocation ?? ""}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, warehouseLocation: e.target.value })}
+                            placeholder="Warehouse Location"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.purchasePrice?.toString() ?? "0"}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, purchasePrice: parseFloat(e.target.value) || 0 })}
+                            type="number"
+                            step="0.01"
+                            placeholder="Purchase Price"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.salesPrice?.toString() ?? "0"}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, salesPrice: parseFloat(e.target.value) || 0 })}
+                            type="number"
+                            step="0.01"
+                            placeholder="Sales Price"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.competitorPrice?.toString() ?? "0"}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, competitorPrice: parseFloat(e.target.value) || 0 })}
+                            type="number"
+                            step="0.01"
+                            placeholder="Competitor Price"
+                            required
+                          />
+                          <Input
+                            value={selectedProduct.barcodeString ?? ""}
+                            onChange={(e) => setSelectedProduct({ ...selectedProduct, barcodeString: e.target.value })}
+                            placeholder="Barcode"
+                            required
+                          />
+                          <div className="flex gap-2">
+                            <Input
+                              value={selectedProduct.packageDimensions?.length?.toString() ?? "0"}
+                              onChange={(e) => setSelectedProduct({
+                                ...selectedProduct,
+                                packageDimensions: { ...selectedProduct.packageDimensions, length: parseFloat(e.target.value) || 0 }
+                              })}
+                              type="number"
+                              step="0.1"
+                              placeholder="Length"
+                              required
+                            />
+                            <Input
+                              value={selectedProduct.packageDimensions?.width?.toString() ?? "0"}
+                              onChange={(e) => setSelectedProduct({
+                                ...selectedProduct,
+                                packageDimensions: { ...selectedProduct.packageDimensions, width: parseFloat(e.target.value) || 0 }
+                              })}
+                              type="number"
+                              step="0.1"
+                              placeholder="Width"
+                              required
+                            />
+                            <Input
+                              value={selectedProduct.packageDimensions?.height?.toString() ?? "0"}
+                              onChange={(e) => setSelectedProduct({
+                                ...selectedProduct,
+                                packageDimensions: { ...selectedProduct.packageDimensions, height: parseFloat(e.target.value) || 0 }
+                              })}
+                              type="number"
+                              step="0.1"
+                              placeholder="Height"
+                              required
+                            />
+                            <Input
+                              value={selectedProduct.packageDimensions?.unit ?? ""}
+                              onChange={(e) => setSelectedProduct({
+                                ...selectedProduct,
+                                packageDimensions: { ...selectedProduct.packageDimensions, unit: e.target.value }
+                              })}
+                              placeholder="Unit (e.g., CM)"
+                              required
+                            />
+                          </div>
+                          <Button type="submit">Save Changes</Button>
+                          <Button variant="outline" onClick={() => setIsUpdateOpen(false)}>Cancel</Button>
+                        </form>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                    </TableCell>
               <TableCell>{product.quantity?.toLocaleString() ?? ""}</TableCell>
               <TableCell>
                 {product.purchasePrice ? `$${product.purchasePrice.toFixed(2)}` : ""}

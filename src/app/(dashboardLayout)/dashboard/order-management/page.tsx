@@ -662,18 +662,7 @@ export default function OrderManagement(): React.ReactElement {
                     </Link>
                   </TableCell>
                   <TableCell  className="text-sm">
-                  <ReusableModal
-                        open={updateOrderOpen}
-                        onOpenChange={setUpdateOrderOpen}
-                        trigger={
-                          <button className="cursor-pointer hover:bg-gray-100 p-2 rounded-full transition-colors">
-                              {order.PONumber}
-                          </button>
-                        }
-                        title="Update Order"
-                      >
-                        <UpdateOrderPage key={idx} order={order} />
-                      </ReusableModal>
+                 {order.PONumber}
                    
                   
                   </TableCell>

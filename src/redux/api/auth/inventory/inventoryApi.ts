@@ -17,6 +17,7 @@ export interface payload {
   packetSize: string;
   weight: number;
   weightUnit: string;
+  incomingQuantity: number;
   profitPercentage: number;
   packageDimensions: {
     length: number;

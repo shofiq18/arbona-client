@@ -182,9 +182,7 @@ export default function ProspectDetails() {
               />
             </div>
             <div>
-              <button className="bg-yellow-500 text-white mr-4 px-4 py-2 rounded-lg hover:bg-yellow-600 transition duration-200">
-                Filter
-              </button>
+              
               <button
                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
                 onClick={() => router.push("/dashboard/add-prospact")}

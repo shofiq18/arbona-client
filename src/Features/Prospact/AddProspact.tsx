@@ -55,41 +55,33 @@ interface FormData {
 export default function AddProspact(): React.ReactElement {
   const [formData, setFormData] = useState<FormData>({
     _id: "",
-    storeName: "Manual Paper Supplies",
-    storePhone: "555-0198",
-    storePersonEmail: "owner@royalpaper.com",
-    storePersonName: "Alice Johnson",
-    storePersonPhone: "555-0234",
-    salesTaxId: "TX-452198",
-    shippingAddress: "456 Elm Street",
-    shippingState: "Texas",
-    shippingZipcode: "75001",
-    shippingCity: "Dallas",
-    miscellaneousDocImage: "https://i.postimg.cc/fRyv1Djb/doc.png",
-    leadSource: "Trade Show",
-    note: "Interested in premium thermal paper, requests samples before bulk order.",
+    storeName: "",
+    storePhone: "",
+    storePersonEmail: "",
+    storePersonName: "",
+    storePersonPhone: "",
+    salesTaxId: "",
+    shippingAddress: "",
+    shippingState: "",
+    shippingZipcode: "",
+    shippingCity: "",
+    miscellaneousDocImage: "",
+    leadSource: "",
+    note: "",
     status: "contacted",
-    assignedSalesPerson: "6866f2a31b30a47987705344",
-    followUpActivities: [{ activity: "Follow-up call for samples feedback", activityDate: "2025-07-10", activityMedium: "call" }],
-    quotedList: [
-      {
-        productObjId: "686eea6ac3e14203529ced6c",
-        itemNumber: "PRO-14",
-        itemName: "Premium Thermal Paper Rolls",
-        packSize: "",
-        price: 150,
-        packetSize: "50 rolls",
-      },
-    ],
-    competitorStatement: "Currently buying from PaperWorld at lower price but quality issues reported.",
+    assignedSalesPerson: "",
+    followUpActivities: [],
+    quotedList: [],
+    competitorStatement: "",
   });
+
+  console.log("formdata ", formData)
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
   const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
   const [newQuote, setNewQuote] = useState<QuotedListItem>({
     productObjId: "",
     itemNumber: "",
     itemName: "",
-    packSize: "",
     price: 0,
     packetSize: "",
   });
@@ -152,7 +144,6 @@ export default function AddProspact(): React.ReactElement {
           productObjId: selectedProduct._id,
           itemNumber: selectedProduct.itemNumber,
           itemName: selectedProduct.name,
-          packSize: selectedProduct.packetSize,
           price: selectedProduct.salesPrice,
           packetSize: selectedProduct.packetSize || "",
         });
@@ -166,7 +157,7 @@ export default function AddProspact(): React.ReactElement {
   };
 
   const addQuote = () => {
-    if (!newQuote.productObjId || !newQuote.itemNumber || !newQuote.itemName || !newQuote.packSize || !newQuote.price) {
+    if (!newQuote.productObjId || !newQuote.itemNumber || !newQuote.itemName ||  !newQuote.price) {
       toast.error("All required quote fields must be filled.");
       return;
     }
@@ -174,7 +165,7 @@ export default function AddProspact(): React.ReactElement {
       ...prev,
       quotedList: [...prev.quotedList, { ...newQuote, packetSize: newQuote.packetSize || "" }],
     }));
-    setNewQuote({ productObjId: "", itemNumber: "", itemName: "", packSize: "", price: 0, packetSize: "" });
+    setNewQuote({ productObjId: "", itemNumber: "", itemName: "",  price: 0, packetSize: "" });
     setIsQuoteModalOpen(false);
   };
 
@@ -208,7 +199,7 @@ export default function AddProspact(): React.ReactElement {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const payload: AddProspectRequest = {
+    const payload = {
      
       storeName: formData.storeName,
       storePhone: formData.storePhone,
@@ -232,7 +223,9 @@ export default function AddProspact(): React.ReactElement {
 
     console.log("check local data", payload);
     try {
-      await addProspect(payload).unwrap();
+     const addData= await addProspect(payload as any).unwrap();
+     
+     console.log("adddata", addData)
       toast.success("Prospect Added successfully");
       router.push("/dashboard/prospact");
     } catch (err) {
@@ -521,7 +514,6 @@ export default function AddProspact(): React.ReactElement {
                   <th className="px-4 py-2">Product ID</th>
                   <th className="px-4 py-2">Item #</th>
                   <th className="px-4 py-2">Item Name</th>
-                  <th className="px-4 py-2">Pack Size</th>
                   <th className="px-4 py-2">Price ($)</th>
                   <th className="px-4 py-2">Packet Size</th>
                   <th className="px-4 py-2">Action</th>
@@ -533,7 +525,6 @@ export default function AddProspact(): React.ReactElement {
                     <td className="px-4 py-2">{item.productObjId}</td>
                     <td className="px-4 py-2">{item.itemNumber}</td>
                     <td className="px-4 py-2">{item.itemName}</td>
-                    <td className="px-4 py-2">{item.packSize}</td>
                     <td className="px-4 py-2">${item.price}</td>
                     <td className="px-4 py-2">{item.packetSize || "N/A"}</td>
                     <td className="px-4 py-2">
@@ -656,18 +647,7 @@ export default function AddProspact(): React.ReactElement {
                   disabled
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="packSize">Pack Size</Label>
-                <Input
-                  id="packSize"
-                  name="packSize"
-                  value={newQuote.packSize}
-                  onChange={handleQuoteInputChange}
-                  placeholder="Pack Size"
-                  className="w-full"
-                  disabled
-                />
-              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="price">Price ($)</Label>
                 <Input

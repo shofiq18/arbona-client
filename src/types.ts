@@ -52,47 +52,7 @@ export interface Order {
   __v: number;
 }
 
-// export interface FilterFormValues {
-//   hasOpenBalance: undefined;
-//   paymentDueStartDate: boolean;
-//   paymentDueEndDate: boolean;
-//   storeIds: boolean;
-//   minOrderAmount: number;
-//   maxOrderAmount: string;
-//   paymentStatus: any;
-//   orderStatus: any;
-//   endDate: any;
-//   startDate: any;
-//   // Define your filter form values here
-//   dateRange?: string;
-//   status?: string;
-//   storeId?: string;
-//   // Add other filter fields as needed
-// }
 
-// export interface ReusableModalProps {
-//   open: boolean;
-//   onOpenChange: (open: boolean) => void;
-//   trigger: React.ReactNode;
-//   title: string;
-//   children: React.ReactNode;
-// }
-
-// export interface FilterFormValues {
-//   fromDate: string;
-//   toDate: string;
-//   fromDueDate: string;
-//   toDueDate: string;
-//   storeName: string;
-//   productStatus: string;
-//   orderStatus: string;
-//   verificationStatus: string;
-// }
-
-// export interface OrderFilterFormProps {
-//   onSubmit: (values: FilterFormValues) => void;
-//   onClear?: () => void;
-// }
 
 export interface ReusableModalProps {
   open: boolean;
@@ -102,23 +62,7 @@ export interface ReusableModalProps {
   children: React.ReactNode;
 }
 
-// export interface FilterFormValues {
-//   hasOpenBalance?: boolean; // undefined is not a valid type, use optional field
-//   paymentDueStartDate?: Date | string | number;
-//   paymentDueEndDate?: Date | string | number;
-//   storeIds?: string[]; // boolean was incorrect
-//   minOrderAmount?: number;
-//   maxOrderAmount?: number; // changed from string to number
-//   paymentStatus?: string | null; // better than `any`
-//   // orderStatus?: string | null;
-//   endDate?: Date | string | number;
-//   startDate?: Date | string | number;
-//   dateRange?: string;
-//   status?: string;
-//   storeId?: string;
-//   orderStatus?: string[];
 
-// }
 
 export interface AddOrderFormValues {
   date: string;
@@ -141,40 +85,7 @@ export interface AddOrderFormProps {
   onCancel?: () => void;
 }
 
-// customer table data type
 
-// export interface Customer {
-//   _id: string;
-//   storeName: string;
-//   storePhone: string;
-//   storePersonEmail: string;
-//   storePersonName: string;
-//   storePersonPhone: string;
-//   billingAddress: string;
-//   billingState: string;
-//   billingZipcode: string;
-//   billingCity: string;
-//   shippingAddress: string;
-//   shippingState: string;
-//   shippingZipcode: string;
-//   shippingCity: string;
-//   salesTaxId: string;
-//   acceptedDeliveryDays: string[];
-//   bankACHAccountInfo: string;
-//   creditApplication: string;
-//   ownerLegalFrontImage: string;
-//   ownerLegalBackImage: string;
-//   voidedCheckImage: string;
-//   isDeleted: boolean;
-//   createdAt: string;
-//   updatedAt: string;
-//   // Optional fields from fakeData, assuming they might exist
-//   openBalance?: string;
-//   totalOrders?: number;
-//   totalOrderAmount?: string;
-//   isCustomerSourceProspect?: boolean;
-
-// }
 
 // "@/types/index.ts" or similar
 
@@ -192,6 +103,7 @@ interface CustomerOrder {
   profitAmount: number;
   profitPercentage: number;
   paymentStatus: string;
+  storeId: string;
 }
 
 export interface Customer {
@@ -241,8 +153,10 @@ export interface ContainerProduct {
   itemNumber: string;
   quantity: number;
   perCaseCost: number;
+  packetSize: string;
   purchasePrice: number;
   salesPrice: number;
+  
 }
 
 export interface Container {
@@ -362,11 +276,7 @@ export interface Prospect {
     updatedAt: string;
     __v: number;
   };
-  followUpActivities: {
-    activity: string;
-    activityDate: string;
-    activityMedium: string;
-  }[];
+  
   quotedList: {
     productObjId?: {
       _id: string;
@@ -420,7 +330,7 @@ export interface QuotedListItem {
   productObjId: string; // 24-char ObjectId (e.g., "686eea6ac3e14203529ced6c")
   itemNumber: string;
   itemName: string;
-  packSize: string;
+  
   price: number;
   // Optional, 24-char ObjectId if required by API
   packetSize?: string; // New field from sample data, optional if not always present
@@ -430,8 +340,8 @@ export interface QuotedListItem {
 export interface FollowUpActivity {
   activity: string;
   activityDate: string; // ISO date string (e.g., "2025-07-10")
-  activityMedium: "call" | "email" | "meeting" | "whatsapp"; // Updated to include "call"
-  _id?: string; // Optional, 24-char ObjectId if required by API
+  activityMedium:string; // Updated to include "call"
+  // Optional, 24-char ObjectId if required by API
 }
 
 // AddProspectRequest type (full form data structure)

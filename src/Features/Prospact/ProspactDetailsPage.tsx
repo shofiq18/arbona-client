@@ -165,7 +165,7 @@ export default function ProspectDetails() {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
   console.log('pagination prospact', paginatedProspects)
-// const actualCustomers = paginatedProspects.filter(customer => customer.isCustomerSourceProspect === false);
+const actualCustomers = paginatedProspects.filter(customer => customer.status !== "converted");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -210,7 +210,7 @@ export default function ProspectDetails() {
               </tr>
             </thead>
             <tbody>
-              {paginatedProspects.map((prospect) => (
+              {actualCustomers.map((prospect) => (
                 <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
                   <td className="p-3 text-gray-800">{prospect.storeName}</td>
                   <td className="p-3 text-gray-800">{prospect.assignedSalesPerson.email}</td>

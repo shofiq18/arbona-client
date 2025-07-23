@@ -348,7 +348,7 @@ const handleApplyFilters = (newFilters:any) => {
         </TableHeader>
 
         <TableBody>
-          {filteredProducts.map((product, idx) => (
+          {filteredProducts?.map((product, idx) => (
             <TableRow key={idx} className="text-sm">
               <TableCell className="text-blue-600 underline cursor-pointer">
                 {product.name}

@@ -29,6 +29,7 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 // Updated interfaces to include payment due date
 interface Product {
@@ -89,7 +90,7 @@ interface OrderPayload {
   products: OrderProduct[];
 }
 
-const AddOrderPage = () => {
+const AddOrderPage = ({setAddOrderOpen}:{setAddOrderOpen:any}) => {
   // Updated state to include payment due date
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [orderDate, setOrderDate] = useState<string>(
@@ -305,7 +306,8 @@ const AddOrderPage = () => {
               <Calendar className="w-4 h-4" /> Delivery Date
             </Label>
             <Input
-              type="shippingDate"
+              type="date"
+              name="shippingDate"
               value={orderDate}
               onChange={(e) => setOrderDate(e.target.value)}
             />
@@ -401,7 +403,7 @@ const AddOrderPage = () => {
                             </div>
                           </div>
                           <div className="text-sm font-semibold">
-                            ₹{orderItem?.product.price || product.salesPrice}
+                            ${orderItem?.product.price || product.salesPrice}
                           </div>
                         </div>
                         <div className="mt-2">
@@ -477,7 +479,7 @@ const AddOrderPage = () => {
                                   />
                                 </label>
                                 <span>
-                                  Total: ₹{orderItem.total.toFixed(2)}
+                                  Total: ${orderItem.total.toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -530,7 +532,7 @@ const AddOrderPage = () => {
                           </span>
                         </div>
                         <span className="font-semibold ml-2">
-                          ₹{item.total.toFixed(2)}
+                          ${item.total.toFixed(2)}
                         </span>
                       </div>
                     ))
@@ -544,7 +546,7 @@ const AddOrderPage = () => {
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Order Amount:</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </Card>
@@ -552,9 +554,11 @@ const AddOrderPage = () => {
         </div>
 
         <div className="flex justify-end mt-4">
-          <Button variant="outline" className="mr-2">
-            Cancel
-          </Button>
+        
+          <Button onClick={() => setAddOrderOpen(false)} variant="outline" className="mr-2">
+  Cancel
+</Button>
+        
           <Button
             className="bg-blue-600 hover:bg-blue-700"
             disabled={

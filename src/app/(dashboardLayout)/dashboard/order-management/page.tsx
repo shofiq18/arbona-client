@@ -149,6 +149,7 @@ export default function OrderManagement(): React.ReactElement {
   // }
 
   // States
+    const [isVisible, setIsVisible] = useState(true);
   const [addOrderOpen, setAddOrderOpen] = useState(false);
   const [updateOrderOpen, setUpdateOrderOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -452,7 +453,8 @@ export default function OrderManagement(): React.ReactElement {
   return (
     <div>
       {/* Section 1: Orders Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+
+      { isVisible&&  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {cardData.map((card, idx) => (
           <div
             style={{ backgroundColor: card.bg }}
@@ -493,6 +495,9 @@ export default function OrderManagement(): React.ReactElement {
           </div>
         ))}
       </div>
+
+      }
+    
       {/* Active Filters Display */}
       {showActiveFilters && activeFilters && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -554,7 +559,7 @@ export default function OrderManagement(): React.ReactElement {
         <div className="relative max-w-xs">
           <Input
             type="text"
-            placeholder="Search orders..."
+            placeholder="Search by store name..."
             value={searchTerm}
             onChange={handleSearchChange}
             className="pr-8"
@@ -579,7 +584,7 @@ export default function OrderManagement(): React.ReactElement {
           )}
         </div>
         <div className="flex items-center space-x-2">
-          <Button className="bg-[#21C45D]">Hide Boards</Button>
+          <Button onClick={()=>setIsVisible(!isVisible)} className="bg-[#21C45D]">Hide Boards</Button>
           <ReusableModal
             open={filterOpen}
             onOpenChange={setFilterOpen}
@@ -610,10 +615,11 @@ export default function OrderManagement(): React.ReactElement {
           <ReusableModal
             open={addOrderOpen}
             onOpenChange={setAddOrderOpen}
+           
             trigger={<Button className="bg-[#EF4343]">+ Add Order</Button>}
             title="Add New Order"
           >
-            <AddOrderPage />
+            <AddOrderPage  setAddOrderOpen={setAddOrderOpen} />
           </ReusableModal>
           {/* <DropdownMenu>
   <DropdownMenuTrigger>  <ImFilePdf className="w-5 h-5 text-black" /></DropdownMenuTrigger>

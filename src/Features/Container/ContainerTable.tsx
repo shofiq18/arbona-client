@@ -72,11 +72,17 @@ export default function ContainerTable() {
 
     console.log("container data ", containers)
 
-    const filteredData: Container[] = useMemo(() => {
-        return containers.filter((c) =>
-            `${c.containerName} ${c.containerNumber}`.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [search, containers]);
+    // const filteredData: Container[] = useMemo(() => {
+    //     return containers.filter((c) =>
+    //         `${c.containerName} ${c.containerNumber}`.toLowerCase().includes(search.toLowerCase())
+    //     );
+    // }, [search, containers]);
+
+
+     const filteredData = containers.filter((cont) =>
+    cont.containerName.toLowerCase().includes(search.toLowerCase()) || cont.containerNumber.toLowerCase().includes(search.toLowerCase())
+  );
+
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData: Container[] = useMemo(() => {
@@ -402,7 +408,7 @@ export default function ContainerTable() {
 
             <div className="flex justify-between items-center text-sm text-gray-600 mt-4">
                 <p>
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to
                     {Math.min(currentPage * itemsPerPage, filteredData.length)} of {filteredData.length}
                 </p>
                 <div className="flex items-center gap-1">

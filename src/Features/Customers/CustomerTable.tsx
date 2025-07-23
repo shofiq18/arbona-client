@@ -31,7 +31,7 @@ export default function CustomerTable() {
 
   // Filter customers based on search (storePersonName)
   const filteredData = customers.filter((customer) =>
-    customer.storePersonName.toLowerCase().includes(search.toLowerCase())
+    customer.storeName.toLowerCase().includes(search.toLowerCase()) || customer.storePersonName.toLowerCase().includes(search.toLowerCase())
   );
 
   // Calculate pagination
@@ -125,9 +125,9 @@ export default function CustomerTable() {
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePhone}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonPhone}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">{row.storePersonEmail}</td>
-                <td className="p-2 whitespace-nowrap text-gray-700">{row.openBalance || "N/A"}</td>
-                <td className="p-2 whitespace-nowrap text-gray-700">{row.totalOrders || "N/A"}</td>
-                <td className="p-2 whitespace-nowrap text-gray-700">{row.totalOrderAmount || "N/A"}</td>
+                <td className="p-2 whitespace-nowrap text-gray-700">${row.openBalance || "N/A"}</td>
+                <td className="p-2 whitespace-nowrap text-gray-700">${row.totalOrders || "N/A"}</td>
+                <td className="p-2 whitespace-nowrap text-gray-700">${row.totalOrderAmount || "N/A"}</td>
                 <td className="p-2 whitespace-nowrap text-gray-700">
                   {row.isCustomerSourceProspect === true ? "Convert" : "Direct"}
                 </td>
@@ -279,16 +279,7 @@ export default function CustomerTable() {
           >
             »
           </button>
-          <select
-            className="ml-2 border px-2 py-1 rounded bg-gray-100 text-gray-700"
-            value={itemsPerPage}
-            onChange={(e) => {
-              setCurrentPage(1); // Reset to first page on change
-            }}
-            disabled
-          >
-            <option value="20">20</option>
-          </select>
+          
         </div>
       </div>
     </div>

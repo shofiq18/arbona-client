@@ -42,7 +42,7 @@ const BestSellingProducts: React.FC = () => {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
+    <div className="px-4 py-3 bg-white rounded-lg shadow-md ">
       <div className="flex justify-between items-center mb-4">
         <select
           value={selectedOption}
@@ -64,7 +64,7 @@ const BestSellingProducts: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {products.map((product) => (
+            {products.slice(0,5).map((product) => (
               <tr key={product._id} className="border-t">
                 <td className="flex items-center p-2">{product.name || 'Unknown Product'}</td>
                 <td className="p-2">{product.numberOfOrders}</td>

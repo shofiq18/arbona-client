@@ -7,6 +7,7 @@ import {
   useConvertProspectMutation,
   useDeleteProspectMutation,
   useGetProspectsQuery,
+  useSendEmailMutation,
   useUpdateProspectMutation,
 } from "@/redux/api/auth/prospact/prospactApi";
 import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
@@ -45,7 +46,7 @@ export default function ProspectDetails() {
 
   // Uncomment this if you intend to use the convert mutation
   const [convertProspect] = useConvertProspectMutation();
-
+const [sendEmail]=useSendEmailMutation()
 
   // Fetch all salespeople
   const {
@@ -166,6 +167,17 @@ export default function ProspectDetails() {
   };
   console.log('pagination prospact', paginatedProspects)
 const actualCustomers =prospects.filter(customer => customer.status !== "converted");
+
+const handileClickSendEMail=async(id:string)=>{
+
+  try {
+   const email= await sendEmail(id)
+   console.log( "send email",email)
+    toast.success("Email success fully send ")
+  } catch (error) {
+    console.log(error)
+  }
+}
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -203,6 +215,7 @@ const actualCustomers =prospects.filter(customer => customer.status !== "convert
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Sales Person</th>
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Next Follow-Up</th>
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Quote Status</th>
+                <th className="border-b p-3 text-left font-semibold text-gray-700">Quote Sent to Client</th>
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Competitor Statement</th>
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Notes</th>
                 <th className="border-b p-3 text-left font-semibold text-gray-700">Convert Customer</th>
@@ -242,6 +255,9 @@ const actualCustomers =prospects.filter(customer => customer.status !== "convert
                       "Pending"
                     )}
                   </td>
+                   <td className="p-3 text-gray-800">
+                    <button onClick={()=>handileClickSendEMail(prospect._id)} className="bg-blue-500 text-white px-2 py-1 ml-1 rounded-lg hover:bg-blue-600 transition duration-200" >Sent Quote</button>
+                   </td>
                   <td className="p-3 text-gray-800">
                     {prospect.competitorStatement ? (
                       <span

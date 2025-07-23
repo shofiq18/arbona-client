@@ -191,14 +191,23 @@ const prospectApi = baseApi.injectEndpoints({
         },
          invalidatesTags: ["PROSPECT"], // Add this to re-fetch prospects after deletion
       }),
- 
-
+    
+  }),
+     sendEmail: builder.mutation<{ success: boolean; message?: string }, string>({
+      query: (id) => ({
+        url: `/prospect/${id}/send-quote`, // Corrected: Use backticks for template literals
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`, // Corrected: Use backticks
+        },
+         invalidatesTags: ["PROSPECT"], // Add this to re-fetch prospects after deletion
+      }),
     
   }),
   }),
 });
 
-export const { useGetProspectsQuery, useGetProspectByIdQuery,  useAddProspectMutation, useConvertProspectMutation, useUpdateProspectMutation,useDeleteProspectMutation } = prospectApi;
+export const { useGetProspectsQuery,  useGetProspectByIdQuery,  useAddProspectMutation, useConvertProspectMutation, useUpdateProspectMutation,useDeleteProspectMutation, useSendEmailMutation } = prospectApi;
 export default prospectApi;
 
 

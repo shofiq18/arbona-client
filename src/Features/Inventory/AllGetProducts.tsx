@@ -313,9 +313,7 @@ const handleApplyFilters = (newFilters:any) => {
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
                       <ImFilePdf className="w-5 h-5 text-black" />
                     </Button>
-                    <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
-                      <FaFileExcel className="w-5 h-5 text-black" />
-                    </Button>
+                   
         </div>
       </div>
       {/* add dialog */}

@@ -717,88 +717,87 @@ export default function UpdateProspectPage({ prospectId }: { prospectId: string 
         </div>
       </form>
 
+     
       {isQuoteModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add Quote Info</h2>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="productObjId">Product ID</Label>
-                <select
-                  id="productObjId"
-                  name="productObjId"
-                  value={newQuote.productObjId}
-                  onChange={handleQuoteInputChange}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={isInventoryLoading}
-                >
-                  <option value="">Select Product</option>
-                  {inventoryData?.data?.map((product: Product) => (
-                    <option key={product._id} value={product._id}>
-                      {product.name} (Item #: {product.itemNumber})
-                    </option>
-                  )) || <option disabled>No products available</option>}
-                </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="itemNumber">Item Number</Label>
-                <Input
-                  id="itemNumber"
-                  name="itemNumber"
-                  value={newQuote.itemNumber}
-                  placeholder="Item Number"
-                  className="w-full"
-                  disabled // This field is auto-filled
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="itemName">Item Name</Label>
-                <Input
-                  id="itemName"
-                  name="itemName"
-                  value={newQuote.itemName}
-                  placeholder="Item Name"
-                  className="w-full"
-                  disabled // This field is auto-filled
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  value={newQuote.price}
-                  placeholder="Price"
-                  className="w-full"
-                  disabled // This field is auto-filled
-                />
-              </div>
-              {/* Added Packet Size if it's meant to be distinct or displayed */}
-              <div className="space-y-2">
-                <Label htmlFor="packetSize">Packet Size (from Product)</Label>
-                <Input
-                  id="packetSize"
-                  name="packetSize"
-                  value={newQuote.packetSize}
-                  placeholder="Packet Size"
-                  className="w-full"
-                  disabled // This field is auto-filled
-                />
-              </div>
-            </div>
-            <div className="flex justify-end space-x-4 mt-4">
-              <Button type="button" onClick={() => setIsQuoteModalOpen(false)} variant="outline">
-                Cancel
-              </Button>
-              <Button type="button" onClick={addQuote} className="bg-blue-600 text-white">
-                Add Quote
-              </Button>
-            </div>
-          </div>
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h2 className="text-xl font-bold mb-4">Add Quote Info</h2>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="productObjId">Product ID</Label>
+          <select
+            id="productObjId"
+            name="productObjId"
+            value={newQuote.productObjId}
+            onChange={handleQuoteInputChange}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={isInventoryLoading}
+          >
+            <option value="">Select Product</option>
+            {inventoryData?.data?.map((product: Product) => (
+              <option key={product._id} value={product._id}>
+                {product.name} (Item #: {product.itemNumber})
+              </option>
+            )) || <option disabled>No products available</option>}
+          </select>
         </div>
-      )}
+        <div className="space-y-2">
+          <Label htmlFor="itemNumber">Item Number</Label>
+          <Input
+            id="itemNumber"
+            name="itemNumber"
+            value={newQuote.itemNumber}
+            placeholder="Item Number"
+            className="w-full"
+            disabled // This field is auto-filled
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="itemName">Item Name</Label>
+          <Input
+            id="itemName"
+            name="itemName"
+            value={newQuote.itemName}
+            placeholder="Item Name"
+            className="w-full"
+            disabled // This field is auto-filled
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="price">Price ($)</Label>
+          <Input
+            id="price"
+            name="price"
+            type="number"
+            value={newQuote.price}
+            onChange={handleQuoteInputChange} // Ensure price changes are handled
+            placeholder="Enter price"
+            className="w-full"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="packetSize">Packet Size (from Product)</Label>
+          <Input
+            id="packetSize"
+            name="packetSize"
+            value={newQuote.packetSize}
+            placeholder="Packet Size"
+            className="w-full"
+            disabled // This field is auto-filled
+          />
+        </div>
+      </div>
+      <div className="flex justify-end space-x-4 mt-4">
+        <Button type="button" onClick={() => setIsQuoteModalOpen(false)} variant="outline">
+          Cancel
+        </Button>
+        <Button type="button" onClick={addQuote} className="bg-blue-600 text-white">
+          Add Quote
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
 
       {isFollowUpModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

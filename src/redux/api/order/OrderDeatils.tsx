@@ -43,7 +43,7 @@ import Link from "next/link";
 
 const OrderDeatils = ({ id }: { id: string }) => {
   const { data, isError, isLoading } = useGiteSingleOrderQuery(id);
-  console.log(data);
+  console.log("order deatils data", data);
   const [searchQuery, setSearchQuery] = useState("");
 
   const orderData = [
@@ -374,27 +374,27 @@ const OrderDeatils = ({ id }: { id: string }) => {
                 <TableHead className="font-semibold">Net Price</TableHead>
                 <TableHead className="font-semibold">Profit</TableHead>
                 <TableHead className="font-semibold">Scan Status</TableHead>
-                <TableHead className="font-semibold">Action</TableHead>
+               
               </TableRow>
             </TableHeader>
             <TableBody>
               {data?.data?.products?.map((item: any, index: number) => (
                 <TableRow key={index} className="hover:bg-gray-50">
                   <TableCell className="font-medium">
-                    {item?.productId.name}
+                    {item?.productId?.name}
                   </TableCell>
                   <TableCell   className="text-blue-600 cursor-pointer">
-                    {item?.productId.itemNumber}
+                    {item?.productId?.itemNumber}
                   </TableCell>
-                  <TableCell>{item.productId.barcodeString}</TableCell>
-                  <TableCell>{item.productId.categoryId.name}</TableCell>
-                  <TableCell>{item.quantity}</TableCell>
+                  <TableCell>{item?.productId?.barcodeString}</TableCell>
+                  <TableCell>{item?.productId?.categoryId?.name}</TableCell>
+                  <TableCell>{item?.quantity}</TableCell>
                   <TableCell>
-                    {item.productId.purchasePrice.toFixed(2)}
+                    {item?.productId?.purchasePrice.toFixed(2)}
                   </TableCell>
-                  <TableCell>{item.discount.toFixed(2)}</TableCell>
-                  <TableCell>{item.productId.salesPrice.toFixed(2)}</TableCell>
-                  <TableCell>{item.productId.competitorPrice}</TableCell>
+                  <TableCell>{item?.discount?.toFixed(2)}</TableCell>
+                  <TableCell>{item?.productId?.salesPrice.toFixed(2)}</TableCell>
+                  <TableCell>{item?.productId?.competitorPrice}</TableCell>
                   <TableCell>
                     <Badge
                       variant="secondary"
@@ -403,16 +403,7 @@ const OrderDeatils = ({ id }: { id: string }) => {
                       panding
                     </Badge>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Edit className="h-4 w-4 text-gray-600" />
-                      </Button>
-                      <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
-                        <Eye className="h-4 w-4 text-gray-600" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  
                 </TableRow>
               ))}
             </TableBody>

@@ -1,18 +1,25 @@
-
-
-
 "use client";
 
-import { useGetCustomerQuery } from "@/redux/api/customers/customersApi";
+import { useGetCustomerQuery, useSendEmailForNotPaidOrdersMutation } from "@/redux/api/customers/customersApi";
 import { useParams } from "next/navigation";
 import Loading from "@/redux/Shared/Loading"; // Adjust path as needed
 import Link from "next/link";
-
+import { toast } from "react-toastify";
+import { useState } from "react";
+import { format } from "date-fns";
 
 const CustomerDetailsPage: React.FC = () => {
   const params = useParams();
   const id = params.id as string;
   const { data, isLoading, isError } = useGetCustomerQuery(id);
+
+  // State for mutation status
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  // Mutation hook
+  const [sendEmail] = useSendEmailForNotPaidOrdersMutation();
 
   if (isLoading) {
     return <Loading title="Loading Customer Details..." message="Customer details fetched successfully" />;
@@ -23,7 +30,31 @@ const CustomerDetailsPage: React.FC = () => {
   }
 
   const customer = data.data;
-  console.log("customer", customer)
+  console.log("customer", customer);
+
+  // Function to handle email sending
+  const handleSendEmail = async () => {
+    setIsSending(true);
+    setSendError(null);
+    setIsSuccess(false);
+
+    try {
+      const response = await sendEmail(id).unwrap();
+      if (response.success) {
+        toast.success("Email sent successfully!");
+        setIsSuccess(true);
+      } else {
+        throw new Error(response.message || "Failed to send email");
+      }
+    } catch (error: any) {
+      console.error("Error sending email:", error);
+      const errorMessage = error?.data?.message || "Failed to send email. Please try again.";
+      toast.error(errorMessage);
+      setSendError(errorMessage);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
@@ -127,6 +158,26 @@ const CustomerDetailsPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Emailing Section */}
+        <div>
+          {customer.openBalance ? (
+            <div className="flex items-center justify-between border p-3 rounded-2xl bg-white border-red-200 gap-5">
+              <p className="text-xl font-bold">
+                This customer has <span className="text-xl text-red-700 font-bold">{customer.openBalance}</span> open balance remaining
+              </p>
+              <button
+                onClick={handleSendEmail}
+                className="bg-green-600 px-3 py-1 text-lg font-bold text-white rounded-md hover:bg-green-700 transition duration-300"
+                disabled={isSending}
+              >
+                {isSending ? "Sending..." : "Send Email?"}
+              </button>
+            </div>
+          ) : null}
+          {sendError && <p className="text-red-500 mt-2">{sendError}</p>}
+          {isSuccess && <p className="text-green-600 mt-2">Email sent successfully!</p>}
+        </div>
+
         {/* Orders Table */}
         <div className="bg-white p-4 rounded-lg shadow-md mt-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 border-b border-gray-200 pb-2">Order History</h2>
@@ -135,7 +186,6 @@ const CustomerDetailsPage: React.FC = () => {
               <table className="w-full text-left border-collapse text-sm min-w-[800px]">
                 <thead className="bg-gray-100 text-gray-700">
                   <tr>
-                    
                     <th className="p-3 whitespace-nowrap">PO #</th>
                     <th className="p-3 whitespace-nowrap">Date</th>
                     <th className="p-3 whitespace-nowrap">Due Date</th>
@@ -152,14 +202,13 @@ const CustomerDetailsPage: React.FC = () => {
                 <tbody>
                   {customer.customerOrders.map((order) => (
                     <tr key={order._id} className="border-t hover:bg-gray-50">
-                      
-                     <td className="p-3 whitespace-nowrap text-gray-700">
-                    <Link href={`/dashboard/order-management/${ order._id}/${order?.storeId}`} className="text-blue-600 hover:underline">
-                      {order.PONumber}
-                    </Link>
-                  </td>
-                      <td className="p-3 whitespace-nowrap text-gray-700">{new Date(order.date).toLocaleDateString()}</td>
-                      <td className="p-3 whitespace-nowrap text-gray-700">{order.paymentDueDate}</td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">
+                        <Link href={`/dashboard/order-management/${order._id}/${order?.storeId}`} className="text-blue-600 hover:underline">
+                          {order.PONumber}
+                        </Link>
+                      </td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">{format(new Date(order.date), "yyyy-MM-dd")}</td>
+                      <td className="p-3 whitespace-nowrap text-gray-700">{order.paymentDueDate ? format(new Date(order.paymentDueDate), "yyyy-MM-dd") : "N/A"}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">${order.orderAmount.toFixed(2)}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">{order.orderStatus}</td>
                       <td className="p-3 whitespace-nowrap text-gray-700">${order.paymentAmountReceived.toFixed(2)}</td>

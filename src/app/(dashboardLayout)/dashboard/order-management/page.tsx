@@ -647,7 +647,6 @@ export default function OrderManagement(): React.ReactElement {
           <TableHeader className="sticky top-0 bg-gray-50 z-10">
             <TableRow>
               <TableHead className="min-w-[120px]">Order Date</TableHead>
-              <TableHead className="min-w-[140px]">Invoice No.</TableHead>
               <TableHead className="min-w-[120px]">PO No.</TableHead>
               <TableHead className="min-w-[150px]">Store Name</TableHead>
               <TableHead className="min-w-[120px]">Payment Due</TableHead>
@@ -704,14 +703,7 @@ export default function OrderManagement(): React.ReactElement {
                       year: "numeric",
                     })}
                   </TableCell>
-                  <TableCell>
-                    <Link
-                      href="#"
-                      className="cursor-pointer text-blue-600 font-medium hover:underline"
-                    >
-                      {order.invoiceNumber}
-                    </Link>
-                  </TableCell>
+                  
                   <TableCell   className="text-sm cursor-pointer text-blue-600 font-medium hover:underline">
                 <Link href={`/dashboard/order-management/${order._id}`}>
                  {order.PONumber}

@@ -88,7 +88,7 @@ const SalesOverview = () => {
         </p>
       </div>
       <Link href="/dashboard/order-management" passHref>
-      <div className="bg-[#219EBC] text-white p-4 rounded-lg cursor-pointer"> {/* Added cursor-pointer for visual feedback */}
+      <div className="bg-[#219EBC] text-white p-4 rounded-lg cursor-pointer h-34"> {/* Added cursor-pointer for visual feedback */}
         <h3 className="text-base md:text-xl mb-2">Due Amount</h3>
         <p className="text-3xl md:text-4xl font-bold mb-2">${overviewData.dueAmount}</p>
         

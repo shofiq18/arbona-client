@@ -562,33 +562,8 @@ export default function ProspectDetailsPage() {
   const handleUpdateRedirect = (prospectId: string) => {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
-
-  // Loading and Error states for initial data fetch
-  if (isLoading || isFetching) {
-    return <Loading />; // Display your Loading component while data is being fetched
-  }
-
-  if (error) {
-    // A more robust error display or fallback UI
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-red-100">
-        <div className="p-8 bg-white rounded-lg shadow-md text-center">
-          <h3 className="text-2xl font-bold text-red-700 mb-4">Error Loading Prospects</h3>
-          <p className="text-gray-600">
-            {error instanceof Error ? error.message : "An unknown error occurred while fetching data."}
-          </p>
-          <button
-            onClick={() => refetch()}
-            className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Main component render
+  console.log('pagination prospact', paginatedProspects)
+const actualCustomers = paginatedProspects.filter(customer => customer.status !== "converted");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -739,7 +714,7 @@ export default function ProspectDetailsPage() {
           </table>
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
+        {/* <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
           <span>
             Showing {filteredProspects.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, filteredProspects.length)} of{" "}
             {filteredProspects.length}
@@ -784,7 +759,7 @@ export default function ProspectDetailsPage() {
               <option value={25}>25 ▼</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {/* Modal for Quote Status / Competitor Statement / Notes */}
         {isModalOpen && modalContent && selectedProspect && (

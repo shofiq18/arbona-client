@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Label } from "@/components/ui/label";
 import { ArrowUpDown, PlusCircle } from "lucide-react";
 import { FaFilePdf } from "react-icons/fa6";
@@ -14,6 +15,11 @@ import { FaFilePdf } from "react-icons/fa6";
 import { ArrowUpDown, PlusCircle, FileText } from "lucide-react"; // FileText is already imported
 import { FaFileExcel, FaFilePdf } from "react-icons/fa6"; // Keep this if you use it elsewhere, otherwise it can be removed
 >>>>>>> 24a3dac70971453a76e66b71a998bc64e832b87b
+=======
+import { Label } from "@/components/ui/label";
+import { ArrowUpDown, PlusCircle } from "lucide-react";
+import { FaFileExcel, FaFilePdf } from "react-icons/fa6";
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
 import {
   useGetInventoryQuery,
   useDeleteInventoryMutation,
@@ -72,10 +78,13 @@ const handleApplyFilters = (newFilters:any) => {
 
   };
 <<<<<<< HEAD
+<<<<<<< HEAD
   //shwo the modal name nad catagory 
 =======
 
 >>>>>>> 24a3dac70971453a76e66b71a998bc64e832b87b
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
    const filteredProducts = products.filter((product) => {
     const matchesSearch =
       product.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -111,6 +120,9 @@ const handleApplyFilters = (newFilters:any) => {
   //   (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
   // );
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
 
 
   // Calculate total pages
@@ -121,8 +133,11 @@ const handleApplyFilters = (newFilters:any) => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+<<<<<<< HEAD
 =======
 >>>>>>> 24a3dac70971453a76e66b71a998bc64e832b87b
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
 
   // Calculate profit percentage dynamically
   const calculateProfitPercentage = (purchasePrice: number, salesPrice: number) => {
@@ -198,7 +213,10 @@ const handleApplyFilters = (newFilters:any) => {
   };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
   
   const handleDownloadExcel = async () => {
 
@@ -293,7 +311,10 @@ const handleApplyFilters = (newFilters:any) => {
   };
 
 
+<<<<<<< HEAD
 >>>>>>> 24a3dac70971453a76e66b71a998bc64e832b87b
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
   if (isLoading) {
     return <Loading title="All Product Loading..." message="all product fetch successfully " />;
   }
@@ -326,6 +347,7 @@ const handleApplyFilters = (newFilters:any) => {
             <PlusCircle className="h-4 w-4" /> Add Product
           </Button>
 <<<<<<< HEAD
+<<<<<<< HEAD
           <Button
             variant="outline"
             className="text-gray-500 border border-gray-300 hover:bg-gray-500"
@@ -333,6 +355,8 @@ const handleApplyFilters = (newFilters:any) => {
             <FaFilePdf className="h-4 w-4" />
           </Button>
 =======
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
           {/* Export to XL Button with icon only */}
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
                       <ImFilePdf className="w-5 h-5 text-black" />
@@ -340,7 +364,10 @@ const handleApplyFilters = (newFilters:any) => {
                     <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
                       <FaFileExcel className="w-5 h-5 text-black" />
                     </Button>
+<<<<<<< HEAD
 >>>>>>> 24a3dac70971453a76e66b71a998bc64e832b87b
+=======
+>>>>>>> a1da1287291d37fc498abb638772ed0278670947
         </div>
       </div>
       {/* add dialog */}

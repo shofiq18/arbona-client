@@ -7,7 +7,7 @@ console.log("backend api, ", `${process.env.NEXT_PUBLIC_URL}`);
 export const baseApi = createApi({
   reducerPath: "baseApi", // Define a base reducerPath
   baseQuery: fetchBaseQuery({
-    baseUrl: `https://arbora-server-v2.vercel.app/api/v1`,
+    baseUrl: `http://172.252.13.69:5100/api/v1`,
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = Cookies?.get("token");

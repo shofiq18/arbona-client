@@ -76,7 +76,7 @@ export default function ProspectDetails() {
     (prospect) =>
       prospect.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       prospect.storePersonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      prospect.assignedSalesPerson.email.toLowerCase().includes(searchTerm.toLowerCase())
+       (prospect.assignedSalesPerson?.email || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination logic
@@ -213,7 +213,7 @@ const actualCustomers =prospects.filter(customer => customer.status !== "convert
               {actualCustomers.map((prospect) => (
                 <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
                   <td className="p-3 text-gray-800">{prospect.storeName}</td>
-                  <td className="p-3 text-gray-800">{prospect.assignedSalesPerson.email}</td>
+                  <td className="p-3 text-gray-800">{prospect.assignedSalesPerson?.email || "N/A" }</td>
                   <td className="p-3 text-gray-800">
                     {prospect.followUpActivities.length > 0
                       ? prospect.followUpActivities[0].activityDate
@@ -280,18 +280,19 @@ const actualCustomers =prospects.filter(customer => customer.status !== "convert
                     >
                       Assign Salesperson
                     </button>
+                    
                     <button
-                      className="bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700 transition duration-200"
+                      className=" text-black px-2 py-1 rounded-lg cursor-pointer  transition duration-200"
+                      onClick={() => handleUpdateRedirect(prospect._id)}
+                    >
+                      ✎
+                    </button>
+                    <button
+                      className=" text-white px-2 cursor-pointer py-1 rounded-lg  transition duration-200"
                       onClick={() => handleDeleteProspect(prospect._id)}
                       disabled={isDeleting}
                     >
                       🗑️
-                    </button>
-                    <button
-                      className="bg-yellow-500 text-white px-2 py-1 rounded-lg hover:bg-yellow-600 transition duration-200"
-                      onClick={() => handleUpdateRedirect(prospect._id)}
-                    >
-                      ✎
                     </button>
                   </td>
                 </tr>

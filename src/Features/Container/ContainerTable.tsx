@@ -64,9 +64,13 @@ export default function ContainerTable() {
         error,
     } = useGetContainersQuery();
 
+
+
     const [deleteContainer] = useDeleteContainerMutation();
 
     const containers: Container[] = response?.data || [];
+
+    console.log("container data ", containers)
 
     const filteredData: Container[] = useMemo(() => {
         return containers.filter((c) =>
@@ -446,6 +450,7 @@ export default function ContainerTable() {
                                         <th className="border p-2">Item Number</th>
                                         <th className="border p-2">Quantity</th>
                                         <th className="border p-2">Per Case Cost</th>
+                                        <th className="border p-2">per Case Shipping Cost</th>
                                         <th className="border p-2">Sales Price</th>
                                         <th className="border p-2">Purchase Price</th>
                                         <th className="border p-2">Packet Size</th> {/* Added Packet Size column header */}
@@ -457,7 +462,16 @@ export default function ContainerTable() {
                                             <td className="border p-2">{prod.category}</td>
                                             <td className="border p-2">{prod.itemNumber}</td>
                                             <td className="border p-2">{prod.quantity}</td>
-                                            <td className="border p-2">{prod.perCaseCost || '-'}</td>
+                                            <td className="border p-2">
+                                            {prod.perCaseCost !== undefined && prod.perCaseCost !== null
+                                              ? parseFloat(String(prod.perCaseCost)).toFixed(3)
+                                              : '-'}
+                                          </td>
+                                          <td className="border p-2">
+                                            {prod.perCaseShippingCost !== undefined && prod.perCaseShippingCost !== null
+                                              ? parseFloat(String(prod.perCaseShippingCost)).toFixed(3)
+                                              : '-'}
+                                          </td>
                                             <td className="border p-2">${prod.salesPrice}</td>
                                             <td className="border p-2">${prod.purchasePrice}</td>
                                             <td className="border p-2">{prod.packetSize || 'N/A'}</td> {/* Display Packet Size */}

@@ -122,6 +122,7 @@ export interface Customer {
   billingCity: string;
   shippingAddress: string;
   shippingState: string;
+  note: string;
   shippingZipcode: string;
   shippingCity: string;
   creditApplication?: string;

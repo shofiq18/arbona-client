@@ -27,6 +27,8 @@ export default function CustomerTable() {
   // Extract customers array from response.data, default to empty array
   const customers = response?.data || [];
 
+  console.log("customer data ", response)
+
   // Filter customers based on search (storePersonName)
   const filteredData = customers.filter((customer) =>
     customer.storePersonName.toLowerCase().includes(search.toLowerCase())
@@ -205,6 +207,7 @@ export default function CustomerTable() {
                 <p className="mb-2"><span className="font-semibold text-gray-700">Shipping City:</span> <span className="text-gray-600">{selectedCustomer.shippingCity || "N/A"}</span></p>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Shipping State:</span> <span className="text-gray-600">{selectedCustomer.shippingState || "N/A"}</span></p>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Shipping Zipcode:</span> <span className="text-gray-600">{selectedCustomer.shippingZipcode || "N/A"}</span></p>
+                <p className="mb-2"><span className="font-semibold text-gray-700">Note :</span> <span className="text-gray-600">{selectedCustomer.note || "N/A"}</span></p>
               </div>
               <div>
                 <p className="mb-2"><span className="font-semibold text-gray-700">Credit Application:</span>

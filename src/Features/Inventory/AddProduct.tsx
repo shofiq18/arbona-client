@@ -36,6 +36,8 @@ const AddProductPage = () => {
   const { data: packSize } = useGetPackSizeQuery(); // Removed unused refetch
   const packSizes: string[] = packSize?.data ?? [];
 
+  console.log("pack", packSize)
+
   const weightUnits = ['KILOGRAM', 'POUND', 'OUNCE', 'LITRE', 'PIECE', 'GRAM', 'MILLIGRAM', 'MILLILITER'];
   const packageUnits = ['CM', 'INCH'];
 

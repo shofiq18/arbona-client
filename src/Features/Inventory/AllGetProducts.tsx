@@ -1,11 +1,11 @@
 
 "use client";
-
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowUpDown, PlusCircle, FileText } from "lucide-react"; // FileText is already imported
-import { FaFilePdf } from "react-icons/fa6"; // Keep this if you use it elsewhere, otherwise it can be removed
+import { FaFileExcel, FaFilePdf } from "react-icons/fa6"; // Keep this if you use it elsewhere, otherwise it can be removed
 import {
   useGetInventoryQuery,
   useDeleteInventoryMutation,
@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import Loading from "@/redux/Shared/Loading";
 import ErrorState from "@/redux/Shared/ErrorState";
 import ProductFiltersModal from "./FilterModal";
+import { ImFilePdf } from "react-icons/im";
 
 
 
@@ -65,11 +66,41 @@ const handleApplyFilters = (newFilters:any) => {
    
 
   };
+
+   const filteredProducts = products.filter((product) => {
+    const matchesSearch =
+      product.name.toLowerCase().includes(search.toLowerCase()) ||
+      (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase());
+
+    const matchesCategory = activeFilters.category
+      ? (product.categoryId?.name || "") === activeFilters.category
+      : true;
+
+    const matchesProduct = activeFilters.product
+      ? product.name === activeFilters.product
+      : true;
+
+    const matchesOutOfStock = activeFilters.outOfStock
+      ? (product.quantity ?? 0) === 0
+      : true;
+
+   const matchesLowStock = activeFilters.lowStock
+  ? (product.quantity ?? 0) < 50 && (product.quantity ?? 0) > 0 
+  : true;
+
+    return (
+      matchesSearch &&
+      matchesCategory &&
+      matchesProduct &&
+      matchesOutOfStock &&
+      matchesLowStock
+    );
+  });
   // Filter products based on search
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(search.toLowerCase()) ||
-    (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
-  );
+  // const filteredProducts = products.filter((product) =>
+  //   product.name.toLowerCase().includes(search.toLowerCase()) ||
+  //   (product.categoryId?.name?.toLowerCase() ?? "").includes(search.toLowerCase())
+  // );
 
   // Calculate profit percentage dynamically
   const calculateProfitPercentage = (purchasePrice: number, salesPrice: number) => {
@@ -149,6 +180,97 @@ const handleApplyFilters = (newFilters:any) => {
   };
 
   
+  const handleDownloadExcel = async () => {
+
+  try {
+    const token = Cookies?.get("token");
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/order/bulk-order-excel-empty?download=true`,{
+         headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `${token}`,
+  },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Excel file");
+    }
+
+ 
+    const data = await response.arrayBuffer();
+
+   
+    const blob = new Blob([data], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }); 
+
+    
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    
+    
+    link.download = `order_repo.xlsx`; 
+  
+   
+    document.body.appendChild(link);
+    
+   
+    link.click(); 
+    
+   
+    document.body.removeChild(link); 
+
+    
+    URL.revokeObjectURL(link.href);
+  } catch (err) {
+    console.error("Error downloading Excel file:", err);
+   
+  }
+};
+
+  const handleDownload = async () => {
+    const token = Cookies?.get("token");
+    console.log(token)
+    if (!token) {
+      console.error('Authentication token not found. Please log in.');
+      return; // Stop execution if no token
+    }
+    try {
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/product/all-products-pdf`,{
+           headers: {
+          'Authorization': `${token}`, // Add the Bearer token
+          'Content-Type': 'application/json', // Good practice, though PDF download might not strictly need it
+        },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+      const fileURL = URL.createObjectURL(blob);
+
+      window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip";
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+      setTimeout(() => {
+        URL.revokeObjectURL(fileURL);
+      }, 10);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
 
   if (isLoading) {
@@ -190,7 +312,12 @@ const handleApplyFilters = (newFilters:any) => {
             <PlusCircle className="h-4 w-4" /> Add Product
           </Button>
           {/* Export to XL Button with icon only */}
-          
+          <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
+                      <ImFilePdf className="w-5 h-5 text-black" />
+                    </Button>
+                    <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
+                      <FaFileExcel className="w-5 h-5 text-black" />
+                    </Button>
         </div>
       </div>
 

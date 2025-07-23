@@ -38,6 +38,12 @@ const customersApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Customers"],
     }),
+      sendEmailForNotPaidOrders: builder.mutation<{ success: boolean; message: string }, string>({
+      query: (id) => ({
+        url: `/customer/${id}/send-email-for-not-paid-orders`,
+        method: "POST",
+      }),
+    }),
   }),
 });
 
@@ -47,5 +53,6 @@ export const {
   useAddCustomerMutation,
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
+  useSendEmailForNotPaidOrdersMutation
 } = customersApi;
 export default customersApi;

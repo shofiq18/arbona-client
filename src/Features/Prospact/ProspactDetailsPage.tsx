@@ -1,8 +1,354 @@
+// "use client";
+
+// import { useRouter } from "next/navigation";
+// import { useState } from "react";
+// import Image from "next/image"; // Image is imported but not used. Consider removing if not needed.
+// import {
+//   useConvertProspectMutation,
+//   useDeleteProspectMutation,
+//   useGetProspectsQuery,
+//   useUpdateProspectMutation,
+// } from "@/redux/api/auth/prospact/prospactApi";
+// import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
+// import { Prospect } from "@/types"; // Make sure your Prospect type matches your API response
+// import Loading from "@/redux/Shared/Loading";
+// import toast from "react-hot-toast";
+
+// // It's generally better to handle token in baseApi.ts
+// // or use an interceptor if you use it in many places.
+// // For this component, it's fine as long as you have 'use client'.
+// const getTokenFromCookie = () => {
+//   const cookies = document.cookie.split('; ');
+//   const tokenCookie = cookies.find(cookie => cookie.startsWith('token='));
+//   const token = tokenCookie ? tokenCookie.split('=')[1] : '';
+//   if (!token) {
+//     // In a real app, you might redirect to login or show a more graceful error
+//     console.warn("No token found in cookies. Please log in.");
+//     // alert("No token found in cookies. Please log in."); // Avoid alert in production componentsg
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+//     setSelectedProspect(null);
+//     setModalContent(null);
+//   };
+
+//   const openUpdateModal = (prospect: Prospect) => {
+//     setSelectedProspect(prospect);
+//     setNewSalespersonId(prospect.assignedSalesPerson._id);
+//     setIsUpdateModalOpen(true);
+//   };
+
+//   // Correct and unique definition of handleUpdateProspect
+//   const handleUpdateProspect = async () => {
+//     if (!selectedProspect || !selectedProspect._id || !newSalespersonId) {
+//       toast.error("Invalid prospect or salesperson ID."); // Use toast for user feedback
+//       return;
+//     }
+
+//     const payload = { _id: selectedProspect._id, assignedSalesPerson: newSalespersonId };
+
+//     try {
+//       await updateProspect(payload).unwrap();
+//       await refetch(); // Wait for refetch to complete
+//       closeUpdateModal();
+//       toast.success("Prospect Salesperson updated successfully!");
+//     } catch (err: any) { // Type 'err' as 'any' or more specific type if known
+//       console.error("Failed to update prospect:", err);
+//       const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
+//       toast.error(`Error updating prospect: ${errorMessage}`);
+//     }
+//   };
+
+//   const handleDeleteProspect = async (prospectId: string) => {
+//     if (!window.confirm(`Are you sure you want to delete prospect with ID: ${prospectId}?`)) {
+//       return;
+//     }
+
+//     try {
+//       await deleteProspect(prospectId).unwrap();
+//       await refetch(); // Wait for refetch to complete
+//       toast.success("Prospect deleted successfully!");
+//     } catch (err: any) { // Type 'err' as 'any' or more specific type if known
+//       console.error("Failed to delete prospect:", err);
+//       const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
+//       toast.error(`Error deleting prospect: ${errorMessage}`);
+//     }
+//   };
+
+//   const closeUpdateModal = () => {
+//     setIsUpdateModalOpen(false);
+//     setSelectedProspect(null);
+//     setNewSalespersonId("");
+//   };
+
+//   const handleUpdateRedirect = (prospectId: string) => {
+//     router.push(`/dashboard/update-prospact/${prospectId}`);
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
+//       <div className="mx-auto">
+//         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4 sm:mb-0">
+//           Prospect Details
+//         </h2>
+//         <div>
+//           <div className="flex justify-between my-8 sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+//             <div className="relative">
+//               <input
+//                 type="text"
+//                 placeholder="Search prospect, salesperson"
+//                 value={searchTerm}
+//                 onChange={(e) => setSearchTerm(e.target.value)}
+//                 className="w-full sm:w-64 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+//               />
+//             </div>
+//             <div>
+              
+//               <button
+//                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
+//                 onClick={() => router.push("/dashboard/add-prospact")}
+//               >
+//                 + Add Prospect
+//               </button>
+//             </div>
+//           </div>
+//         </div>
+
+//         <div className="bg-white overflow-hidden">
+//           <table className="w-full border-collapse text-sm">
+//             <thead className="bg-gray-200">
+//               <tr>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Client</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Sales Person</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Next Follow-Up</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Quote Status</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Competitor Statement</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Notes</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Convert Customer</th>
+//                 <th className="border-b p-3 text-left font-semibold text-gray-700">Action</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {paginatedProspects.map((prospect) => (
+//                 <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
+//                   <td className="p-3 text-gray-800">{prospect.storeName}</td>
+//                   <td className="p-3 text-gray-800">{prospect.assignedSalesPerson.email}</td>
+//                   <td className="p-3 text-gray-800">
+//                     {prospect.followUpActivities.length > 0
+//                       ? prospect.followUpActivities[0].activityDate
+//                       : "N/A"}
+//                   </td>
+//                   <td className="p-3 text-gray-800">
+//                     {prospect.quotedList.length > 0 ? (
+//                       <span
+//                         className="text-blue-500 cursor-pointer hover:underline"
+//                         onClick={() =>
+//                           openModal(
+//                             prospect,
+//                             "Quote Status",
+//                             prospect.quotedList
+//                               .map(
+//                                 (item) =>
+//                                   `Product ID: ${item.productObjId?._id || "N/A"}, Item #: ${item.itemNumber}, Item Name: ${item.itemName}, Price: $${item.price}`
+//                               )
+//                               .join("\n")
+//                           )
+//                         }
+//                       >
+//                         📄
+//                       </span>
+//                     ) : (
+//                       "Pending"
+//                     )}
+//                   </td>
+//                   <td className="p-3 text-gray-800">
+//                     {prospect.competitorStatement ? (
+//                       <span
+//                         className="text-blue-500 cursor-pointer hover:underline"
+//                         onClick={() =>
+//                           openModal(prospect, "Competitor File", prospect.competitorStatement)
+//                         }
+//                       >
+//                         📄
+//                       </span>
+//                     ) : (
+//                       "N/A"
+//                     )}
+//                   </td>
+//                   <td className="p-3 text-gray-800">
+//                     {prospect.note ? (
+//                       <span
+//                         className="text-blue-500 cursor-pointer hover:underline"
+//                         onClick={() => openModal(prospect, "Notes", prospect.note)}
+//                       >
+//                         📄
+//                       </span>
+//                     ) : (
+//                       "No notes"
+//                     )}
+//                   </td>
+//                   <td className="p-3">
+//                     {/* Convert button - uncommented and linked to handleConvertProspect */}
+//                     <button onClick={() => handleConvertProspect(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
+//                   </td>
+//                   <td className="p-3 flex space-x-6 items-center">
+//                     <button
+//                       className="bg-blue-500 text-white px-2 py-1 ml-1 rounded-lg hover:bg-blue-600 transition duration-200"
+//                       onClick={() => openUpdateModal(prospect)}
+//                       disabled={isUpdating}
+//                     >
+//                       Assign Salesperson
+//                     </button>
+                    
+//                     <button
+//                       className=" text-black px-2 py-1 rounded-lg cursor-pointer  transition duration-200"
+//                       onClick={() => handleUpdateRedirect(prospect._id)}
+//                     >
+//                       ✎
+//                     </button>
+//                     <button
+//                       className=" text-white px-2 cursor-pointer py-1 rounded-lg  transition duration-200"
+//                       onClick={() => handleDeleteProspect(prospect._id)}
+//                       disabled={isDeleting}
+//                     >
+//                       🗑️
+//                     </button>
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
+//           <span>
+//             Showing {startIndex + 1} to {Math.min(endIndex, filteredProspects.length)} of{" "}
+//             {filteredProspects.length}
+//           </span>
+//           <div className="flex items-center space-x-2 mt-4 sm:mt-0">
+//             <button
+//               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+//               disabled={currentPage === 1}
+//               className="px-2 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition duration-200"
+//             >
+//               ◄
+//             </button>
+//             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+//               <button
+//                 key={page}
+//                 onClick={() => setCurrentPage(page)}
+//                 className={`px-3 py-1 rounded ${
+//                   currentPage === page ? "bg-green-500 text-white" : "bg-gray-200 hover:bg-gray-300"
+//                 } transition duration-200`}
+//               >
+//                 {page}
+//               </button>
+//             ))}
+//             <button
+//               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+//               disabled={currentPage === totalPages}
+//               className="px-2 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition duration-200"
+//             >
+//               ►
+//             </button>
+//             <select
+//               value={itemsPerPage}
+//               onChange={(e) => {
+//                 // If you uncommented this part and want to use itemsPerPage for actual pagination size
+//                 // setItemsPerPage(Number(e.target.value));
+//                 setCurrentPage(1); // Reset to first page when items per page changes
+//               }}
+//               className="p-1 border border-gray-300 rounded"
+//             >
+//               <option value={5}>5 ▼</option>
+//               <option value={10}>10 ▼</option>
+//               <option value={25}>25 ▼</option>
+//             </select>
+//           </div>
+//         </div>
+
+//         {/* Modal for Quote Status / Competitor Statement / Notes */}
+//         {isModalOpen && modalContent && selectedProspect && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+//             <div className="bg-white p-6 rounded-lg w-full max-w-md">
+//               <h3 className="text-xl font-bold mb-4">{modalContent.title}</h3>
+//               <div className="space-y-4">
+//                 <pre className="whitespace-pre-wrap">{modalContent.data}</pre>
+//               </div>
+//               <button
+//                 className="mt-6 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+//                 onClick={closeModal}
+//               >
+//                 Close
+//               </button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Modal for Update Salesperson - Rendered ONLY ONCE */}
+//         {isUpdateModalOpen && selectedProspect && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+//             <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+//               <h3 className="text-xl font-bold mb-4">Update Salesperson</h3>
+//               <div className="space-y-4">
+//                 <p>Current Salesperson ID: {selectedProspect.assignedSalesPerson._id}</p>
+//                 <div className="flex space-x-4">
+//                   <label htmlFor="newSalesperson" className="block text-sm font-medium text-gray-700">New Salesperson:</label>
+//                   <select
+//                     id="newSalesperson" // Added ID for accessibility
+//                     value={newSalespersonId}
+//                     onChange={(e) => setNewSalespersonId(e.target.value)}
+//                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+//                     disabled={isSalesUsersLoading || isUpdating}
+//                   >
+//                     {salesUsersError ? (
+//                       <option disabled>Error loading salespeople</option>
+//                     ) : isSalesUsersLoading ? (
+//                       <option disabled>Loading...</option>
+//                     ) : (
+//                       // Add a default "Select Salesperson" option
+//                       <>
+//                         <option value="">Select a Salesperson</option>
+//                         {(salesUsersResponse?.data || [])
+//                           .filter((user) => user.role === "salesUser")
+//                           .map((user) => (
+//                             <option key={user._id} value={user._id}>
+//                               {user.email} ({user._id})
+//                             </option>
+//                           ))}
+//                       </>
+//                     )}
+//                   </select>
+//                 </div>
+//               </div>
+//               <div className="mt-6 flex justify-end space-x-4">
+//                 <button
+//                   className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
+//                   onClick={closeUpdateModal}
+//                   disabled={isUpdating}
+//                 >
+//                   Cancel
+//                 </button>
+//                 <button
+//                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+//                   onClick={handleUpdateProspect}
+//                   disabled={isUpdating}
+//                 >
+//                   {isUpdating ? "Updating..." : "Update"}
+//                 </button>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
+
+
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import Image from "next/image"; // Image is imported but not used. Consider removing if not needed.
+import { useState, useEffect, useMemo } from "react"; // Added useMemo for optimization
 import {
   useConvertProspectMutation,
   useDeleteProspectMutation,
@@ -10,37 +356,157 @@ import {
   useUpdateProspectMutation,
 } from "@/redux/api/auth/prospact/prospactApi";
 import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
-import { Prospect } from "@/types"; // Make sure your Prospect type matches your API response
-import Loading from "@/redux/Shared/Loading";
-import toast from "react-hot-toast";
+// Assuming you have a Prospect type defined in '@/types'
+// If not, you'll need to define it or remove the import and type annotations
+import { Prospect } from "@/types";
+import Loading from "@/redux/Shared/Loading"; // Assuming this path is correct for your Loading component
+import toast from "react-hot-toast"; // Assuming react-hot-toast is installed and configured
 
 // It's generally better to handle token in baseApi.ts
 // or use an interceptor if you use it in many places.
 // For this component, it's fine as long as you have 'use client'.
+// Corrected and completed getTokenFromCookie
 const getTokenFromCookie = () => {
   const cookies = document.cookie.split('; ');
   const tokenCookie = cookies.find(cookie => cookie.startsWith('token='));
   const token = tokenCookie ? tokenCookie.split('=')[1] : '';
   if (!token) {
-    // In a real app, you might redirect to login or show a more graceful error
     console.warn("No token found in cookies. Please log in.");
-    // alert("No token found in cookies. Please log in."); // Avoid alert in production componentsg
+    // In a real app, you might redirect to login or show a more graceful error
+    // e.g., router.push('/login');
+  }
+  return token;
+};
+
+// Define a type for your modal content
+interface ModalContent {
+  title: string;
+  data: string;
+}
+
+// Define the Prospect interface more robustly if not already in @/types
+// This is an example, adjust based on your actual API response structure
+// If you already have it in @/types, you can remove this local definition.
+// declare module "@/types" {
+//   export interface Prospect {
+//     _id: string;
+//     storeName: string;
+//     assignedSalesPerson: {
+//       _id: string;
+//       email: string;
+//       fullName?: string; // Assuming fullName might exist
+//     };
+//     followUpActivities: Array<{
+//       activityDate: string; // Assuming this is a date string
+//       // ... other properties of followUpActivity
+//     }>;
+//     quotedList: Array<{
+//       productObjId?: { _id: string }; // Optional product object ID
+//       itemNumber: string;
+//       itemName: string;
+//       price: number;
+//       // ... other properties of quotedItem
+//     }>;
+    
+//     competitorStatement?: string; // Optional field
+//     note?: string; // Optional field
+//     // ... other properties of Prospect
+//   }
+// }
+
+
+export default function ProspectDetailsPage() {
+  const router = useRouter();
+
+  // State declarations
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Default items per page
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
+  const [modalContent, setModalContent] = useState<ModalContent | null>(null);
+
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [newSalespersonId, setNewSalespersonId] = useState<string>("");
+
+  // RTK Query Hooks
+  // You might want to pass `searchTerm` to `useGetProspectsQuery` if your API supports server-side filtering
+  // For now, it's client-side filtering as per the previous code's `filteredProspects` logic.
+  const { data: prospectsData, isLoading, isFetching, refetch, error } = useGetProspectsQuery({});
+
+  const [updateProspect, { isLoading: isUpdating }] = useUpdateProspectMutation();
+  const [deleteProspect, { isLoading: isDeleting }] = useDeleteProspectMutation();
+  const [convertProspect, { isLoading: isConverting }] = useConvertProspectMutation();
+
+  const { data: salesUsersResponse, isLoading: isSalesUsersLoading, error: salesUsersError } = useGetSalesUsersQuery({});
+
+  // Memoize all prospects data once fetched
+  const allProspects: Prospect[] = useMemo(() => prospectsData?.data || [], [prospectsData]);
+
+  // Filter prospects based on search term
+  const filteredProspects = useMemo(() => {
+    if (!searchTerm) {
+      return allProspects;
+    }
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    return allProspects.filter(
+      (prospect) =>
+        prospect.storeName.toLowerCase().includes(lowerCaseSearchTerm) ||
+        prospect.assignedSalesPerson?.email?.toLowerCase().includes(lowerCaseSearchTerm) || // Added ?. for safety
+        prospect.assignedSalesPerson?.fullName?.toLowerCase().includes(lowerCaseSearchTerm) // Added ?. for safety
+    );
+  }, [allProspects, searchTerm]);
+
+  // Calculate pagination details
+  const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProspects = useMemo(() => {
+    return filteredProspects.slice(startIndex, endIndex);
+  }, [filteredProspects, startIndex, endIndex]);
+
+  // Adjust current page if items per page changes or filtered data changes
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    } else if (totalPages === 0 && currentPage !== 1) {
+        setCurrentPage(1);
+    }
+  }, [itemsPerPage, totalPages, currentPage]);
+
+
+  // Modal functions for viewing details
+  const openModal = (prospect: Prospect, title: string, data: string) => {
+    setSelectedProspect(prospect);
+    setModalContent({ title, data });
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedProspect(null);
     setModalContent(null);
   };
 
+  // Modal functions for updating salesperson
   const openUpdateModal = (prospect: Prospect) => {
     setSelectedProspect(prospect);
-    setNewSalespersonId(prospect.assignedSalesPerson._id);
+    // Ensure assignedSalesPerson and _id exist before setting
+    setNewSalespersonId(prospect.assignedSalesPerson?._id || "");
     setIsUpdateModalOpen(true);
   };
 
-  // Correct and unique definition of handleUpdateProspect
+  const closeUpdateModal = () => {
+    setIsUpdateModalOpen(false);
+    setSelectedProspect(null);
+    setNewSalespersonId("");
+  };
+
+  // CRUD Operations functions
   const handleUpdateProspect = async () => {
     if (!selectedProspect || !selectedProspect._id || !newSalespersonId) {
-      toast.error("Invalid prospect or salesperson ID."); // Use toast for user feedback
+      toast.error("Invalid prospect or salesperson ID.");
       return;
     }
 
@@ -48,10 +514,10 @@ const getTokenFromCookie = () => {
 
     try {
       await updateProspect(payload).unwrap();
-      await refetch(); // Wait for refetch to complete
+      await refetch(); // Refetch data after successful update
       closeUpdateModal();
       toast.success("Prospect Salesperson updated successfully!");
-    } catch (err: any) { // Type 'err' as 'any' or more specific type if known
+    } catch (err: any) {
       console.error("Failed to update prospect:", err);
       const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
       toast.error(`Error updating prospect: ${errorMessage}`);
@@ -65,25 +531,64 @@ const getTokenFromCookie = () => {
 
     try {
       await deleteProspect(prospectId).unwrap();
-      await refetch(); // Wait for refetch to complete
+      await refetch(); // Refetch data after successful deletion
       toast.success("Prospect deleted successfully!");
-    } catch (err: any) { // Type 'err' as 'any' or more specific type if known
+    } catch (err: any) {
       console.error("Failed to delete prospect:", err);
       const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
       toast.error(`Error deleting prospect: ${errorMessage}`);
     }
   };
 
-  const closeUpdateModal = () => {
-    setIsUpdateModalOpen(false);
-    setSelectedProspect(null);
-    setNewSalespersonId("");
+  const handleConvertProspect = async (prospectId: string) => {
+    if (!window.confirm(`Are you sure you want to convert prospect with ID: ${prospectId} to a customer?`)) {
+      return;
+    }
+
+    try {
+      await convertProspect(prospectId).unwrap();
+      await refetch(); // Refetch data after successful conversion
+      toast.success("Prospect converted to customer successfully!");
+      // Optionally redirect or perform other actions after conversion
+      // router.push('/dashboard/customers'); // Example redirection
+    } catch (err: any) {
+      console.error("Failed to convert prospect:", err);
+      const errorMessage = err?.data?.message || err?.message || "Unknown error occurred.";
+      toast.error(`Error converting prospect: ${errorMessage}`);
+    }
   };
 
+  // Redirection for update page
   const handleUpdateRedirect = (prospectId: string) => {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
 
+  // Loading and Error states for initial data fetch
+  if (isLoading || isFetching) {
+    return <Loading />; // Display your Loading component while data is being fetched
+  }
+
+  if (error) {
+    // A more robust error display or fallback UI
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-red-100">
+        <div className="p-8 bg-white rounded-lg shadow-md text-center">
+          <h3 className="text-2xl font-bold text-red-700 mb-4">Error Loading Prospects</h3>
+          <p className="text-gray-600">
+            {error instanceof Error ? error.message : "An unknown error occurred while fetching data."}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-6 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Main component render
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -91,7 +596,7 @@ const getTokenFromCookie = () => {
           Prospect Details
         </h2>
         <div>
-          <div className="flex justify-between my-8 sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-col sm:flex-row justify-between my-8 space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="relative">
               <input
                 type="text"
@@ -99,10 +604,10 @@ const getTokenFromCookie = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full sm:w-64 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                aria-label="Search prospects" // Added for accessibility
               />
             </div>
             <div>
-              
               <button
                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
                 onClick={() => router.push("/dashboard/add-prospact")}
@@ -113,7 +618,7 @@ const getTokenFromCookie = () => {
           </div>
         </div>
 
-        <div className="bg-white overflow-hidden">
+        <div className="bg-white overflow-hidden shadow-sm rounded-lg">
           <table className="w-full border-collapse text-sm">
             <thead className="bg-gray-200">
               <tr>
@@ -128,100 +633,115 @@ const getTokenFromCookie = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedProspects.map((prospect) => (
-                <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
-                  <td className="p-3 text-gray-800">{prospect.storeName}</td>
-                  <td className="p-3 text-gray-800">{prospect.assignedSalesPerson.email}</td>
-                  <td className="p-3 text-gray-800">
-                    {prospect.followUpActivities.length > 0
-                      ? prospect.followUpActivities[0].activityDate
-                      : "N/A"}
-                  </td>
-                  <td className="p-3 text-gray-800">
-                    {prospect.quotedList.length > 0 ? (
-                      <span
-                        className="text-blue-500 cursor-pointer hover:underline"
-                        onClick={() =>
-                          openModal(
-                            prospect,
-                            "Quote Status",
-                            prospect.quotedList
-                              .map(
-                                (item) =>
-                                  `Product ID: ${item.productObjId?._id || "N/A"}, Item #: ${item.itemNumber}, Item Name: ${item.itemName}, Price: $${item.price}`
-                              )
-                              .join("\n")
-                          )
-                        }
-                      >
-                        📄
-                      </span>
-                    ) : (
-                      "Pending"
-                    )}
-                  </td>
-                  <td className="p-3 text-gray-800">
-                    {prospect.competitorStatement ? (
-                      <span
-                        className="text-blue-500 cursor-pointer hover:underline"
-                        onClick={() =>
-                          openModal(prospect, "Competitor File", prospect.competitorStatement)
-                        }
-                      >
-                        📄
-                      </span>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td className="p-3 text-gray-800">
-                    {prospect.note ? (
-                      <span
-                        className="text-blue-500 cursor-pointer hover:underline"
-                        onClick={() => openModal(prospect, "Notes", prospect.note)}
-                      >
-                        📄
-                      </span>
-                    ) : (
-                      "No notes"
-                    )}
-                  </td>
-                  <td className="p-3">
-                    {/* Convert button - uncommented and linked to handleConvertProspect */}
-                    <button onClick={() => handleConvertProspect(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button>
-                  </td>
-                  <td className="p-3 flex space-x-6 items-center">
-                    <button
-                      className="bg-blue-500 text-white px-2 py-1 ml-1 rounded-lg hover:bg-blue-600 transition duration-200"
-                      onClick={() => openUpdateModal(prospect)}
-                      disabled={isUpdating}
-                    >
-                      Assign Salesperson
-                    </button>
-                    
-                    <button
-                      className=" text-black px-2 py-1 rounded-lg cursor-pointer  transition duration-200"
-                      onClick={() => handleUpdateRedirect(prospect._id)}
-                    >
-                      ✎
-                    </button>
-                    <button
-                      className=" text-white px-2 cursor-pointer py-1 rounded-lg  transition duration-200"
-                      onClick={() => handleDeleteProspect(prospect._id)}
-                      disabled={isDeleting}
-                    >
-                      🗑️
-                    </button>
+              {paginatedProspects.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="p-4 text-center text-gray-500">
+                    {searchTerm ? "No matching prospects found." : "No prospects available."}
                   </td>
                 </tr>
-              ))}
+              ) : (
+                paginatedProspects.map((prospect) => (
+                  <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
+                    <td className="p-3 text-gray-800">{prospect.storeName}</td>
+                    <td className="p-3 text-gray-800">
+                      {prospect.assignedSalesPerson?.email || "N/A"}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {prospect.followUpActivities && prospect.followUpActivities.length > 0
+                        ? new Date(prospect.followUpActivities[0].activityDate).toLocaleDateString() // Format date for display
+                        : "N/A"}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {prospect.quotedList && prospect.quotedList.length > 0 ? (
+                        <span
+                          className="text-blue-500 cursor-pointer hover:underline"
+                          onClick={() =>
+                            openModal(
+                              prospect,
+                              "Quote Status",
+                              prospect.quotedList
+                                .map(
+                                  (item) =>
+                                    `Product ID: ${item.productObjId?._id || "N/A"}, Item #: ${item.itemNumber}, Item Name: ${item.itemName}, Price: $${item.price}`
+                                )
+                                .join("\n")
+                            )
+                          }
+                        >
+                          📄
+                        </span>
+                      ) : (
+                        "Pending"
+                      )}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {prospect.competitorStatement ? (
+                        <span
+                          className="text-blue-500 cursor-pointer hover:underline"
+                          onClick={() =>
+                            openModal(prospect, "Competitor File", prospect.competitorStatement)
+                          }
+                        >
+                          📄
+                        </span>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td className="p-3 text-gray-800">
+                      {prospect.note ? (
+                        <span
+                          className="text-blue-500 cursor-pointer hover:underline"
+                          onClick={() => openModal(prospect, "Notes", prospect.note)}
+                        >
+                          📄
+                        </span>
+                      ) : (
+                        "No notes"
+                      )}
+                    </td>
+                    <td className="p-3">
+                      <button
+                        onClick={() => handleConvertProspect(prospect._id)}
+                        className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200"
+                        disabled={isConverting} // Disable during conversion
+                      >
+                        {isConverting && selectedProspect?._id === prospect._id ? "Converting..." : "Convert"}
+                      </button>
+                    </td>
+                    <td className="p-3 flex space-x-6 items-center">
+                      <button
+                        className="bg-blue-500 text-white px-2 py-1 ml-1 rounded-lg hover:bg-blue-600 transition duration-200"
+                        onClick={() => openUpdateModal(prospect)}
+                        disabled={isUpdating} // Disable while an update is in progress
+                      >
+                        Assign Salesperson
+                      </button>
+
+                      <button
+                        className=" text-black px-2 py-1 rounded-lg cursor-pointer transition duration-200"
+                        onClick={() => handleUpdateRedirect(prospect._id)}
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className="text-white px-2 cursor-pointer py-1 rounded-lg transition duration-200 bg-red-500 hover:bg-red-600"
+                        onClick={() => handleDeleteProspect(prospect._id)}
+                        disabled={isDeleting} // Disable during deletion
+                      >
+                        {isDeleting && selectedProspect?._id === prospect._id ? "Deleting..." : "🗑️"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
 
         <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
           <span>
-            Showing {startIndex + 1} to {Math.min(endIndex, filteredProspects.length)} of{" "}
+            Showing {filteredProspects.length > 0 ? startIndex + 1 : 0} to {Math.min(endIndex, filteredProspects.length)} of{" "}
             {filteredProspects.length}
           </span>
           <div className="flex items-center space-x-2 mt-4 sm:mt-0">
@@ -245,7 +765,7 @@ const getTokenFromCookie = () => {
             ))}
             <button
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || totalPages === 0}
               className="px-2 py-1 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition duration-200"
             >
               ►
@@ -253,11 +773,11 @@ const getTokenFromCookie = () => {
             <select
               value={itemsPerPage}
               onChange={(e) => {
-                // If you uncommented this part and want to use itemsPerPage for actual pagination size
-                // setItemsPerPage(Number(e.target.value));
+                setItemsPerPage(Number(e.target.value));
                 setCurrentPage(1); // Reset to first page when items per page changes
               }}
               className="p-1 border border-gray-300 rounded"
+              aria-label="Items per page" // Added for accessibility
             >
               <option value={5}>5 ▼</option>
               <option value={10}>10 ▼</option>
@@ -268,11 +788,11 @@ const getTokenFromCookie = () => {
 
         {/* Modal for Quote Status / Competitor Statement / Notes */}
         {isModalOpen && modalContent && selectedProspect && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-full max-w-md">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"> {/* Added p-4 for mobile spacing */}
+            <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg transform scale-100 transition-transform duration-300"> {/* Added shadow and transition */}
               <h3 className="text-xl font-bold mb-4">{modalContent.title}</h3>
-              <div className="space-y-4">
-                <pre className="whitespace-pre-wrap">{modalContent.data}</pre>
+              <div className="max-h-80 overflow-y-auto border p-3 rounded-md bg-gray-50"> {/* Added scroll for long content */}
+                <pre className="whitespace-pre-wrap text-gray-700 font-sans text-sm">{modalContent.data}</pre>
               </div>
               <button
                 className="mt-6 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
@@ -286,15 +806,15 @@ const getTokenFromCookie = () => {
 
         {/* Modal for Update Salesperson - Rendered ONLY ONCE */}
         {isUpdateModalOpen && selectedProspect && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"> {/* Added p-4 for mobile spacing */}
+            <div className="bg-white p-6 rounded-lg w-full max-w-2xl shadow-lg transform scale-100 transition-transform duration-300"> {/* Added shadow and transition */}
               <h3 className="text-xl font-bold mb-4">Update Salesperson</h3>
               <div className="space-y-4">
-                <p>Current Salesperson ID: {selectedProspect.assignedSalesPerson._id}</p>
-                <div className="flex space-x-4">
+                <p className="text-gray-700">Current Salesperson: {selectedProspect.assignedSalesPerson?.email || "N/A"}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
                   <label htmlFor="newSalesperson" className="block text-sm font-medium text-gray-700">New Salesperson:</label>
                   <select
-                    id="newSalesperson" // Added ID for accessibility
+                    id="newSalesperson"
                     value={newSalespersonId}
                     onChange={(e) => setNewSalespersonId(e.target.value)}
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -305,14 +825,13 @@ const getTokenFromCookie = () => {
                     ) : isSalesUsersLoading ? (
                       <option disabled>Loading...</option>
                     ) : (
-                      // Add a default "Select Salesperson" option
                       <>
                         <option value="">Select a Salesperson</option>
                         {(salesUsersResponse?.data || [])
-                          .filter((user) => user.role === "salesUser")
-                          .map((user) => (
+                          .filter((user: any) => user.role === "salesUser") // Assuming user.role exists
+                          .map((user: any) => ( // Assuming user has _id and email
                             <option key={user._id} value={user._id}>
-                              {user.email} ({user._id})
+                              {user.email} {user.fullName ? `(${user.fullName})` : ''}
                             </option>
                           ))}
                       </>
@@ -331,7 +850,7 @@ const getTokenFromCookie = () => {
                 <button
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
                   onClick={handleUpdateProspect}
-                  disabled={isUpdating}
+                  disabled={isUpdating || !newSalespersonId} // Disable if no salesperson selected
                 >
                   {isUpdating ? "Updating..." : "Update"}
                 </button>

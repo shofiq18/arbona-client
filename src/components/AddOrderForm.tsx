@@ -302,6 +302,17 @@ const AddOrderPage = () => {
 
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" /> Delivery Date
+            </Label>
+            <Input
+              type="shippingDate"
+              value={orderDate}
+              onChange={(e) => setOrderDate(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
               <Calendar className="w-4 h-4" /> Payment Due Date
             </Label>
             <Input

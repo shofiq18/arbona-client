@@ -94,13 +94,15 @@ const SalesOverview = () => {
         
       </div>
     </Link>
-      <div className="bg-[#1F6F97] text-white p-4 rounded-lg">
+      <Link href="/dashboard/order-management" passHref >
+        <div className="bg-[#1F6F97] text-white p-4 rounded-lg">
         <h3 className="text-base md:text-lg mb-2">Orders (Last 7 Days)</h3>
         <p className="text-3xl md:text-4xl font-bold mb-2">{overviewData.ordersLast7Days}</p>
         <p className="text-sm">
           Previous 7 days <span className="text-green-400">↑ {overviewData.trends.ordersLast7Days}%</span>
         </p>
       </div>
+      </Link>
       <div className="flex gap-4 bg-[#023047] text-white p-8 md:p-4 rounded-lg items-center justify-between">
         <div className="text-white border-r-2 border-gray-400 pr-8 xl:pr-10 2xl:pr-18">
           <h3 className="text-lg">Total Product</h3>

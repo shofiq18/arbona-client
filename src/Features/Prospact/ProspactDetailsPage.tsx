@@ -89,7 +89,8 @@ export default function ProspectDetails() {
   const handleConvertProspect = async (id: string) => {
     console.log("convert api", id);
     try {
-      await convertProspect(id).unwrap(); // Use unwrap() to get the actual data or throw error
+     const convert= await convertProspect(id).unwrap(); // Use unwrap() to get the actual data or throw error
+      console.log(convert)
       toast.success("Prospect converted successfully!");
       refetch(); // Refetch prospects to update the list
     } catch (err) {
@@ -163,7 +164,8 @@ export default function ProspectDetails() {
   const handleUpdateRedirect = (prospectId: string) => {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
-
+  console.log('pagination prospact', paginatedProspects)
+const actualCustomers =prospects.filter(customer => customer.status !== "converted");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -208,7 +210,7 @@ export default function ProspectDetails() {
               </tr>
             </thead>
             <tbody>
-              {paginatedProspects.map((prospect) => (
+              {actualCustomers.map((prospect) => (
                 <tr key={prospect._id} className="border-b hover:bg-gray-50 transition-colors">
                   <td className="p-3 text-gray-800">{prospect.storeName}</td>
                   <td className="p-3 text-gray-800">{prospect.assignedSalesPerson.email}</td>
@@ -299,7 +301,7 @@ export default function ProspectDetails() {
           </table>
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
+        {/* <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
           <span>
             Showing {startIndex + 1} to {Math.min(endIndex, filteredProspects.length)} of{" "}
             {filteredProspects.length}
@@ -344,7 +346,7 @@ export default function ProspectDetails() {
               <option value={25}>25 ▼</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {/* Modal for Quote Status / Competitor Statement / Notes */}
         {isModalOpen && modalContent && selectedProspect && (

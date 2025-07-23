@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useState, useMemo } from "react";
 import { ImFilePdf } from "react-icons/im";
 import { FaFileExcel } from "react-icons/fa6";
+import Loading from "@/components/Loding/Loding";
 
 interface Order {
   _id: string;
@@ -98,8 +99,10 @@ export default function OrderManagement(): React.ReactElement {
   error,
 } = useGetOrdersQuery(undefined)
   console.log("check", orders);
-
+const [isBestLoading,setIsBestLoading]=useState(false)
   const handleDownload = async () => {
+
+    setIsBestLoading(true)
     const token = Cookies?.get("token");
     console.log(token)
     if (!token) {
@@ -139,8 +142,11 @@ export default function OrderManagement(): React.ReactElement {
       setTimeout(() => {
         URL.revokeObjectURL(fileURL);
       }, 10);
+
+      setIsBestLoading(false)
     } catch (err) {
       console.log(err);
+       setIsBestLoading(false)
     }
   };
 
@@ -404,7 +410,7 @@ export default function OrderManagement(): React.ReactElement {
   }
 
   const handleDownloadExcel = async () => {
-
+setIsBestLoading(true)
   try {
     const token = Cookies?.get("token");
     const response = await fetch(
@@ -444,9 +450,10 @@ export default function OrderManagement(): React.ReactElement {
 
     
     URL.revokeObjectURL(link.href);
+    setIsBestLoading(false)
   } catch (err) {
     console.error("Error downloading Excel file:", err);
-   
+   setIsBestLoading(false)
   }
 };
 
@@ -497,7 +504,9 @@ export default function OrderManagement(): React.ReactElement {
       </div>
 
       }
-    
+    {
+      isBestLoading&&<Loading/>
+    }
       {/* Active Filters Display */}
       {showActiveFilters && activeFilters && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">

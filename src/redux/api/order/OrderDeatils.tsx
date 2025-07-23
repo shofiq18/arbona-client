@@ -39,9 +39,12 @@ import {
 import { useGiteSingleOrderQuery } from "./orderManagementApi";
 import { ImFilePdf } from "react-icons/im";
 import Link from "next/link";
+import Loading from "@/components/Loding/Loding";
 
 
 const OrderDeatils = ({ id }: { id: string }) => {
+
+  const [isBestLoading,setIsBestLoading]=useState(false)
   const { data, isError, isLoading } = useGiteSingleOrderQuery(id);
   console.log("order deatils data", data);
   const [searchQuery, setSearchQuery] = useState("");
@@ -205,6 +208,7 @@ const OrderDeatils = ({ id }: { id: string }) => {
 // };
 
   const handleDownloadInvice = async (id: string) => {
+    setIsBestLoading(true)
     
     try {
        const token = Cookies?.get("token");
@@ -214,10 +218,12 @@ const OrderDeatils = ({ id }: { id: string }) => {
          headers: {
     'Content-Type': 'application/json',
     'Authorization': `${token}`,
+    
   },
       }
         
       );
+
 
       if (!response.ok) {
         throw new Error("Failed to fetch PDF");
@@ -244,12 +250,17 @@ const OrderDeatils = ({ id }: { id: string }) => {
        setTimeout(() => {
       URL.revokeObjectURL(fileURL);
     }, 10);
+
+    setIsBestLoading(false)
     } catch (err) {
       console.log(err);
+      setIsBestLoading(false)
     }
+
+    
   };
   const handleDownloadDilverySlip = async (id: string) => {
-
+setIsBestLoading(true)
     try {
        const token = Cookies?.get("token");
       // Fetch the PDF as a binary response (arrayBuffer)
@@ -286,8 +297,54 @@ const OrderDeatils = ({ id }: { id: string }) => {
        setTimeout(() => {
       URL.revokeObjectURL(fileURL);
     }, 10);
+    setIsBestLoading(false)
     } catch (err) {
       console.log(err);
+       setIsBestLoading(false)
+    }
+  };
+  const handleDownloadShipTOAddress = async (id: string) => {
+setIsBestLoading(true)
+    try {
+       const token = Cookies?.get("token");
+      // Fetch the PDF as a binary response (arrayBuffer)
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_URL}/order/${id}/ship-to-address-pdf`,{
+         headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `${token}`,
+  },
+      }
+        
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      // Read the binary data as an ArrayBuffer
+      const data = await response.arrayBuffer();
+
+      // Create a Blob from the ArrayBuffer (this represents a PDF)
+      const blob = new Blob([data], { type: "application/pdf" });
+ const fileURL = URL.createObjectURL(blob);
+
+  
+    window.open(fileURL, "_blank");
+      // Create a temporary link to trigger the download
+      // const link = document.createElement("a");
+      // link.href = URL.createObjectURL(blob);
+      // link.download = "order_delivery-slip"; 
+
+      // Clean up the URL object
+      // URL.revokeObjectURL(link.href);
+       setTimeout(() => {
+      URL.revokeObjectURL(fileURL);
+    }, 10);
+    setIsBestLoading(false)
+    } catch (err) {
+      console.log(err);
+       setIsBestLoading(false)
     }
   };
   
@@ -301,7 +358,9 @@ const OrderDeatils = ({ id }: { id: string }) => {
   }
 
   return (
-    <div>
+    <div> 
+
+    {isBestLoading&&  <Loading />}
       {" "}
       <div className="p-6 bg-white">
         {/* Header */}
@@ -346,7 +405,12 @@ const OrderDeatils = ({ id }: { id: string }) => {
                   <DropdownMenuItem
                     onClick={() => handleDownloadDilverySlip(data.data._id)}
                   >
-                    delivery slip
+                    Delivery slip
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadShipTOAddress(data.data._id)}
+                  >
+                    Ship to address 
                   </DropdownMenuItem>
                   {/* <DropdownMenuItem
                     onClick={handleDownloadExcel}

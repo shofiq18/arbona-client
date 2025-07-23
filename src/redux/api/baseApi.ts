@@ -7,7 +7,7 @@ console.log("backend api, ", `${process.env.NEXT_PUBLIC_URL}`);
 export const baseApi = createApi({
   reducerPath: "baseApi", // Define a base reducerPath
   baseQuery: fetchBaseQuery({
-    baseUrl: `http://172.252.13.69:5100/api/v1`,
+    baseUrl: `https://api.arbora.code-commando.com/api/v1`,
     credentials: "include",
     prepareHeaders: (headers) => {
       const token = Cookies?.get("token");

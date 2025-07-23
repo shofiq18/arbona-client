@@ -1106,7 +1106,7 @@ export default function AddProspact(): React.ReactElement {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
- Circuits and Systems
+ 
             <Label htmlFor="storePersonName">Customer Full Name</Label>
             <Input
               id="storePersonName"

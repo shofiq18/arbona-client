@@ -610,58 +610,59 @@ export default function UpdateProspectPage({ prospectId }: { prospectId: string 
           {validationErrors.assignedSalesPerson && <span className="text-red-500 text-sm">{validationErrors.assignedSalesPerson}</span>}
         </div>
 
-        <div className="flex space-x-4">
-          <Button type="button" onClick={() => setIsQuoteModalOpen(true)} className="bg-blue-600 text-white">
-            Quote Info
-          </Button>
-          <Button type="button" onClick={() => setIsFollowUpModalOpen(true)} className="bg-green-600 text-white">
-            Follow Up
-          </Button>
+
+        <div className="my-10 p-10 border rounded-2xl border-green-600 border-2">
+          
+                {formData.quotedList.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <Label className="block my-2">Quoted Items</Label>
+                    <table className="w-full text-sm text-left text-gray-500 mt-2">
+                      <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-2">Product ID</th>
+                          <th className="px-4 py-2">Item #</th>
+                          <th className="px-4 py-2">Item Name</th>
+                          <th className="px-4 py-2">Price ($)</th>
+                          <th className="px-4 py-2">Packet Size</th>
+                          <th className="px-4 py-2">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {formData.quotedList.map((item, index) => (
+                          <tr key={index} className="bg-white border-b">
+                            <td className="px-4 py-2">{item.productObjId || "N/A"}</td>
+                            <td className="px-4 py-2">{item.itemNumber}</td>
+                            <td className="px-4 py-2">{item.itemName}</td>
+                            <td className="px-4 py-2">${item.price}</td>
+                            <td className="px-4 py-2">{item.packetSize || "N/A"}</td>
+                            <td className="px-4 py-2">
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteQuote(index)}
+                                className="text-white"
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {/* Display specific quoted list errors if any */}
+                    {Object.keys(validationErrors).filter(key => key.startsWith('quotedList[')).map((key) => (
+                      <span key={key} className="text-red-500 text-sm block mt-1">{validationErrors[key]}</span>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex space-x-4 mt-5 justify-end">
+                  <Button type="button" onClick={() => setIsQuoteModalOpen(true)} className="bg-blue-600 text-white">
+                  Add product to quote
+                  </Button>
+                </div>
+
         </div>
-
-        {formData.quotedList.length > 0 && (
-          <div className="overflow-x-auto">
-            <Label className="block my-2">Quoted Items</Label>
-            <table className="w-full text-sm text-left text-gray-500 mt-2">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2">Product ID</th>
-                  <th className="px-4 py-2">Item #</th>
-                  <th className="px-4 py-2">Item Name</th>
-                  <th className="px-4 py-2">Price ($)</th>
-                  <th className="px-4 py-2">Packet Size</th>
-                  <th className="px-4 py-2">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.quotedList.map((item, index) => (
-                  <tr key={index} className="bg-white border-b">
-                    <td className="px-4 py-2">{item.productObjId || "N/A"}</td>
-                    <td className="px-4 py-2">{item.itemNumber}</td>
-                    <td className="px-4 py-2">{item.itemName}</td>
-                    <td className="px-4 py-2">${item.price}</td>
-                    <td className="px-4 py-2">{item.packetSize || "N/A"}</td>
-                    <td className="px-4 py-2">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteQuote(index)}
-                        className="text-white"
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {/* Display specific quoted list errors if any */}
-            {Object.keys(validationErrors).filter(key => key.startsWith('quotedList[')).map((key) => (
-              <span key={key} className="text-red-500 text-sm block mt-1">{validationErrors[key]}</span>
-            ))}
-          </div>
-        )}
-
         {formData.followUpActivities.length > 0 && (
           <div className="overflow-x-auto">
             <Label className="block my-2">Follow Up Activities</Label>
@@ -696,6 +697,9 @@ export default function UpdateProspectPage({ prospectId }: { prospectId: string 
             </table>
           </div>
         )}
+                  <Button type="button" onClick={() => setIsFollowUpModalOpen(true)} className="bg-green-600 text-white">
+                    Follow Up
+                  </Button>
 
         <div className="flex justify-end space-x-4 pt-6">
           <Button

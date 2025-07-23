@@ -32,58 +32,50 @@ export default function Dashboard(): React.ReactElement {
   );
 
   return (
-    <div className="p-4 md:p-2 space-y-6">
-      {/* Section 1: Sales Overview */}
-      <SalesOverview />
+       <div className="p-4 md:p-2 space-y-6">
 
-      {/* Section 2: Best Selling Products & Weekly Report */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <BestSellingProducts />
-        </div>
-        <div>
-          <MonthlyReport />
-          <div className="w-full h-56 bg-white shadow-md rounded-2xl mt-2 p-5 overflow-auto" suppressHydrationWarning>
-            <p className="text-lg font-semibold mb-3 text-red-700">
-              ⚠️ {isLoading ? "Loading..." : lowStockProducts?.length || 0} low stock products
-            </p>
-            <table className="min-w-full text-left">
-              <thead className="border-b">
-                <tr>
-                  <th className="py-2 px-3">Category</th>
-                  <th className="py-2 px-3">Product Name</th>
-                  <th className="py-2 px-3">Quantity</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td colSpan={3} className="py-2 px-3 text-center">
-                      Loading...
-                    </td>
-                  </tr>
-                ) : lowStockProducts?.length ? (
-                  lowStockProducts.map((product) => (
-                    <tr key={product._id} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-3">{(product.categoryId as { name: string } | undefined)?.name || "N/A"}</td>
-                      <td className="py-2 px-3 text-red-700">{product.name}</td>
-                      <td className="py-2 px-3">{product.quantity}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={3} className="py-2 px-3 text-center">
-                      No low stock products
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
 
-      <ProductSegmentation />
-    </div>
+            {/* Section 1: Sales Overview */}
+
+            <SalesOverview/>
+
+            {/* Section 2: Best Selling Products & Weekly Report */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div >
+                    <BestSellingProducts />
+                </div>
+                <div>
+                    <div>
+                      <MonthlyReport/>
+                    </div>
+                    <div className="w-full h-56 bg-white shadow-md rounded-2xl mt-2 p-5 overflow-auto">
+                        <p className="text-lg font-semibold mb-3 text-red-700">⚠️ {lowStockProducts?.length} low stock products</p>
+                        <table className="min-w-full text-left ">
+                            <thead className="border-b">
+                                <tr>
+                                    <th className="py-2 px-3">Category</th>
+                                    <th className="py-2 px-3">Product Name</th>
+                                    <th className="py-2 px-3">Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {lowStockProducts?.map((product) => (
+                                    <tr key={product._id} className="border-b hover:bg-gray-50">
+                                        <td className="py-2 px-3">{product.categoryId?.name || "N/A"}</td>
+                                        <td className="py-2 px-3 text-red-700">{product.name}</td>
+                                        <td className="py-2 px-3">{product.quantity}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            
+
+            <ProductSegmentation/>
+        </div>
   );
 }

@@ -89,7 +89,8 @@ export default function ProspectDetails() {
   const handleConvertProspect = async (id: string) => {
     console.log("convert api", id);
     try {
-      await convertProspect(id).unwrap(); // Use unwrap() to get the actual data or throw error
+     const convert= await convertProspect(id).unwrap(); // Use unwrap() to get the actual data or throw error
+      console.log(convert)
       toast.success("Prospect converted successfully!");
       refetch(); // Refetch prospects to update the list
     } catch (err) {
@@ -163,7 +164,8 @@ export default function ProspectDetails() {
   const handleUpdateRedirect = (prospectId: string) => {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
-
+  console.log('pagination prospact', paginatedProspects)
+// const actualCustomers = paginatedProspects.filter(customer => customer.isCustomerSourceProspect === false);
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">

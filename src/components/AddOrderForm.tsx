@@ -29,8 +29,8 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
-import { Separator } from "./ui/separator";
 
+// Updated interfaces to include payment due date
 interface Product {
   _id: string;
   name: string;
@@ -73,33 +73,29 @@ interface Category {
   _id: string;
   name: string;
 }
+
 interface OrderProduct {
   productId: string;
   quantity: number;
   discount: number;
 }
 
+// Updated payload interface to include payment due date
 interface OrderPayload {
-  date: string; // e.g. "2025-07-05"
-  invoiceNumber: string;
-  PONumber: string;
+  date: string;
   storeId: string;
   paymentDueDate: string;
-  paymentAmountReceived: number;
-  paymentStatus: string;
-  salesPerson?: string; // Optional if your API supports it
+  orderAmount: number;
   products: OrderProduct[];
 }
 
 const AddOrderPage = () => {
+  // Updated state to include payment due date
   const [selectedClient, setSelectedClient] = useState<string>("");
-  const [orderDate, setOrderDate] = useState<string>("2025-01-15");
-  const [invoiceNumber, setInvoiceNumber] = useState<string>("");
-  const [PONumber, setPONumber] = useState<string>("");
-  const [paymentDueDate, setPaymentDueDate] = useState<string>("");
-  const [paymentAmountReceived, setPaymentAmountReceived] = useState<number>(0);
-  const [paymentStatus, setPaymentStatus] = useState<string>("notPaid");
-  const [salesPerson, setSalesPerson] = useState<string>("");
+  const [orderDate, setOrderDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
+  const [paymentDueDate, setPaymentDueDate] = useState<string>(""); // Added payment due date
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
   const [selectedCategoryName, setSelectedCategoryName] = useState<string>("");
@@ -220,25 +216,21 @@ const AddOrderPage = () => {
     return {
       totalAmount,
       totalQuantity,
-      totalWeight: totalQuantity,
     };
   };
 
-  const { totalAmount, totalQuantity, totalWeight } = calculateTotals();
+  const { totalAmount, totalQuantity } = calculateTotals();
 
-  const constructOrderPayload = () => ({
+  // Updated payload construction to include payment due date
+  const constructOrderPayload = (): OrderPayload => ({
     date: orderDate,
-    invoiceNumber,
-    PONumber,
     storeId: selectedClient,
     paymentDueDate,
-    paymentAmountReceived,
-    paymentStatus,
-    salesPerson,
+    orderAmount: Math.round(totalAmount),
     products: orderItems.map((item) => ({
       productId: item.product.id,
-      quantity: item.quantity,
-      discount: item.discount,
+      quantity: Math.round(item.quantity),
+      discount: Math.round(item.discount),
     })),
   });
 
@@ -247,20 +239,21 @@ const AddOrderPage = () => {
       alert("Please select a client and add items");
       return;
     }
+
     const payload = constructOrderPayload();
+    console.log("Order payload:", payload); // For debugging
+
     try {
-      await addOrder(payload as OrderPayload).unwrap();
+      await addOrder(payload).unwrap();
+      // Reset form including payment due date
       setOrderItems([]);
       setSearchTerm("");
       setSelectedClient("");
-      setInvoiceNumber("");
-      setPONumber("");
-      setOrderDate("");
-      setPaymentDueDate("");
-      setPaymentAmountReceived(0);
-      setPaymentStatus("notPaid");
-      setSalesPerson("");
+      setOrderDate(new Date().toISOString().split("T")[0]);
+      setPaymentDueDate(""); // Reset payment due date
+      alert("Order placed successfully!");
     } catch (err: any) {
+      console.error("Order creation error:", err);
       alert(
         "Order failed: " + (err?.data?.message || err?.error || "Unknown error")
       );
@@ -270,8 +263,8 @@ const AddOrderPage = () => {
   return (
     <Card className="w-full flex flex-col">
       <CardContent className="flex-1 flex flex-col overflow-hidden">
-        {/* Top form */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* Updated form to include payment due date - now 3 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <User className="w-4 h-4" /> Select Client
@@ -295,6 +288,7 @@ const AddOrderPage = () => {
               </SelectContent>
             </Select>
           </div>
+
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Calendar className="w-4 h-4" /> Order Date
@@ -305,54 +299,34 @@ const AddOrderPage = () => {
               onChange={(e) => setOrderDate(e.target.value)}
             />
           </div>
+
           <div className="space-y-2">
-            <Label>Invoice Number</Label>
-            <Input
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder="Invoice Number"
-            />
-            <Label>P.O. Number</Label>
-            <Input
-              value={PONumber}
-              onChange={(e) => setPONumber(e.target.value)}
-              placeholder="PO Number"
-            />
-            <Label>Payment Due Date</Label>
+            <Label className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" /> Payment Due Date
+            </Label>
             <Input
               type="date"
               value={paymentDueDate}
               onChange={(e) => setPaymentDueDate(e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Amount Received</Label>
-            <Input
-              type="number"
-              value={paymentAmountReceived}
-              onChange={(e) => setPaymentAmountReceived(Number(e.target.value))}
-            />
-            <Label>Payment Status</Label>
-            <Select value={paymentStatus} onValueChange={setPaymentStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="notPaid" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="notPaid">Not Paid</SelectItem>
-                <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="partial">Partial</SelectItem>
-              </SelectContent>
-            </Select>
-            <Label>Sales Person</Label>
-            <Input
-              value={salesPerson}
-              onChange={(e) => setSalesPerson(e.target.value)}
-              placeholder="Sales Person ID"
+              placeholder="Select payment due date"
             />
           </div>
         </div>
 
-        {/* Rest of your UI for categories/products/order/summary remains as before */}
+        {/* Search bar */}
+        <div className="mb-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search products by name or SKU..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+
+        {/* Categories, Products, and Order Summary */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="col-span-1">
             <Card className="h-full">
@@ -387,10 +361,11 @@ const AddOrderPage = () => {
               </CardContent>
             </Card>
           </div>
+
           <div className="col-span-2 space-y-2">
             <Card className="h-[600px] overflow-y-auto">
               <CardHeader>
-                <CardTitle>{selectedCategoryName} Products</CardTitle>
+                <CardTitle>{selectedCategoryName || "Products"}</CardTitle>
               </CardHeader>
               <CardContent>
                 {productLoading ? (
@@ -415,15 +390,12 @@ const AddOrderPage = () => {
                             </div>
                           </div>
                           <div className="text-sm font-semibold">
-                            ₹
-                            {orderItem
-                              ? orderItem.product.price
-                              : product.salesPrice}
+                            ₹{orderItem?.product.price || product.salesPrice}
                           </div>
                         </div>
                         <div className="mt-2">
                           {orderItem ? (
-                            <div className="bg-red-100 border border-red-400 rounded p-3">
+                            <div className="bg-blue-100 border border-blue-400 rounded p-3">
                               <div className="flex items-center gap-2 justify-between">
                                 <div className="flex items-center gap-2">
                                   <Button
@@ -516,6 +488,7 @@ const AddOrderPage = () => {
               </CardContent>
             </Card>
           </div>
+
           <div className="col-span-1">
             <Card className="h-full flex flex-col">
               <CardHeader>
@@ -537,8 +510,15 @@ const AddOrderPage = () => {
                         key={item.product.id}
                         className="flex justify-between items-center p-2 border-b"
                       >
-                        <span className="font-medium">{item.product.name}</span>
-                        <span className="font-semibold">
+                        <div className="flex-1">
+                          <span className="font-medium block">
+                            {item.product.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Qty: {item.quantity} | Discount: ₹{item.discount}
+                          </span>
+                        </div>
+                        <span className="font-semibold ml-2">
                           ₹{item.total.toFixed(2)}
                         </span>
                       </div>
@@ -551,26 +531,21 @@ const AddOrderPage = () => {
                   <span>Total Qty:</span>
                   <span className="font-semibold">{totalQuantity}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>Total Weight:</span>
-                  <span className="font-semibold">
-                    {totalWeight.toFixed(2)} kg
-                  </span>
-                </div>
                 <div className="flex justify-between font-bold text-base">
-                  <span>Total:</span>
+                  <span>Order Amount:</span>
                   <span>₹{totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </Card>
           </div>
         </div>
+
         <div className="flex justify-end mt-4">
           <Button variant="outline" className="mr-2">
             Cancel
           </Button>
           <Button
-            className="bg-red-600 hover:bg-red-700"
+            className="bg-blue-600 hover:bg-blue-700"
             disabled={
               !selectedClient || orderItems.length === 0 || isOrderSubmitting
             }

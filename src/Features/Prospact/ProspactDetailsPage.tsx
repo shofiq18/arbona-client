@@ -1,6 +1,5 @@
 
 
-
 "use client";
 
 import { useRouter } from "next/navigation";
@@ -12,7 +11,6 @@ import { Prospect } from "@/types";
 import Loading from "@/redux/Shared/Loading";
 import toast from "react-hot-toast";
 
-// Function to extract token from cookies (optional backup)
 const getTokenFromCookie = () => {
   const cookies = document.cookie.split('; ');
   const tokenCookie = cookies.find(cookie => cookie.startsWith('token='));
@@ -31,17 +29,21 @@ export default function ProspectDetails() {
   const [newSalespersonId, setNewSalespersonId] = useState("");
   const itemsPerPage = 10;
   const router = useRouter();
+// const [converProspect]=useConvertProspectMutation()
 
-  // Fetch prospects from API with refetch capability
-  const { data: prospectsResponse, error, isLoading, refetch } = useGetProspectsQuery(undefined);
+
+  // Fetch prospects with RTK Query
+  const { data: prospectsResponse, error, isLoading, refetch } = useGetProspectsQuery(undefined, {
+    refetchOnMountOrArgChange: true, // Ensures data is fresh on mount or arg change
+  });
 
   // Fetch all salespeople
   const { data: salesUsersResponse, isLoading: isSalesUsersLoading, error: salesUsersError } =
     useGetSalesUsersQuery(undefined);
 
   // Update and delete prospect mutations
-  const [updateProspect] = useUpdateProspectMutation();
-  const [deleteProspect] = useDeleteProspectMutation();
+  const [updateProspect, { isLoading: isUpdating }] = useUpdateProspectMutation();
+  const [deleteProspect, { isLoading: isDeleting }] = useDeleteProspectMutation();
 
   // Handle loading and error states
   if (isLoading) return <div className="min-h-screen p-4 text-center"><Loading/></div>;
@@ -64,6 +66,19 @@ export default function ProspectDetails() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedProspects = filteredProspects.slice(startIndex, endIndex);
 
+
+  
+//   const converProspacts=async(id:string)=>{
+//     console.log("convert api",id)
+//  try {
+//       await converProspect(id)
+//       toast.success("Prospact Convert successfully");
+     
+//     } catch (err) {
+//       toast.error("Failed to convert prospact");
+//       console.error("convert error:", err);
+//     }
+//   }
   const openModal = (prospect: Prospect, title: string, data: string) => {
     setSelectedProspect(prospect);
     setModalContent({ title, data });
@@ -78,7 +93,7 @@ export default function ProspectDetails() {
 
   const openUpdateModal = (prospect: Prospect) => {
     setSelectedProspect(prospect);
-    setNewSalespersonId(prospect.assignedSalesPerson._id); // Default to current salesperson ID
+    setNewSalespersonId(prospect.assignedSalesPerson._id);
     setIsUpdateModalOpen(true);
   };
 
@@ -94,26 +109,17 @@ export default function ProspectDetails() {
       return;
     }
 
-    console.log("Attempting update for prospect ID:", selectedProspect._id);
-    console.log("New Salesperson ID:", newSalespersonId);
-    const payload = {
-      _id: selectedProspect._id,
-      assignedSalesPerson: newSalespersonId,
-    };
-    console.log("Full request payload:", payload);
-    console.log("Constructed URL:", `https://dhaval722-server.vercel.app/api/v1/prospect/${selectedProspect._id}`);
+    const payload = { _id: selectedProspect._id, assignedSalesPerson: newSalespersonId };
 
     try {
-      const response = await updateProspect(payload).unwrap();
-      console.log("Update response:", response);
-      refetch();
+      await updateProspect(payload).unwrap();
+      await refetch(); // Wait for refetch to complete
       closeUpdateModal();
       toast.success("Prospect Salesperson updated successfully!");
     } catch (err) {
       console.error("Failed to update prospect:", err);
       const errorMessage = err || "Unknown error";
-      const errorDetails = err|| "No additional details";
-      alert(`Error updating prospect: ${errorMessage} (Details: ${errorDetails}). Check console for details.`);
+      alert(`Error updating prospect: ${errorMessage}. Check console for details.`);
     }
   };
 
@@ -122,17 +128,19 @@ export default function ProspectDetails() {
       return;
     }
 
-    console.log("Attempting to delete prospect ID:", prospectId);
     try {
       await deleteProspect(prospectId).unwrap();
-      console.log("Delete response:", { success: true });
-      refetch();
+      await refetch(); // Wait for refetch to complete
       toast.success("Prospect deleted successfully!");
     } catch (err) {
       console.error("Failed to delete prospect:", err);
       const errorMessage = err || "Unknown error";
       alert(`Error deleting prospect: ${errorMessage}. Check console for details.`);
     }
+  };
+
+  const handleUpdateRedirect = (prospectId: string) => {
+    router.push(`/dashboard/update-prospact/${prospectId}`);
   };
 
   return (
@@ -151,7 +159,9 @@ export default function ProspectDetails() {
               />
             </div>
             <div>
-              
+              <button className="bg-yellow-500 text-white mr-4 px-4 py-2 rounded-lg hover:bg-yellow-600 transition duration-200">
+                Filter
+              </button>
               <button
                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
                 onClick={() => router.push("/dashboard/add-prospact")}
@@ -236,22 +246,28 @@ export default function ProspectDetails() {
                     )}
                   </td>
                   <td className="p-3">
-                    <button className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">
-                      Convert
-                    </button>
+                    {/* <button onClick={()=>converProspacts(prospect._id)} className="bg-green-500 text-white px-2 py-1 rounded-lg hover:bg-green-600 transition duration-200">Convert</button> */}
                   </td>
-                  <td className=" p-3 flex space-x-6 item-centen">
+                  <td className="p-3 flex space-x-6 items-center">
                     <button
                       className="bg-blue-500 text-white px-2 py-1 ml-1 rounded-lg hover:bg-blue-600 transition duration-200"
                       onClick={() => openUpdateModal(prospect)}
+                      disabled={isUpdating}
                     >
                       Assign Salesperson
                     </button>
                     <button
-                      className=" text-white rounded-lg  transition duration-200"
+                      className="bg-red-600 text-white px-2 py-1 rounded-lg hover:bg-red-700 transition duration-200"
                       onClick={() => handleDeleteProspect(prospect._id)}
+                      disabled={isDeleting}
                     >
-                      🗑️ 
+                      🗑️
+                    </button>
+                    <button
+                      className="bg-yellow-500 text-white px-2 py-1 rounded-lg hover:bg-yellow-600 transition duration-200"
+                      onClick={() => handleUpdateRedirect(prospect._id)}
+                    >
+                      ✎
                     </button>
                   </td>
                 </tr>
@@ -305,9 +321,8 @@ export default function ProspectDetails() {
           </div>
         </div>
 
-        {/* Existing Modal */}
         {isModalOpen && modalContent && selectedProspect && (
-          <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-md">
               <h3 className="text-xl font-bold mb-4">{modalContent.title}</h3>
               <div className="space-y-4">
@@ -323,9 +338,8 @@ export default function ProspectDetails() {
           </div>
         )}
 
-        {/* Update Modal */}
         {isUpdateModalOpen && selectedProspect && (
-          <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg w-full max-w-2xl">
               <h3 className="text-xl font-bold mb-4">Update Salesperson</h3>
               <div className="space-y-4">
@@ -336,7 +350,7 @@ export default function ProspectDetails() {
                     value={newSalespersonId}
                     onChange={(e) => setNewSalespersonId(e.target.value)}
                     className="flex-1 p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    disabled={isSalesUsersLoading}
+                    disabled={isSalesUsersLoading || isUpdating}
                   >
                     {salesUsersError ? (
                       <option disabled>Error loading salespeople</option>
@@ -358,14 +372,16 @@ export default function ProspectDetails() {
                 <button
                   className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200"
                   onClick={closeUpdateModal}
+                  disabled={isUpdating}
                 >
                   Cancel
                 </button>
                 <button
                   className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
                   onClick={handleUpdateProspect}
+                  disabled={isUpdating}
                 >
-                  Update
+                  {isUpdating ? "Updating..." : "Update"}
                 </button>
               </div>
             </div>

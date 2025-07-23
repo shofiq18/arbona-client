@@ -10,6 +10,7 @@ export interface ContainerProduct {
   itemNumber: string;
   quantity: number;
   perCaseCost: number;
+  perCaseShippingCost?: string;
   purchasePrice: number;
   salesPrice: number;
   packetSize: string;

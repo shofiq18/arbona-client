@@ -1,13 +1,13 @@
 
 
 
-
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea"; // Import Textarea
 import { useParams, useRouter } from "next/navigation";
 import { useUpdateCustomerMutation, useGetCustomerQuery } from "@/redux/api/customers/customersApi";
 import { toast } from "react-hot-toast";
@@ -44,7 +44,7 @@ export default function EditCustomerPage() {
     isDeleted: false,
     createdAt: "",
     updatedAt: "",
-
+    note: "", // Initialize the note field
   });
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function EditCustomerPage() {
         ...prev,
         ...customerData.data,
         isCustomerSourceProspect: customerData.data.isCustomerSourceProspect ?? false,
+        note: customerData.data.note || "", // Ensure note is set from fetched data
       }));
     }
   }, [customerData]);
@@ -60,7 +61,7 @@ export default function EditCustomerPage() {
   if (isLoading) return <div className="p-4">Loading...</div>;
   if (error) return <div className="p-4 text-red-500">Error loading customer data</div>;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -289,14 +290,24 @@ export default function EditCustomerPage() {
               className="w-full text-gray-700"
             />
           </div>
-          
+          {/* Add the Note field here */}
+          <div className="space-y-2 md:col-span-2"> {/* Make it span two columns for better layout */}
+            <Label htmlFor="note">Note</Label>
+            <Textarea
+              id="note"
+              name="note"
+              value={formData.note}
+              onChange={handleChange}
+              className="w-full text-gray-700"
+              rows={4} // Adjust rows as needed for the textarea
+            />
+          </div>
         </div>
-        
 
-                {/* image start here */}
+        {/* image start here */}
 
         <div className="grid md:grid-cols-4 py-4 gap-6">
-            <div className="space-y-2 ">
+          <div className="space-y-2 ">
             <Label htmlFor="creditApplication">Credit Application</Label>
             <div className="border-2 border-dashed border-gray-300 p-4 rounded-lg text-center">
               {formData.creditApplication ? (
@@ -416,13 +427,11 @@ export default function EditCustomerPage() {
               <p className="text-xs text-gray-400 mt-1">Drag and drop or click to upload</p>
             </div>
           </div>
-        
         </div>
         <div className="flex justify-end gap-4">
-          
           <Button type="button"
           onClick={() => router.push("/dashboard/customers")}
-           className="bg-gray-500 text-white hover:bg-gray-600">
+            className="bg-gray-500 text-white hover:bg-gray-600">
             Cancel
           </Button>
           <Button type="submit" className="bg-red-600 text-white hover:bg-red-700">

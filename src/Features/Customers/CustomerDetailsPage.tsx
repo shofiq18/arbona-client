@@ -123,6 +123,8 @@ const CustomerDetailsPage: React.FC = () => {
             <div className="space-y-2">
               <p className="text-gray-600"><span className="font-medium text-gray-800">Delivery Days:</span> {customer.acceptedDeliveryDays.join(", ") || "N/A"}</p>
               <p className="text-gray-600"><span className="font-medium text-gray-800">Bank Info:</span> {customer.bankACHAccountInfo || "N/A"}</p>
+              <p className="text-gray-600"><span className="font-medium text-gray-800">Note :</span> {customer.note || "N/A"}</p>
+             
             </div>
           </div>
         </div>

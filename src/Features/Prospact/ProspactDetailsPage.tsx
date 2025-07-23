@@ -165,7 +165,7 @@ export default function ProspectDetails() {
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
   console.log('pagination prospact', paginatedProspects)
-const actualCustomers = paginatedProspects.filter(customer => customer.status !== "converted");
+const actualCustomers =prospects.filter(customer => customer.status !== "converted");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -300,7 +300,7 @@ const actualCustomers = paginatedProspects.filter(customer => customer.status !=
           </table>
         </div>
 
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
+        {/* <div className="mt-6 flex flex-col sm:flex-row justify-between items-center text-sm text-gray-700">
           <span>
             Showing {startIndex + 1} to {Math.min(endIndex, filteredProspects.length)} of{" "}
             {filteredProspects.length}
@@ -345,7 +345,7 @@ const actualCustomers = paginatedProspects.filter(customer => customer.status !=
               <option value={25}>25 ▼</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
         {/* Modal for Quote Status / Competitor Statement / Notes */}
         {isModalOpen && modalContent && selectedProspect && (

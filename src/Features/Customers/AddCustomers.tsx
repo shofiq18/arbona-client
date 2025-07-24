@@ -115,14 +115,10 @@ export default function AddCustomer(): React.ReactElement {
     "shippingCity",
     "shippingState",
     "shippingZipcode",
-    "termDays",
-    "acceptDeliveryDays",
-    "shippingStatus",
-    "bankAchInfo",
-    "creditApplication",
-    "ownerLegalFrontImage",
-    "ownerLegalBackImage",
-    "voidedCheckImage",
+    
+ 
+    
+    
   ];
 
   // Handle input changes
@@ -140,6 +136,7 @@ export default function AddCustomer(): React.ReactElement {
       delete newErrors[name];
       return newErrors;
     });
+    console.log("name nad vale", name, value)
   };
 
   // Handle same as billing address checkbox
@@ -188,6 +185,7 @@ export default function AddCustomer(): React.ReactElement {
     }
   };
 
+  
   // Toggle dropdown visibility
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -278,7 +276,7 @@ export default function AddCustomer(): React.ReactElement {
         shippingCity: formData.shippingCity,
         shippingState: formData.shippingState,
         shippingZipcode: formData.shippingZipcode,
-        salesTaxId: formData.salesTaxId,
+        salesTaxId: formData.salesTaxId ||"Not provided",
         acceptedDeliveryDays: formData.acceptDeliveryDays,
         bankACHAccountInfo: formData.bankAchInfo,
         creditApplication: formData.creditApplication || undefined,
@@ -290,7 +288,7 @@ export default function AddCustomer(): React.ReactElement {
         note: formData.note || undefined,
         miscellaneous: formData.miscellaneous || undefined,
       };
-
+console.log("alll data check",payload)
       await addCustomer(payload).unwrap();
       console.log("added customer", payload);
       toast.success("Customer Added successfully");
@@ -475,23 +473,63 @@ export default function AddCustomer(): React.ReactElement {
               <select
                 id="billingState"
                 name="billingState"
-                value={formData.billingState}
+               
                 onChange={handleInputChange}
                 required
                 
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Select State</option>
-                <option value="AL">Alabama</option>
-                <option value="AK">Alaska</option>
-                <option value="AZ">Arizona</option>
-                <option value="AR">Arkansas</option>
-                <option value="CA">California</option>
-                <option value="CO">Colorado</option>
-                <option value="CT">Connecticut</option>
-                <option value="DE">Delaware</option>
-                <option value="FL">Florida</option>
-                <option value="GA">Georgia</option>
+               <option value="AL">Alabama</option>
+            <option value="AK">Alaska</option>
+            <option value="AZ">Arizona</option>
+            <option value="AR">Arkansas</option>
+            <option value="CA">California</option>
+            <option value="CO">Colorado</option>
+            <option value="CT">Connecticut</option>
+            <option value="DE">Delaware</option>
+            <option value="FL">Florida</option>
+            <option value="GA">Georgia</option>
+            <option value="HI">Hawaii</option>
+            <option value="ID">Idaho</option>
+            <option value="IL">Illinois</option>
+            <option value="IN">Indiana</option>
+            <option value="IA">Iowa</option>
+            <option value="KS">Kansas</option>
+            <option value="KY">Kentucky</option>
+            <option value="LA">Louisiana</option>
+            <option value="ME">Maine</option>
+            <option value="MD">Maryland</option>
+            <option value="MA">Massachusetts</option>
+            <option value="MI">Michigan</option>
+            <option value="MN">Minnesota</option>
+            <option value="MS">Mississippi</option>
+            <option value="MO">Missouri</option>
+            <option value="MT">Montana</option>
+            <option value="NE">Nebraska</option>
+            <option value="NV">Nevada</option>
+            <option value="NH">New Hampshire</option>
+            <option value="NJ">New Jersey</option>
+            <option value="NM">New Mexico</option>
+            <option value="NY">New York</option>
+            <option value="NC">North Carolina</option>
+            <option value="ND">North Dakota</option>
+            <option value="OH">Ohio</option>
+            <option value="OK">Oklahoma</option>
+            <option value="OR">Oregon</option>
+            <option value="PA">Pennsylvania</option>
+            <option value="RI">Rhode Island</option>
+            <option value="SC">South Carolina</option>
+            <option value="SD">South Dakota</option>
+            <option value="TN">Tennessee</option>
+            <option value="TX">Texas</option>
+            <option value="UT">Utah</option>
+            <option value="VT">Vermont</option>
+            <option value="VA">Virginia</option>
+            <option value="WA">Washington</option>
+            <option value="WV">West Virginia</option>
+            <option value="WI">Wisconsin</option>
+            <option value="WY">Wyoming</option>
                 {/* Add more states as needed */}
               </select>
               {fieldErrors.billingState && <p className="text-red-500 text-sm">{fieldErrors.billingState}</p>}
@@ -622,7 +660,7 @@ export default function AddCustomer(): React.ReactElement {
               placeholder="Enter sales tax ID"
               className="w-full"
             />
-            {fieldErrors.salesTaxId && <p className="text-red-500 text-sm">{fieldErrors.salesTaxId}</p>}
+           
           </div>
 
           <div className="space-y-2">
@@ -633,7 +671,7 @@ export default function AddCustomer(): React.ReactElement {
               type="number"
               value={formData.termDays}
               onChange={handleInputChange}
-              required
+              
               placeholder="Enter term days"
               className="w-full"
             />
@@ -732,10 +770,10 @@ export default function AddCustomer(): React.ReactElement {
             onChange={handleInputChange}
             placeholder="Enter bank ACH account information"
             rows={5}
-            required
+
             className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
           />
-          {fieldErrors.bankAchInfo && <p className="text-red-500 text-sm">{fieldErrors.bankAchInfo}</p>}
+         
         </div>
 
         {/* File Uploads */}
@@ -1018,7 +1056,7 @@ export default function AddCustomer(): React.ReactElement {
           <Button
             type="submit"
             className="px-6 py-2 bg-red-600 hover:bg-red-700 cursor-pointer text-white"
-            disabled={isLoading || formData.acceptDeliveryDays.length === 0}
+            disabled={isLoading }
           >
             {isLoading ? "Saving..." : "Save"}
           </Button>

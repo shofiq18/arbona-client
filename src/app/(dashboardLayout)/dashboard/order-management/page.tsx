@@ -643,9 +643,9 @@ setIsBestLoading(true)
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
             <ImFilePdf className="w-5 h-5 text-black" />
           </Button>
-          <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
+          {/* <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
             <FaFileExcel className="w-5 h-5 text-black" />
-          </Button>
+          </Button> */}
         </div>
       </div>
       {/* Results Summary */}
@@ -673,24 +673,7 @@ setIsBestLoading(true)
               <TableHead className="min-w-[100px]">Profit Margin</TableHead>
               <TableHead className="min-w-[100px]">Profit Markup</TableHead>
               <TableHead className="min-w-[130px]">Payment Status</TableHead>
-              <TableHead className="min-w-[140px]">Sales Person</TableHead>
-              <TableHead className="min-w-[150px]">Store Phone</TableHead>
-              <TableHead className="min-w-[200px]">Store Email</TableHead>
-              <TableHead className="min-w-[150px]">Sales Tax ID</TableHead>
-              <TableHead className="min-w-[200px]">Billing Address</TableHead>
-              <TableHead className="min-w-[120px]">Billing City</TableHead>
-              <TableHead className="min-w-[120px]">Billing State</TableHead>
-              <TableHead className="min-w-[120px]">Billing Zip</TableHead>
-              <TableHead className="min-w-[200px]">Shipping Address</TableHead>
-              <TableHead className="min-w-[120px]">Shipping City</TableHead>
-              <TableHead className="min-w-[120px]">Shipping State</TableHead>
-              <TableHead className="min-w-[120px]">Shipping Charge</TableHead>
-              <TableHead className="min-w-[120px]">Shipping Zip</TableHead>
-              <TableHead className="min-w-[200px]">Bank Account Info</TableHead>
-              <TableHead className="min-w-[180px]">Delivery Days</TableHead>
-              <TableHead className="min-w-[120px]">Created At</TableHead>
-              <TableHead className="min-w-[120px]">Updated At</TableHead>
-              <TableHead className="min-w-[150px]">Products Count</TableHead>
+              
               <TableHead className="min-w-[150px] sticky right-0 bg-gray-50">
                 Action
               </TableHead>
@@ -783,70 +766,7 @@ setIsBestLoading(true)
                       {order.paymentStatus}
                     </span>
                   </TableCell>
-                  <TableCell className="text-sm">
-                    {order?.storeId?.storePersonName || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.storePhone || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.storePersonEmail || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.salesTaxId || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.billingAddress || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.billingCity || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.billingState || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.billingZipcode || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.shippingAddress || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.shippingCity || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.shippingState || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.shippingCharge || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.shippingZipcode || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.bankACHAccountInfo || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {order.storeId?.acceptedDeliveryDays?.join(", ") || "N/A"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {new Date(order.createdAt).toLocaleDateString("en-US", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {new Date(order.updatedAt).toLocaleDateString("en-US", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {order.products?.length || 0} items
-                    </span>
-                  </TableCell>
+                 
                   <TableCell className="text-sm sticky right-0 bg-white">
                     <div className="flex items-center space-x-2">
                       {/* View Button */}

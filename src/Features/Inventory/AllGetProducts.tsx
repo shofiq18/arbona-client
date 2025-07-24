@@ -34,6 +34,7 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Loading from "@/redux/Shared/Loading";
+import BestLoding from "@/components/Loding/Loding";
 import ErrorState from "@/redux/Shared/ErrorState";
 import ProductFiltersModal from "./FilterModal";
 import { ImFilePdf } from "react-icons/im";
@@ -42,6 +43,7 @@ export default function AllGetProducts() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isBestLoading,setIsBestLoading]=useState(false)
   const itemsPerPage = 20;
   const router = useRouter();
   const { data, isLoading, isError } = useGetInventoryQuery();
@@ -186,7 +188,7 @@ const handleApplyFilters = (newFilters:any) => {
 
   
   const handleDownloadExcel = async () => {
-
+ setIsBestLoading(true)
   try {
     const token = Cookies?.get("token");
     const response = await fetch(
@@ -226,13 +228,15 @@ const handleApplyFilters = (newFilters:any) => {
 
     
     URL.revokeObjectURL(link.href);
+     setIsBestLoading(false)
   } catch (err) {
     console.error("Error downloading Excel file:", err);
-   
+    setIsBestLoading(false)
   }
 };
 
   const handleDownload = async () => {
+    setIsBestLoading(true)
     const token = Cookies?.get("token");
     console.log(token)
     if (!token) {
@@ -272,8 +276,10 @@ const handleApplyFilters = (newFilters:any) => {
       setTimeout(() => {
         URL.revokeObjectURL(fileURL);
       }, 10);
+      setIsBestLoading(false)
     } catch (err) {
       console.log(err);
+       setIsBestLoading(false)
     }
   };
 
@@ -288,6 +294,8 @@ const handleApplyFilters = (newFilters:any) => {
 
   return (
     <div className="p-4">
+
+      {isBestLoading && <BestLoding/>}
       {/* Search and Controls */}
       <div className="flex justify-between items-center mb-4">
         <Input
@@ -313,6 +321,9 @@ const handleApplyFilters = (newFilters:any) => {
           <Button onClick={handleDownload} className="bg-[#D9D9D9]" size="icon">
                       <ImFilePdf className="w-5 h-5 text-black" />
                     </Button>
+                    <Button onClick={handleDownloadExcel} className="bg-[#D9D9D9]" size="icon">
+                                <FaFileExcel className="w-5 h-5 text-black" />
+                              </Button>
                    
         </div>
       </div>

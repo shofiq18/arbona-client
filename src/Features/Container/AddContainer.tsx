@@ -35,7 +35,7 @@ const AddContainerPage = () => {
     perCaseCost: 0,
     packetSize: '', // Initialize as an empty string
     purchasePrice: 0,
-    salesPrice: 0,
+    salesPrice: 0, // Keep as 0, as it will be converted to Number later
   });
   const [addContainer, { isLoading }] = useAddContainerMutation();
   const { data: inventoryResponse } = useGetInventoryQuery();
@@ -61,7 +61,8 @@ const AddContainerPage = () => {
   };
 
   const handleAddProduct = () => {
-    if (newProduct.category && newProduct.itemNumber && newProduct.quantity && newProduct.purchasePrice && newProduct.salesPrice && newProduct.packetSize) {
+    // Removed newProduct.salesPrice from this condition
+    if (newProduct.category && newProduct.itemNumber && newProduct.quantity && newProduct.purchasePrice && newProduct.packetSize) {
       setContainer((prev) => ({
         ...prev,
         containerProducts: [
@@ -71,9 +72,9 @@ const AddContainerPage = () => {
             quantity: Number(newProduct.quantity),
             perCaseCost: newProduct.perCaseCost ? Number(newProduct.perCaseCost) : 0,
             purchasePrice: Number(newProduct.purchasePrice),
-            packetSize: newProduct.packetSize, // Corrected: Directly assign the string value
-            salesPrice: Number(newProduct.salesPrice),
-            _id: Date.now().toString(), // Use a unique ID for temporary client-side products
+            packetSize: newProduct.packetSize,
+            salesPrice: newProduct.salesPrice ? Number(newProduct.salesPrice) : 0, // Make salesPrice optional, default to 0 if not provided
+            _id: Date.now().toString(),
           },
         ],
       }));
@@ -84,11 +85,12 @@ const AddContainerPage = () => {
         quantity: 0,
         perCaseCost: 0,
         purchasePrice: 0,
-        packetSize: '', // Reset to empty string
-        salesPrice: 0,
+        packetSize: '',
+        salesPrice: 0, // Reset to 0
       });
     } else {
-        toast.error('Please fill all product details (Category, Item Number, Quantity, Packet Size, Purchase Price, Sales Price).');
+      // Updated error message to reflect that Sales Price is no longer required here
+      toast.error('Please fill all product details (Category, Item Number, Quantity, Packet Size, Purchase Price).');
     }
   };
 
@@ -101,7 +103,7 @@ const AddContainerPage = () => {
           quantity: Number(updatedProduct.quantity),
           perCaseCost: updatedProduct.perCaseCost ? Number(updatedProduct.perCaseCost) : 0,
           purchasePrice: Number(updatedProduct.purchasePrice),
-          salesPrice: Number(updatedProduct.salesPrice)
+          salesPrice: Number(updatedProduct.salesPrice) // Still convert to number if provided
         } : prod
       ),
     }));
@@ -297,18 +299,18 @@ const AddContainerPage = () => {
             </div>
           </div>
           
-         {/* 2nd line */}
+          {/* 2nd line */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <label className="block text-sm font-medium mb-1">Sales Price</label>
+              <label className="block text-sm font-medium mb-1">Sales Price (Optional)</label>
               <input
                 type="number"
                 name="salesPrice"
                 value={newProduct.salesPrice}
                 onChange={handleInputChange}
-                placeholder="Sales Price *"
+                placeholder="Sales Price"
                 className="border p-2 w-full "
-                required // Keep required here if it's mandatory for adding a product
+                // The 'required' attribute is removed, making it optional
               />
             </div>
             <div>
@@ -320,7 +322,7 @@ const AddContainerPage = () => {
                 onChange={handleInputChange}
                 placeholder="Purchase Price *"
                 className="border p-2 w-full"
-                required // Keep required here if it's mandatory for adding a product
+                required
               />
             </div>
             <div>
@@ -332,7 +334,6 @@ const AddContainerPage = () => {
                 onChange={handleInputChange}
                 placeholder="Per case cost (optional)"
                 className="border p-2 w-full"
-                // No 'required' here as it's optional
               />
             </div>
             <div>
@@ -344,8 +345,7 @@ const AddContainerPage = () => {
                 onChange={handleInputChange}
                 placeholder="packet size"
                 className="border p-2 w-full"
-                // REMOVE 'required' from here
-                // required // <--- REMOVE THIS LINE
+                // The 'required' attribute is removed, making it optional
               />
             </div>
           </div>

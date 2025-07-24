@@ -48,6 +48,12 @@ export default function ProspectDetails() {
   const [convertProspect] = useConvertProspectMutation();
 const [sendEmail]=useSendEmailMutation()
 
+
+ // Filter customers based on search (storePersonName)
+  // const filteredData = customers.filter((customer) =>
+  //   customer.storeName.toLowerCase().includes(search.toLowerCase()) || customer.storePersonName.toLowerCase().includes(search.toLowerCase())
+  // );
+
   // Fetch all salespeople
   const {
     data: salesUsersResponse,
@@ -73,6 +79,7 @@ const [sendEmail]=useSendEmailMutation()
   console.log("qoateddata", prospects); // Typo here: "qoateddata" should be "quotedData"
 
   // Filter prospects based on search term
+  console.log("search tearm",searchTerm)
   const filteredProspects = prospects.filter(
     (prospect) =>
       prospect.storeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,6 +87,7 @@ const [sendEmail]=useSendEmailMutation()
        (prospect.assignedSalesPerson?.email || "").toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  console.log('filter data', filteredProspects)
   // Pagination logic
   const totalPages = Math.ceil(filteredProspects.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -166,7 +174,7 @@ const [sendEmail]=useSendEmailMutation()
     router.push(`/dashboard/update-prospact/${prospectId}`);
   };
   console.log('pagination prospact', paginatedProspects)
-const actualCustomers =prospects.filter(customer => customer.status !== "converted");
+const actualCustomers =filteredProspects.filter(customer => customer.status !== "converted");
 
 const handileClickSendEMail=async(id:string)=>{
 

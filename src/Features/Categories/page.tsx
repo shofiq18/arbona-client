@@ -58,7 +58,7 @@ const Categories: React.FC = () => {
 
   const categoriesData: Category[] = data?.data ?? [];
 
-
+console.log(categoriesData)
 
   const filteredCategories = categoriesData.filter(
     (category) =>
@@ -85,7 +85,8 @@ const Categories: React.FC = () => {
   const handleSave = async () => {
     if (newCategory.name && newCategory.description) {
       try {
-        await addCategory(newCategory).unwrap();
+       const cattegoryData= await addCategory(newCategory).unwrap();
+    
         toast.success("Category added successfully!");
         setNewCategory({ name: "", description: "" });
         setIsAddModalOpen(false);
@@ -147,7 +148,9 @@ const Categories: React.FC = () => {
   const confirmDelete = async () => {
     if (selectedCategory) {
       try {
-        await deleteCategory(selectedCategory._id).unwrap();
+        console.log("select category data",selectedCategory)
+     const deleteCategorys=   await deleteCategory(selectedCategory._id).unwrap();
+     console.log(deleteCategory)
         toast.success(`Deleted ${selectedCategory.name} successfully!`);
         setIsDeleteConfirmOpen(false);
         setSelectedCategory(null);

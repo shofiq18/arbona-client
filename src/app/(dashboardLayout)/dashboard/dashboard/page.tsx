@@ -91,15 +91,16 @@ import { useGetInventoryQuery } from "@/redux/api/auth/inventory/inventoryApi";
 import { useGetProspectsQuery } from "@/redux/api/auth/prospact/prospactApi";
 import { useRouter } from "next/navigation"; // Import useRouter
 import { useEffect, useState } from "react";
-import { Prospect } from "@/types";
+import { Prospect, ProspectsResponse } from "@/types";
 
 export default function Dashboard(): React.ReactElement {
   const { data, isLoading, isError } = useGetInventoryQuery();
   const [prospects, setProspects] = useState<Prospect[]>([]);
-  const allProducts = data?.data;
+  const allProducts = data?.data ;
   const lowStockProducts = allProducts?.filter(
     (product) => product.quantity < product.reorderPointOfQuantity
   );
+
 
   // Fetch prospects with RTK Query
   const { data: prospectsResponse, error, refetch } = useGetProspectsQuery(undefined, {
@@ -121,12 +122,15 @@ export default function Dashboard(): React.ReactElement {
     }
   }, [prospectsResponse]);
 
-  console.log(prospects);
+  console.log("prospectsResponse",prospectsResponse);
 
   // Handler for View button
   const handleViewProspect = (prospectId: string) => {
     router.push(`/dashboard/update-prospact/${prospectId}`); // Navigate to update-prospact page
   };
+
+  console.log("prostpact data",data)
+const actualCustomers :Prospect[]|undefined =prospectsResponse?.data.filter(customer => customer?.status !== "converted")||[]
 
   return (
     <div className="p-4 md:p-2 space-y-6">
@@ -150,8 +154,8 @@ export default function Dashboard(): React.ReactElement {
                 </tr>
               </thead>
               <tbody>
-                {prospects.length > 0 ? (
-                  prospects.map((prospect) => (
+                {actualCustomers?.length > 0 ? (
+                  actualCustomers?.map((prospect) => (
                     <tr key={prospect._id} className="border-b hover:bg-gray-50">
                       <td className="py-2 px-3">{prospect.storeName || "N/A"}</td>
                       <td className="py-2 px-3 text-black">{prospect.storePersonName || "N/A"}</td>

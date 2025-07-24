@@ -186,6 +186,7 @@ const handileClickSendEMail=async(id:string)=>{
     console.log(error)
   }
 }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">

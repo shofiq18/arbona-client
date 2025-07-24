@@ -1,6 +1,6 @@
 "use client";
-
-import { useRouter } from "next/navigation";
+ import  Cookies from "js-cookie"
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image"; // Image is imported but not used. Consider removing if not needed.
 import {
@@ -14,11 +14,13 @@ import { useGetSalesUsersQuery } from "@/redux/api/auth/admin/adminApi";
 import { Prospect } from "@/types"; // Make sure your Prospect type matches your API response
 import Loading from "@/redux/Shared/Loading";
 import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
+import { DecodedToken } from "@/app/(dashboardLayout)/dashboard/page";
 
 // It's generally better to handle token in baseApi.ts
 // or use an interceptor if you use it in many places.
 // For this component, it's fine as long as you have 'use client'.
-const getTokenFromCookie = () => {
+ const getTokenFromCookie = () => {
   const cookies = document.cookie.split('; ');
   const tokenCookie = cookies.find(cookie => cookie.startsWith('token='));
   const token = tokenCookie ? tokenCookie.split('=')[1] : '';
@@ -187,6 +189,29 @@ const handileClickSendEMail=async(id:string)=>{
   }
 }
 
+  const pathname = usePathname();
+  const role = Cookies.get("role")?.toLowerCase();
+  const isAdmin = role === "admin";
+  const token = Cookies.get("token");
+
+  let isRole=""
+  console.log("is admin role check",role)
+  // Decode token to get email dynamically
+  let email = "admin@gmail.com"; // Default value
+  let username = "Daval"; // Default username
+  if (token) {
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(token);
+      email = decodedToken.email;
+      // Derive username from email (e.g., first part before @)
+      username = email.split("@")[0] || "User";
+      isRole=decodedToken.role
+    } catch (error) {
+      console.error("Failed to decode token:", error);
+    }
+  }
+
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-white p-4 sm:p-6 lg:p-8">
       <div className="mx-auto">
@@ -206,12 +231,16 @@ const handileClickSendEMail=async(id:string)=>{
             </div>
             <div>
               
-              <button
+              {
+                isRole==="admin"&& <button
                 className="bg-red-600 text-white px-4 py-2 cursor-pointer rounded-lg hover:bg-red-700 transition duration-200"
                 onClick={() => router.push("/dashboard/add-prospact")}
               >
                 + Add Prospect
               </button>
+              
+              }
+             
             </div>
           </div>
         </div>

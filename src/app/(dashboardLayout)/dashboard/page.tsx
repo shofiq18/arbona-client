@@ -19,7 +19,7 @@ import Cookies from "js-cookie"; // Explicit import
 import { jwtDecode } from "jwt-decode";
 import { Button } from "@/components/ui/button";
 
-interface DecodedToken {
+export interface DecodedToken {
   email: string;
   role: string;
   // Add other claims if needed (e.g., name, iat, exp)

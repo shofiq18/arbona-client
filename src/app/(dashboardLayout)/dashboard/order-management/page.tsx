@@ -753,7 +753,7 @@ setIsBestLoading(true)
                     ${order.profitAmount.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-sm font-medium">
-                    {order.profitPercentage}%
+                    {order.profitPercentage.toFixed(2)}%
                   </TableCell>
                   <TableCell className="text-sm">
                     <span

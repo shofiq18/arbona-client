@@ -556,7 +556,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                             </div>
                           </div>
                           <div className="text-sm font-semibold">
-                            ₹{orderItem?.product.price || product.salesPrice}
+                            ${orderItem?.product.price || product.salesPrice}
                           </div>
                         </div>
                         <div className="mt-2">
@@ -632,7 +632,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                                   />
                                 </label>
                                 <span>
-                                  Total: ₹{orderItem.total.toFixed(2)}
+                                  Total: ${orderItem.total.toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -681,11 +681,11 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                             {item.product.name}
                           </span>
                           <span className="text-xs text-gray-500">
-                            Qty: {item.quantity} | Discount: ₹{item.discount}
+                            Qty: {item.quantity} | Discount: ${item.discount}
                           </span>
                         </div>
                         <span className="font-semibold ml-2">
-                          ₹{item.total.toFixed(2)}
+                          ${item.total.toFixed(2)}
                         </span>
                       </div>
                     ))
@@ -699,7 +699,7 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Order Amount:</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>${totalAmount.toFixed(2)}</span>
                 </div>
               </div>
             </Card>
@@ -708,8 +708,8 @@ const UpdateOrderPage: React.FC<UpdateOrderPageProps> = ({
 
         <div className="flex justify-between mt-4">
           <div className="text-sm text-muted-foreground">
-            Original Order Amount: ₹{order?.orderAmount?.toFixed(2)} | Current
-            Amount: ₹{totalAmount.toFixed(2)}
+            Original Order Amount: ${order?.orderAmount?.toFixed(2)} | Current
+            Amount: ${totalAmount.toFixed(2)}
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleCancel}>

@@ -81,12 +81,7 @@ export default function CustomerTable() {
           >
             <PlusCircle className="h-4 w-4" /> Add Customer
           </Button>
-          <Button
-            variant="outline"
-            className="bg-gray-100 text-gray-700 hover:bg-gray-200"
-          >
-            <FaFilePdf className="h-2 w-2" />
-          </Button>
+         
         </div>
       </div>
 

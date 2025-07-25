@@ -44,7 +44,7 @@ export default function EditCustomerPage() {
     isDeleted: false,
     createdAt: "",
     updatedAt: "",
-    note: "", // Initialize the note field
+    note: "",
   });
 
   useEffect(() => {
@@ -297,6 +297,17 @@ export default function EditCustomerPage() {
               id="note"
               name="note"
               value={formData.note}
+              onChange={handleChange}
+              className="w-full text-gray-700"
+              rows={4} // Adjust rows as needed for the textarea
+            />
+          </div>
+          <div className="space-y-2 md:col-span-2"> {/* Make it span two columns for better layout */}
+            <Label htmlFor="note">Bank ACH Account Information</Label>
+            <Textarea
+              id="note"
+              name="note"
+              value={formData.bankACHAccountInfo}
               onChange={handleChange}
               className="w-full text-gray-700"
               rows={4} // Adjust rows as needed for the textarea

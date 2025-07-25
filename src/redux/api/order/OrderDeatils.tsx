@@ -389,9 +389,7 @@ setIsBestLoading(true)
               </Button>
               </Link>
               
-              <Button size="sm" variant="destructive">
-                <FileText className="h-4 w-4" />
-              </Button>
+             
            
               <DropdownMenu>
                 <DropdownMenuTrigger> <ImFilePdf className="w-5 h-5 text-black" /></DropdownMenuTrigger>

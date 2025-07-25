@@ -38,6 +38,7 @@ import BestLoding from "@/components/Loding/Loding";
 import ErrorState from "@/redux/Shared/ErrorState";
 import ProductFiltersModal from "./FilterModal";
 import { ImFilePdf } from "react-icons/im";
+import { useGetCategoriesQuery } from "@/redux/api/category/categoryApi";
 
 export default function AllGetProducts() {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -57,6 +58,12 @@ export default function AllGetProducts() {
     outOfStock: false,
     lowStock: false,
   });
+
+
+  // get category data 
+ const { data: categoryData } = useGetCategoriesQuery(); // Removed unused refetch
+  const categoriesData: { _id: string; name: string }[] = categoryData?.data ?? [];
+
 const handleApplyFilters = (newFilters:any) => {
 
     setActiveFilters(newFilters);
@@ -172,6 +179,8 @@ const handleApplyFilters = (newFilters:any) => {
         barcodeString: selectedProduct.barcodeString,
         packageDimensions: selectedProduct.packageDimensions,
       };
+
+      console.log("product update",payload)
 
       const updatedProduct = await updateInventory(payload).unwrap();
 
@@ -531,15 +540,42 @@ const handleApplyFilters = (newFilters:any) => {
                                 />
                               </div>
                             </div>
-                            <div>
+                            {/* <div>
                               <Label className="mb-1" htmlFor="categoryId">Category ID</Label>
                               <Input
                                 id="categoryId"
-                                value={selectedProduct?.categoryId?._id || ""}
-                                readOnly
+                                value={selectedProduct?.categoryId?.name || ""}
+                             
                                 placeholder="Category ID"
                               />
-                            </div>
+                            </div> */}
+
+                              <div>
+  <label className="block text-sm font-medium text-gray-700">Category *</label>
+  <select
+    name="categoryId"
+    value={
+      typeof selectedProduct?.categoryId === "object"
+        ? selectedProduct?.categoryId?._id || ""
+        : selectedProduct?.categoryId || ""
+    }
+    onChange={(e) =>
+      setSelectedProduct({
+        ...selectedProduct,
+        categoryId: {_id: e.target.value,name:selectedProduct.name}, // Update categoryId, not _id
+      })
+    }
+    className="mt-1 p-2 w-full border rounded"
+    required
+  >
+    <option value="">Select Category</option>
+    {categoriesData.map((cat) => (
+      <option key={cat._id} value={cat._id}>
+        {cat.name}
+      </option>
+    ))}
+  </select>
+</div>
                             <div>
                               <Label className="mb-1" htmlFor="reorderPoint">Reorder Point</Label>
                               <Input

@@ -632,7 +632,7 @@ console.log("alll data check",payload)
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="shippingZipcode">Shipping Zipcode *</Label>
+              <Label htmlFor="shippingZipcode">Shipping Zipcode </Label>
               <Input
                 id="shippingZipcode"
                 name="shippingZipcode"
@@ -664,7 +664,7 @@ console.log("alll data check",payload)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="termDays">Term Days *</Label>
+            <Label htmlFor="termDays">Term Days </Label>
             <Input
               id="termDays"
               name="termDays"
@@ -681,7 +681,7 @@ console.log("alll data check",payload)
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="acceptDeliveryDays">Accept Delivery Days *</Label>
+            <Label htmlFor="acceptDeliveryDays">Accept Delivery Days</Label>
             <div className="relative" ref={dropdownRef}>
               <div
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors cursor-pointer hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
@@ -725,7 +725,7 @@ console.log("alll data check",payload)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="shippingStatus">Shipping Status *</Label>
+            <Label htmlFor="shippingStatus">Shipping Status</Label>
             <select
               id="shippingStatus"
               name="shippingStatus"
@@ -762,7 +762,7 @@ console.log("alll data check",payload)
 
         {/* Bank ACH Account Information */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Bank ACH Account Information *</h3>
+          <h3 className="text-lg font-semibold">Bank ACH Account Information</h3>
           <textarea
             id="bankAchInfo"
             name="bankAchInfo"
